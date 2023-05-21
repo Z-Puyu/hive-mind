@@ -1,11 +1,7 @@
 import React from 'react';
 import { MathJax, MathJaxContext } from 'better-react-mathjax';
 
-interface props {
-  input: string;
-}
-
-const config = {
+const mathjaxConfig = {
   loader: { load: ["[tex]/html"] },
   tex: {
     packages: { "[+]": ["html"] },
@@ -19,9 +15,13 @@ const config = {
   }
 };
 
+interface props {
+  input: string;
+}
+
 const MathDisplay: React.FC<props> = ({input}) => {
   return (
-    <MathJaxContext version={3} config = {config}>
+    <MathJaxContext version={3} config = {mathjaxConfig}>
       <MathJax>
         {input}
       </MathJax>

@@ -1,23 +1,8 @@
 import React from 'react';
 import './App.css';
-import { MathJaxContext, MathJax } from 'better-react-mathjax';
 import Input from './Components/Input';
 
-const config = {
-  loader: { load: ["[tex]/html"] },
-  tex: {
-    packages: { "[+]": ["html"] },
-    inlineMath: [
-      ["$", "$"]
-    ],
-    displayMath: [
-      ["\\[", "\\]"],
-      ["\\begin{displaymath}", "\\end{displaymath}"]
-    ]
-  }
-};
-
-function App() {
+const App: React.FC = () => {
   return (
     <div>
       <h1>This is a simple input box, the code in which gets rendered below it.</h1>
