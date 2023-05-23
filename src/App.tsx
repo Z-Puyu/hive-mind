@@ -1,8 +1,7 @@
-import React from 'react';
 import './App.css';
 import Editor from './Components/Editor';
 
-const App: React.FC = () => {
+function App(): JSX.Element {
   return (
     <div>
       <h1>Here is the main editor:</h1>

@@ -1,13 +1,12 @@
-import React from 'react';
-
 interface props {
-  updater: React.Dispatch<React.SetStateAction<string>>;
+  value: string
+  updater: (str: string) => void;
   isTriggered: boolean;
 }
 
-const Input: React.FC<props> = (props) => {
-  return props.isTriggered ? (
-    <textarea onChange={event => props.updater(event.target.value)}>\LaTeX</textarea>
+function Input({ value, updater, isTriggered }: props): JSX.Element | null {
+  return isTriggered ? (
+    <textarea onChange={event => updater(event.target.value)}>{value}</textarea>
   ) : null;
 }
 

@@ -1,6 +1,4 @@
-import React, { useEffect } from 'react';
-import { useState, useRef } from "react";
-import Input from './Input';
+import { useState } from "react";
 import InlineMaths from './InlineMaths';
 import { MathJax } from 'better-react-mathjax';
 
@@ -9,7 +7,7 @@ interface MathObject {
   str?: string;
 }
 
-const TeXBox: React.FC = () => {
+function TeXBox(): JSX.Element {
   // Some default element to test functionality
   const DEFAULT_DATA: MathObject[] = [
     {

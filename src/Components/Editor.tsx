@@ -1,4 +1,3 @@
-import React from 'react';
 import { MathJaxContext } from 'better-react-mathjax';
 import TeXBox from './TeXBox'
 
@@ -16,7 +15,7 @@ const mathjaxConfig = {
   }
 };
 
-const Editor: React.FC = () => {
+function Editor(): JSX.Element {
   return (
     <MathJaxContext version={3} config={mathjaxConfig}>
       <TeXBox />
