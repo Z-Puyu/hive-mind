@@ -13,6 +13,7 @@
     "better-react-mathjax": "^2.0.2",
     "firebase": "^9.22.0",
     "react": "^18.2.0",
+    "react-contenteditable": "^3.3.7",
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
     "react-router-dom": "^6.11.2",
