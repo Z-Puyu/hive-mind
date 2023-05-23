@@ -1,12 +1,26 @@
+import { useRef, useEffect } from 'react';
+
 interface props {
-  value: string
+  value: string;
   updater: (str: string) => void;
   isTriggered: boolean;
 }
 
 function Input({ value, updater, isTriggered }: props): JSX.Element | null {
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    inputRef.current && inputRef.current.focus();
+  }, [isTriggered])
+
   return isTriggered ? (
-    <textarea onChange={event => updater(event.target.value)}>{value}</textarea>
+    <textarea
+      ref={inputRef}
+      onChange={event => updater(event.target.value)}
+      onFocus={event => event.currentTarget.setSelectionRange(event.currentTarget.value.length,
+        event.currentTarget.value.length)}
+    >
+      {value}
+    </textarea>
   ) : null;
 }
 

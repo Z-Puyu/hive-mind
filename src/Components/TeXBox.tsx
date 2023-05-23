@@ -24,17 +24,9 @@ function TeXBox(): JSX.Element {
   ];
 
   const [mathObjects, setMathObjects] = useState<MathObject[]>(DEFAULT_DATA);
-  // const [currInputStr, setCurrInputStr] = useState<string>("");
-
-  /* const onDollarSignDown = (event: KeyboardEvent) => {
-    if (event.shiftKey && event.key === "$") {
-      setMathObjects(mathObjects.concat([{ isMath: true }]));
-    }
-  }; */
 
   return (
     <div>
-      {/* <Input updater={setInput} isTriggered={inputBoxIsOpen} /> */}
       <MathJax
         contentEditable="true"
         onKeyDown={event => {
@@ -44,7 +36,7 @@ function TeXBox(): JSX.Element {
           }
         }} // This sets the hotkey to insert inline maths.
       >
-        {mathObjects.map(obj => obj.isMath ? <InlineMaths /> : <span>{obj.str}</span>)}
+        {mathObjects.map(obj => obj.isMath ? <InlineMaths initTexVisibility={true}/> : <span>{obj.str}</span>)}
       </MathJax>
     </div>
   );
