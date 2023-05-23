@@ -4,7 +4,7 @@ import { MathJax } from 'better-react-mathjax';
 
 interface MathObject {
   isMath: boolean;
-  str?: string;
+  str: string;
 }
 
 function TeXBox(): JSX.Element {
@@ -16,6 +16,7 @@ function TeXBox(): JSX.Element {
     },
     {
       isMath: true,
+      str: "\\LaTeX",
     },
     {
       isMath: false,
@@ -30,13 +31,14 @@ function TeXBox(): JSX.Element {
       <MathJax
         contentEditable="true"
         onKeyDown={event => {
+          // Press "$" to insert inline maths.
           if (event.shiftKey && event.key === "$") {
             event.preventDefault();
-            setMathObjects(mathObjects.concat([{ isMath: true }]));
+            setMathObjects(mathObjects.concat([{ isMath: true, str: "" }]));
           }
-        }} // This sets the hotkey to insert inline maths.
+        }}
       >
-        {mathObjects.map(obj => obj.isMath ? <InlineMaths initTexVisibility={true}/> : <span>{obj.str}</span>)}
+        {mathObjects.map(obj => obj.isMath ? <InlineMaths tex={obj.str} initTexVisibility={true}/> : <span>{obj.str}</span>)}
       </MathJax>
     </div>
   );
