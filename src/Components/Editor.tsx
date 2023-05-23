@@ -1,5 +1,6 @@
 import React from 'react';
-import { MathJax, MathJaxContext } from 'better-react-mathjax';
+import { MathJaxContext } from 'better-react-mathjax';
+import TeXBox from './TeXBox'
 
 const mathjaxConfig = {
   loader: { load: ["[tex]/html"] },
@@ -15,18 +16,12 @@ const mathjaxConfig = {
   }
 };
 
-interface props {
-  input: string;
-}
-
-const MathDisplay: React.FC<props> = ({input}) => {
+const Editor: React.FC = () => {
   return (
-    <MathJaxContext version={3} config = {mathjaxConfig}>
-      <MathJax>
-        {input}
-      </MathJax>
+    <MathJaxContext version={3} config={mathjaxConfig}>
+      <TeXBox />
     </MathJaxContext>
   );
 }
 
-export default MathDisplay;
+export default Editor;
