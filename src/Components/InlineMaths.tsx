@@ -1,18 +1,19 @@
 import React from 'react';
+import { useState } from 'react';
 import { MathJax } from 'better-react-mathjax';
+import Input from './Input';
 
-interface props {
-  tex: string;
-  inputTrigger: React.Dispatch<React.SetStateAction<boolean>>;
-  texVisibility: boolean;
-}
-
-const InlineMaths: React.FC<props> = (props) => {
+const InlineMaths: React.FC = () => {
+  const [inputBoxIsOpen, setInputBoxStatus] = useState<boolean>(false);
+  const [input, setInput] = useState<string>("\\LaTeX");
   return (
-    <MathJax inline={true} dynamic={true} onClick={() => props.inputTrigger(!props.texVisibility)}
-      contentEditable="false">
-      {"$" + props.tex + "$"}
-    </MathJax>
+    <span contentEditable="false">
+      <Input updater={setInput} isTriggered={inputBoxIsOpen} />
+      <MathJax inline={true} dynamic={true} onClick={() => setInputBoxStatus(!inputBoxIsOpen)}
+        contentEditable="false">
+        {"$" + input + "$"}
+      </MathJax>
+    </span>
   );
 }
 

@@ -4,37 +4,49 @@ import Input from './Input';
 import InlineMaths from './InlineMaths';
 import { MathJax } from 'better-react-mathjax';
 
-const TeXBox: React.FC = () => {
-  const [inputBoxIsOpen, setInputBoxStatus] = useState<boolean>(false);
-  const [input, setInput] = useState<string>("\\LaTeX");
+interface MathObject {
+  isMath: boolean;
+  str?: string;
+}
 
+const TeXBox: React.FC = () => {
   // Some default element to test functionality
-  /* const DEFAULT_DATA = [ 
+  const DEFAULT_DATA: MathObject[] = [
     {
-      text1: "Click on ",
-      tex: input,
-      texVisibility: inputBoxIsOpen,
-      inputTrigger: setInputBoxStatus,
-      text2: " to call out the LaTeX input panel, and click again to close it.",
+      isMath: false,
+      str: "Click on ",
+    },
+    {
+      isMath: true,
+    },
+    {
+      isMath: false,
+      str: " to call out the LaTeX input panel, and click again to close it.",
     },
   ];
 
-  const [html, setHtml] = useState(DEFAULT_DATA);
+  const [mathObjects, setMathObjects] = useState<MathObject[]>(DEFAULT_DATA);
+  // const [currInputStr, setCurrInputStr] = useState<string>("");
+
+  /* const onDollarSignDown = (event: KeyboardEvent) => {
+    if (event.shiftKey && event.key === "$") {
+      setMathObjects(mathObjects.concat([{ isMath: true }]));
+    }
+  }; */
 
   return (
     <div>
-      <Input updater={setInput} isTriggered={inputBoxIsOpen} />
-      <MathJax contentEditable="true">
-        {html.map(obj => <>{obj.text1}{<InlineMaths tex={obj.tex} inputTrigger={obj.inputTrigger} texVisibility={obj.texVisibility} />}{obj.text2}</>)}
-      </MathJax>
-    </div>
-  ); */
-
-  return (
-    <div>
-      <Input updater={setInput} isTriggered={inputBoxIsOpen} />
-      <MathJax contentEditable="true">
-        click on <InlineMaths tex={input} inputTrigger={setInputBoxStatus} texVisibility={inputBoxIsOpen} /> to call out the LaTeX input panel, and click again to close it.
+      {/* <Input updater={setInput} isTriggered={inputBoxIsOpen} /> */}
+      <MathJax
+        contentEditable="true"
+        onKeyDown={event => {
+          if (event.shiftKey && event.key === "$") {
+            event.preventDefault();
+            setMathObjects(mathObjects.concat([{ isMath: true }]));
+          }
+        }} // This sets the hotkey to insert inline maths.
+      >
+        {mathObjects.map(obj => obj.isMath ? <InlineMaths /> : <span>{obj.str}</span>)}
       </MathJax>
     </div>
   );
