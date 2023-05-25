@@ -211,6 +211,30 @@ Thus, we propose to incorporate collaborative editing into HiveMind. Users may c
 - **15-29 May**
 	- Learn about relevant technologies: React, Node.js, MathJax.
 	- Experiment basic features: modular input areas, real-time $\LaTeX$ rendering, hotkey binding.
+- **30 May-10 June**
+	- Implement fully modular note-editing (with drag-and-drop mechanism).
+	- Implement $\LaTeX$ input and rendering.
+	- Implement simple hotkey binding.
+- **10-20 June**
+	- Implement a prototype of project manager.
+	- Continue to work on hotkey binding.
+	- Implement hyperlink between notes components.
+- **21-26 June**
+	- Implement tags into the project manager.
+	- Test and fix potential bugs.
+	- Prepare for Milestone II.
+- **27 June-10 July**
+	- Implement GUI illustration maker.
+	- Work on styling of webpage.
+	- Implement user account manager and login feature.
+- **10 July-20 July**
+	- Implement collaborative note-taking.
+	- Continue working on styling of webpage.
+	- (Tentative) Add more functions to the illustration maker.'
+	- (Tentative) Add "export as PDF" and "export as $\LaTeX$ source code" functions to the notes editor.
+- **21-24 July**
+	- Test and fix potential bugs.
+	- Prepare for Milestone III.
 
 The **Project Log** is attached [here](https://docs.google.com/spreadsheets/d/1vAOZ7g_3GZcTc47UXCHAcNvJ3GAxhJOIIIlv9_ZGqss/edit#gid=0)
 
