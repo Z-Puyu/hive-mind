@@ -48,3 +48,9 @@ body {
   margin-right: 10px;
   border-radius: 50%;
 }
+
+.notes {
+  border-style: solid;
+  border-radius: 3px;
+  border-color: black;
+}
