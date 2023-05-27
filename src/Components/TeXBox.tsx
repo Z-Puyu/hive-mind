@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import TeXBlock from './TeXBlock';
-
-const { v4: uuidv4 } = require('uuid');
+import { useState, useEffect, useRef } from 'react';
+import { NewBoxData, TeXBoxItem } from './Editor';
+import { MathJax } from 'better-react-mathjax';
+import Input from './Input';
 
 export interface TeXBlockItem {
   id: string;
@@ -13,48 +13,65 @@ export interface NewBlockData {
   ref: HTMLElement | null;
 }
 
-export default function TeXBox(): JSX.Element {
-  const initBlock: TeXBlockItem = {
-    id: uuidv4(),
-    html: "This is the initial block, press Enter to type in a new block."
-  };
+interface TeXBoxProps {
+  id: string;
+  html: string;
+  initInputVisibility: boolean;
+  onAddBox: (data: NewBoxData) => void;
+  onUpdatePage: (data: TeXBoxItem) => void;
+}
 
-  const [[TeXBlocks, currBlockData], setTeXBlocks] = useState<[TeXBlockItem[],
-    NewBlockData | undefined]>([[initBlock], undefined]);
+export default function TeXBox(props: TeXBoxProps): JSX.Element {
+  const [innerHtml, setInnerHtml] = useState<string>(props.html);
+  const [inputIsVisible, setInputVisibility] = useState<boolean>(props.initInputVisibility);
+  const boxRef = useRef<HTMLElement>(null);
 
-  useEffect(() => (currBlockData?.ref?.nextElementSibling as HTMLElement)?.focus(),
-    [currBlockData]);
+  useEffect(() => {
+    props.onUpdatePage({
+      id: props.id,
+      html: innerHtml,
+      initInputVisibility: props.initInputVisibility,
+    })
+  }, [innerHtml]);
 
-  const updateBoxHandler = (updatedBlock: TeXBlockItem) => {
-    const currBlockList: TeXBlockItem[] = TeXBlocks;
-    const updatedBlockIndex: number = currBlockList.map(blk => blk.id).indexOf(updatedBlock.id);
-    const updatedBlocks: TeXBlockItem[] = [...TeXBlocks];
-    updatedBlocks[updatedBlockIndex] = {
-      ...updatedBlocks[updatedBlockIndex],
-      html: updatedBlock.html,
-    };
-    setTeXBlocks([updatedBlocks, currBlockData]);
-  };
-
-  const addBlockHandler = (currBlock: NewBlockData) => {
-    const currBlockList: TeXBlockItem[] = TeXBlocks;
-    const currBlockIndex: number = currBlockList.findIndex(block => block.id === currBlock.id);
-    console.log(currBlockIndex);
-    const updatedBlocks: TeXBlockItem[] = [...currBlockList];
-    updatedBlocks.splice(currBlockIndex + 1, 0, { id: uuidv4(), html: "" });
-    setTeXBlocks([updatedBlocks, currBlock]);
-    console.log(TeXBlocks.length)
-    // (currBlock.ref?.nextElementSibling as HTMLElement)?.focus();
+  const onUpdateInputHandler = (newInput: string) => {
+    setInnerHtml(newInput);
   };
 
   return (
     <div>
-      {TeXBlocks.map(block => <TeXBlock
-        id={block.id}
-        html={block.html}
-        onAddBlock={addBlockHandler}
-        onUpdateBox={updateBoxHandler}
-      />)}
+      <Input
+        isVisible={inputIsVisible}
+        value={innerHtml}
+        id={props.id}
+        ref={boxRef.current}
+        onUpdateInput={onUpdateInputHandler}
+        onToggleVisibility={setInputVisibility}
+        onAddBox={props.onAddBox}
+      />
+      <div 
+        className="displayBox"
+        onClick={() => setInputVisibility(!inputIsVisible)}>
+        <MathJax
+          inline={true}
+          dynamic={true}
+        >
+          {/* <ContentEditable
+          disabled={true}
+          innerRef={BoxRef}
+          html={innerHtml}
+          tagName="p"
+          onChange={event => setInnerHtml(event.target.value)}
+          onKeyDown={event => {
+            if (!event.shiftKey && event.key === "Enter") {
+              event.preventDefault();
+              props.onAddBox({ id: props.id, ref: BoxRef.current });
+            }
+          }}
+        /> */}
+          {innerHtml}
+        </MathJax>
+      </div>
     </div>
   );
 }
