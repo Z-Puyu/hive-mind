@@ -37,18 +37,27 @@
   }
 }
 
-.displayBox {
+.display-box {
   width: 90%;
-  border-style: solid;
-  border-radius: 3px;
-  border-color: black;
+  border: none;
+  background-color: rgba(205, 209, 211, 50%);
+  margin: 10px;
+  min-height: 25px;
 }
 
-.TeXInputBox {
+.inline-math-box {
+  border: 3px;
+  background-color: rgba(205, 209, 211, 100%);
+  min-height: 22px;
+  min-width: 50px;
+}
+
+.TeX-input-box {
   resize: none;
   width: 90%;
-  height: 50px;
+  height: 100px;
   border-style: solid;
   border-radius: 3px;
   border-color: black;
+  margin-left: 10px;
 }
