@@ -41,7 +41,7 @@ export default function TeXBox(props: TeXBoxProps): JSX.Element {
         onAddBox={props.onAddBox}
         onDeleteBox={props.onDeleteBox}
       />
-      <div 
+      <div
         className="display-box"
         contentEditable
         onClick={() => setInputVisibility(!inputIsVisible)}>

@@ -12,8 +12,8 @@ export default function App() {
         <Navbar />
         <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/editor" element={<Editor />} />
+            <Route path="/Login" element={<Login />} />
+            <Route path="/Editor" element={<Editor />} />
             <Route path="*" element={<h1>PAGE NOT FOUND</h1>} />
         </Routes>
     </Router>
