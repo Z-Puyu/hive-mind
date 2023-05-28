@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { auth } from "../config/firebase";
+import { auth } from "../Config/Firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signOut } from "firebase/auth";
 import "../App.css";
@@ -19,16 +19,16 @@ export default function Navbar() {
       <div className="links">
         <Link to="/"> Home </Link>
         {user ? (
-          <Link to="/editor"> Editor </Link>
+          <Link to="/Editor"> Editor </Link>
         ) : (
-          <Link to="/login"> Login </Link>
+          <Link to="/Login"> Login </Link>
         )}
       </div>
       <div className="user">
         {user && (
           <>
             <p>{auth.currentUser?.displayName}</p>
-            <img src={user?.photoURL || ""} />
+            <img src={user?.photoURL || ""} alt=""/>
             <button onClick={signUserOut}>Log Out</button>
           </>
         )}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { TeXBoxItem } from '../pages/Editor';
+import { TeXBoxItem } from '../Pages/Editor';
 import { MathJax } from 'better-react-mathjax';
 import Input from './Input';
 
@@ -41,7 +41,7 @@ export default function TeXBox(props: TeXBoxProps): JSX.Element {
         onAddBox={props.onAddBox}
         onDeleteBox={props.onDeleteBox}
       />
-      <div 
+      <div
         className="display-box"
         contentEditable
         onClick={() => setInputVisibility(!inputIsVisible)}>

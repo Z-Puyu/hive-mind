@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MathJaxContext } from 'better-react-mathjax';
-import TeXBox from '../components/TeXBox'
+import TeXBox from '../Components/TeXBox'
 
 const { v4: uuidv4 } = require('uuid');
 
