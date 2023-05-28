@@ -215,6 +215,21 @@ Thus, we propose to incorporate collaborative editing into HiveMind. Users may c
 4. MathJax
 5. $\LaTeX$
 
+## Proof-of-concept
+
+The [project poster](https://drive.google.com/file/d/1iGHT04W8h5N5H2RU6KsVlVeNxAIIhOCD/view?usp=share_link) and [project video](https://drive.google.com/file/d/11urJgv1n9FsqEqYKHdD4jG00sjB7-DRh/view?usp=share_link) can be accessed from here.
+
+We have also deployed a [mini-demonstration project](https://hive-mind-inky.vercel.app/).
+
+To enter the editor, press "Login" from the top navigation bar, and then click on "Editor" to view the sample page.
+
+This project demonstrates some basic features and interactions in the notes editor of HiveMind, including:
+
+- Click on a TeXBox to open and auto-focus to the input field for $\LaTeX$;
+- Type $\LaTeX$ in the input field to see it rendered in real time;
+- Press Enter in the input field to insert a new TeXBox below the current working TeXBox;
+- Press Backspace in an empty TeXBox to delete it.
+
 ## Timeline and Development Plan
 
 - **7-15 May**
@@ -250,3 +265,21 @@ Thus, we propose to incorporate collaborative editing into HiveMind. Users may c
 
 The **Project Log** is attached [here](https://docs.google.com/spreadsheets/d/1vAOZ7g_3GZcTc47UXCHAcNvJ3GAxhJOIIIlv9_ZGqss/edit#gid=0)
 
+## Appendix: Coding Convention
+
+This project is built with the following coding convention:
+
+- Indentations are **2** spaces.
+- Always use **";"** and **","** wherever applicable.
+- All folders are to be named in **kebab-case**.
+- All .tsx and .css files are to be named in **PascalCase** except *index.tsx*.
+- Each React component file should contain **one and only one** top-level component function that has **the same name** as the file.
+- *Component functions*, *interfaces* and *classes* are to be named in **PascalCase** while all other *functions* and *variables* are to be named in **camelCase**.
+- *Component functions* should be declared using `export default function`, while *nested functions* should be declared using `const` and Lambda expressions.
+- All variables and functions should have their types **explicitly** declared whenever possible.
+- Types of props for component functions are to be defined as interfaces.
+- Functions passed on as props must be **declared beforehand**, rather than anonymous Lambda expressions.
+- Leave one empty line between every two functions, before every return statement and after import statements.\
+- An empty line should also be used to separate statements when they clearly belong to different code blocks.
+- Always write a **default branch** for switch statements.
+- Use **optional chaining** instead of contional statements.
