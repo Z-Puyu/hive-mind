@@ -36,7 +36,7 @@ By building a collaborative note-editing web-application with intuitive UI and n
 7. As a perfectionistic student, I want the page layout, paragraphs, remarks, illustrations and equations in my notes to be aesthetically formatted without me having to make much effort.
 8. As a lazy student, I don't see the point of writing my own notes from scratch, and want to collectively build a set of notes with my peers.
 
-## Case Study on Existing Note-taking Tools: What Can Be Learnt and How Can We Do Better?
+## Case Study on Existing Note-taking Tools
 
 We conducted a case study on the various mainstream note-taking tools to learn about their features, advantages and pitfalls.
 
@@ -110,15 +110,21 @@ Inspired by Notion, we propose to make HiveMind a modular editor.
 
 Inside every project the user has created in HiveMind, the main editor contains a list of editable components known as TeXBoxes. We name it as such because these are essentially text-boxes we see in editors like Microsoft Word, but their inner contents are rendered by $\LaTeX$ rather than as plain texts. By double-clicking on a TeXBox, the user can edit the contents inside it, and by click and hold on a TeXBox, the user can move the mouse to drag the TeXBox to some other location in the document, and release to drop the TeXBox there. This way, the user can adjust the order of paragraphs in a document as easily as moving a post-it note.
 
-Every TeXBox again may also contain some editable components known as TeXBlocks. These blocks contain inline mathematics (or other inline scientific notations). Similar to a TeXBox, double-clicking on a TeXBlock calls out a pop-up input area to edit the $\LaTeX$ statements corresponding to the mathematics displayed in the TeXBlock. The user can also use the drag-and-drop mechanism to move a TeXBlock to any location within the document.
+Beside plain texts, every TeXBox may also contain inline mathematics (or other inline scientific notations). Similar to a TeXBox, double-clicking on these inline components calls out a pop-up input area to edit the $\LaTeX$ statements corresponding to the mathematics displayed. 
 
-Graphs, tables, code blocks and other types of components in the notes should be able to get shifted around using the same logic.
+Graphs, tables, code blocks and other types of components in the notes should be able to get shifted around using the same drag-and-drop logic.
 
 #### [Current Progress]
 
-Currently, we have been experimenting with TeXBoxes containing only plain texts to build our proof-of-concept. The editor is initialised with a single TeXBox which accepts new input. When the user press the Enter key, a new TeXBox will be instantiated right after the current TeXBox and get automatically focused.
+Currently, we have been experimenting with TeXBoxes containing only plain texts and inline mathematics to build our proof-of-concept. In the current version of the TeXBoxes, the input field and the actual display box are separated. Clicking on the box will open its input field where the user can then type in $\LaTeX$ to edit the displayed contents. 
 
-We are yet to test out the drag-and-drop mechanism and the deletion of TeXBoxes.
+The editor is initialised with a single TeXBox. When the user press the Enter key in the input field, a new TeXBox will be instantiated right after the current working TeXBox and get automatically focused. Furthermore, pressing Backspace in an empty input field will delete the current working TeXBox.
+
+#### [Future Plan]
+
+Next, we will follow up by trying to integrate the input field into each TeXBox itself, such that the user can directly type into the box, and an input field will only show up when an inline-mathematics block is inserted.
+
+We will also learn to implement the drag-and-drop mechanism on the TeXBoxes.
 
 ### Intuitive and Smooth User-Interface Interactions
 
@@ -126,14 +132,20 @@ We are yet to test out the drag-and-drop mechanism and the deletion of TeXBoxes.
 
 It is great pain when one has to frequently switch between the keyboard and the mouse while editing a long document like lecture notes. Not only does it slow down typing, but it also disrupts the note-taking and thinking processes. Therefore, we aim to build the logic for the user interface such that only a minimal, if any, number of actions need to be completed with the mouse. Ideally, the user should not need to leave the keyboard during the whole process of note-editing except to re-order the modular components. For instance, the following features will be implemented:
 
-1. The user can switch between neighbouring TeXBoxes by Ctrl + Up and Ctrl + Down key combinations, and switch between neighbouring TeXBlocks by Ctrl +      Right and Ctrl + Left key combinations. The hotkeys are designed as such because TeXBoxes are arranged as a vertical array, while TeXBlocks conform to    the left-to-right orientation of writing.
-2. When the caret reaches either inline or displayed mathematics, the $\LaTeX$ input area will pop up automatically either on top or below the selected      mathematics. Intuitively, the user can press Up or Down keys respectively to enter the input area. Otherwise, the user can continue to move      the caret away.
+1. The user can switch between neighbouring TeXBoxes by Ctrl + Up and Ctrl + Down key combinations. The hotkeys are designed as such because TeXBoxes are    arranged as a vertical array.
+2. When the caret reaches either inline or displayed mathematics, the $\LaTeX$ input area will pop up automatically either on top or below the selected      mathematics. Intuitively, the user can press Up or Down keys respectively to enter the input area. Otherwise, the user can continue to move the caret      away.
 3. After editing in the $\LaTeX$ input area, the user can click the confirm button, press Enter, or click anywhere outside of the input area to exit it,      which would also set the caret right after the mathematics automatically.
 4. Special actions such as opening a new $\LaTeX$ environment to insert displayed equations, making new sections or titles should be binded to either        hotkeys or slash commands.
 
 #### [Current Progress]
 
-The various UI components are yet to be implemented as of Milestone I, but we have been experimenting with auto-focusing of input areas and hotkey bindings.
+We have implemented the auto-focusing caret in the input fields. Now if the user click on a TeXBox, the input field will pop up with the caret placed after the last character at the same time.
+
+The various UI components are yet to be implemented as of Milestone I.
+
+#### [Future Plan]
+
+Next, we will learn about hotkey bindings and implement various interactions accordingly.
 
 ### Real-time Rendering of $\LaTeX$ Contents
 
