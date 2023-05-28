@@ -4,9 +4,9 @@ import Home from "./pages/home";
 import Login from "./pages/login";
 import Navbar from "./components/navbar";
 import Notes from "./pages/notes";
-import TexInput from './components/TexInput';
+import Editor from './components/Editor';
 
-function App() {
+export default function App() {
   return (
     <div className = 'App'> 
       <Router>
@@ -15,11 +15,9 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/notes" element={<Notes />} />
+            <Route path="/editor" element={<Editor />} />
             <Route path="*" element={<h1>PAGE NOT FOUND</h1>} />
         </Routes>
     </Router>
-    </div>
-  );
+  </div>)
 }
-
-export default App;

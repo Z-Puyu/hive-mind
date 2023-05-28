@@ -19,7 +19,10 @@ export default function Navbar() {
       <div className="links">
         <Link to="/"> Home </Link>
         {user ? (
-          <Link to="/notes"> Notes </Link>
+          <>
+            <Link to="/notes"> Notes </Link>
+            <Link to="/editor"> Editor </Link>
+          </>
         ) : (
           <Link to="/login"> Login </Link>
         )}

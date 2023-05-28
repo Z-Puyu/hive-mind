@@ -49,8 +49,18 @@ body {
   border-radius: 50%;
 }
 
-.notes {
+.TeXInputBox {
+  resize: none;
+  width: 90%;
+  height: 50px;
   border-style: solid;
   border-radius: 3px;
   border-color: black;
 }
+
+.notes {
+    width: 90%;
+    border-style: solid;
+    border-radius: 3px;
+    border-color: black;
+  }
