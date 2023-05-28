@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { auth } from "../config/firebase";
+import { auth } from "../Config/Firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signOut } from "firebase/auth";
 import "../App.css";
