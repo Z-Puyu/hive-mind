@@ -18,7 +18,7 @@ export default function Input(props: InputProps): JSX.Element | null {
   useEffect(() => inputRef.current?.focus(), [props.isVisible]);
 
   return props.isVisible ? (<textarea
-    className="TeXInputBox"
+    className="TeX-input-box"
     ref={inputRef}
     value={props.value}
     onChange={event => props.onUpdateInput(event.target.value)}

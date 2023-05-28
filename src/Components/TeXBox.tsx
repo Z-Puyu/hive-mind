@@ -42,25 +42,13 @@ export default function TeXBox(props: TeXBoxProps): JSX.Element {
         onDeleteBox={props.onDeleteBox}
       />
       <div 
-        className="displayBox"
+        className="display-box"
+        contentEditable
         onClick={() => setInputVisibility(!inputIsVisible)}>
         <MathJax
           inline={true}
           dynamic={true}
         >
-          {/* <ContentEditable
-          disabled={true}
-          innerRef={BoxRef}
-          html={innerHtml}
-          tagName="p"
-          onChange={event => setInnerHtml(event.target.value)}
-          onKeyDown={event => {
-            if (!event.shiftKey && event.key === "Enter") {
-              event.preventDefault();
-              props.onAddBox({ id: props.id, ref: BoxRef.current });
-            }
-          }}
-        /> */}
           {innerHtml}
         </MathJax>
       </div>

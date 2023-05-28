@@ -28,7 +28,7 @@ export interface TeXBoxItem {
 export default function Editor(): JSX.Element {
   const initBox: TeXBoxItem = {
     id: uuidv4(),
-    html: "On starting the editor, there will be an initial TeXBox. Click on this box, and an input field will pop up for you to edit the contents in this TeXBox with $\\LaTeX$. Try to type \\$\\int\\! \\frac{e^x}{x} \\,\\mathrm{d}x\\$ in it and mathematics will be rendered in real time here: ",
+    html: "On starting the editor, there will be an initial TeXBox. Click on this box, and an input field will pop up for you to edit the contents in this TeXBox with $\\LaTeX$. Try to type \\$\\int\\! \\frac{e^x}{x} \\,\\mathrm{d}x\\$ after THIS WORD: ",
     initInputVisibility: false,
   };
 
@@ -46,7 +46,7 @@ export default function Editor(): JSX.Element {
 
   useEffect(() => nextTargetBox?.focus(), [TeXBoxes, nextTargetBox]);
 
-  const updatePageHandler = (updatedBox: TeXBoxItem) => {
+  const onUpdatePageHandler = (updatedBox: TeXBoxItem) => {
     const currBoxList: TeXBoxItem[] = [...TeXBoxes];
     const updatedBoxIndex: number = currBoxList.map(box => box.id).indexOf(updatedBox.id);
     const updatedBoxes: TeXBoxItem[] = [...TeXBoxes];
@@ -57,7 +57,7 @@ export default function Editor(): JSX.Element {
     setTeXBoxes([updatedBoxes, nextTargetBox]);
   };
 
-  const addBoxHandler = (currBox: TeXBoxItem) => {
+  const onAddBoxHandler = (currBox: TeXBoxItem) => {
     const currBoxList: TeXBoxItem[] = [...TeXBoxes];
     const currBoxIndex: number = currBoxList.findIndex(box => box.id === currBox.id);
     const updatedBoxes: TeXBoxItem[] = [...currBoxList];
@@ -69,7 +69,7 @@ export default function Editor(): JSX.Element {
     setTeXBoxes([updatedBoxes, currBox.ref?.nextElementSibling as HTMLElement]);
   };
 
-  const deleteBoxHandler = (currBox: TeXBoxItem) => {
+  const onDeleteBoxHandler = (currBox: TeXBoxItem) => {
     const prevBox: HTMLElement | null = currBox.ref?.previousElementSibling as HTMLElement;
     if (prevBox !== null) {
       const currBoxIndex: number = TeXBoxes.findIndex(box => box.id === currBox.id);
@@ -87,9 +87,9 @@ export default function Editor(): JSX.Element {
           id={box.id}
           html={box.html}
           initInputVisibility={box.initInputVisibility}
-          onAddBox={addBoxHandler}
-          onUpdatePage={updatePageHandler}
-          onDeleteBox={deleteBoxHandler}
+          onAddBox={onAddBoxHandler}
+          onUpdatePage={onUpdatePageHandler}
+          onDeleteBox={onDeleteBoxHandler}
         />)}
       </MathJaxContext>
     </div>
