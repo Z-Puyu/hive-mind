@@ -279,7 +279,7 @@ This project is built with the following coding convention:
 - All variables and functions should have their types **explicitly** declared whenever possible.
 - Types of props for component functions are to be defined as interfaces.
 - Functions passed on as props must be **declared beforehand**, rather than anonymous Lambda expressions.
-- Leave one empty line between every two functions, before every return statement and after import statements.\
+- Leave one empty line between every two functions, before every return statement and after import statements.
 - An empty line should also be used to separate statements when they clearly belong to different code blocks.
 - Always write a **default branch** for switch statements.
 - Use **optional chaining** instead of contional statements.
