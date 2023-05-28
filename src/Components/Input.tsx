@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { TeXBoxItem } from "./Editor";
+import { TeXBoxItem } from "../pages/Editor";
 
 interface InputProps {
   isVisible: boolean;

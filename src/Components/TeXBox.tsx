@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { TeXBoxItem } from './Editor';
+import { TeXBoxItem } from '../pages/Editor';
 import { MathJax } from 'better-react-mathjax';
 import Input from './Input';
 

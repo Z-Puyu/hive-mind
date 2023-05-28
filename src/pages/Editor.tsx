@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MathJaxContext } from 'better-react-mathjax';
-import TeXBox from './TeXBox'
+import TeXBox from '../components/TeXBox'
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -71,6 +71,8 @@ export default function Editor(): JSX.Element {
 
   const onDeleteBoxHandler = (currBox: TeXBoxItem) => {
     const prevBox: HTMLElement | null = currBox.ref?.previousElementSibling as HTMLElement;
+    console.log(currBox.id);
+    console.log(initBox.id);
     if (prevBox !== null) {
       const currBoxIndex: number = TeXBoxes.findIndex(box => box.id === currBox.id);
       const updatedBoxes: TeXBoxItem[] = [...TeXBoxes];

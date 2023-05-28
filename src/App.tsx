@@ -1,10 +1,9 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from "./pages/home";
-import Login from "./pages/login";
-import Navbar from "./components/navbar";
-import Notes from "./pages/notes";
-import Editor from './components/Editor';
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Navbar from "./components/Navbar";
+import Editor from './pages/Editor';
 
 export default function App() {
   return (
@@ -14,7 +13,6 @@ export default function App() {
         <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/notes" element={<Notes />} />
             <Route path="/editor" element={<Editor />} />
             <Route path="*" element={<h1>PAGE NOT FOUND</h1>} />
         </Routes>
