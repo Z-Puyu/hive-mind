@@ -1,53 +1,77 @@
-import { useState } from "react";
-import InlineMaths from './InlineMaths';
+import { useState, useEffect, useRef } from 'react';
+import { NewBoxData, TeXBoxItem } from './Editor';
 import { MathJax } from 'better-react-mathjax';
+import Input from './Input';
 
-interface MathObject {
-  isMath: boolean;
-  str?: string;
+export interface TeXBlockItem {
+  id: string;
+  html: string;
 }
 
-function TeXBox(): JSX.Element {
-  // Some default element to test functionality
-  const DEFAULT_DATA: MathObject[] = [
-    {
-      isMath: false,
-      str: "Click on ",
-    },
-    {
-      isMath: true,
-    },
-    {
-      isMath: false,
-      str: " to call out the LaTeX input panel, and click again to close it.",
-    },
-  ];
+export interface NewBlockData {
+  id: string;
+  ref: HTMLElement | null;
+}
 
-  const [mathObjects, setMathObjects] = useState<MathObject[]>(DEFAULT_DATA);
-  // const [currInputStr, setCurrInputStr] = useState<string>("");
+interface TeXBoxProps {
+  id: string;
+  html: string;
+  initInputVisibility: boolean;
+  onAddBox: (data: NewBoxData) => void;
+  onUpdatePage: (data: TeXBoxItem) => void;
+}
 
-  /* const onDollarSignDown = (event: KeyboardEvent) => {
-    if (event.shiftKey && event.key === "$") {
-      setMathObjects(mathObjects.concat([{ isMath: true }]));
-    }
-  }; */
+export default function TeXBox(props: TeXBoxProps): JSX.Element {
+  const [innerHtml, setInnerHtml] = useState<string>(props.html);
+  const [inputIsVisible, setInputVisibility] = useState<boolean>(props.initInputVisibility);
+  const boxRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    props.onUpdatePage({
+      id: props.id,
+      html: innerHtml,
+      initInputVisibility: props.initInputVisibility,
+    })
+  }, [innerHtml]);
+
+  const onUpdateInputHandler = (newInput: string) => {
+    setInnerHtml(newInput);
+  };
 
   return (
     <div>
-      {/* <Input updater={setInput} isTriggered={inputBoxIsOpen} /> */}
-      <MathJax
-        contentEditable="true"
-        onKeyDown={event => {
-          if (event.shiftKey && event.key === "$") {
-            event.preventDefault();
-            setMathObjects(mathObjects.concat([{ isMath: true }]));
-          }
-        }} // This sets the hotkey to insert inline maths.
-      >
-        {mathObjects.map(obj => obj.isMath ? <InlineMaths /> : <span>{obj.str}</span>)}
-      </MathJax>
+      <Input
+        isVisible={inputIsVisible}
+        value={innerHtml}
+        id={props.id}
+        ref={boxRef.current}
+        onUpdateInput={onUpdateInputHandler}
+        onToggleVisibility={setInputVisibility}
+        onAddBox={props.onAddBox}
+      />
+      <div 
+        className="displayBox"
+        onClick={() => setInputVisibility(!inputIsVisible)}>
+        <MathJax
+          inline={true}
+          dynamic={true}
+        >
+          {/* <ContentEditable
+          disabled={true}
+          innerRef={BoxRef}
+          html={innerHtml}
+          tagName="p"
+          onChange={event => setInnerHtml(event.target.value)}
+          onKeyDown={event => {
+            if (!event.shiftKey && event.key === "Enter") {
+              event.preventDefault();
+              props.onAddBox({ id: props.id, ref: BoxRef.current });
+            }
+          }}
+        /> */}
+          {innerHtml}
+        </MathJax>
+      </div>
     </div>
   );
 }
-
-export default TeXBox;
