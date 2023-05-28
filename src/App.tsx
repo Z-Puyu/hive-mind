@@ -1,9 +1,9 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from "./Pages/Home";
-import Login from "./Pages/Login";
-import Navbar from "./Components/NavBar";
-import Editor from './Pages/Editor';
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Navbar from "./components/NavBar";
+import Editor from './pages/Editor';
 
 export default function App() {
   return (
