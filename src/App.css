@@ -54,7 +54,9 @@ body {
   border: none;
   background-color: rgba(205, 209, 211, 50%);
   margin: 10px;
+  padding: 10px;
   min-height: 25px;
+  white-space: pre-wrap;
 }
 
 .inline-math-box {
