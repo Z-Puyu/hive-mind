@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, KeyboardEvent } from "react";
+import { useState, useCallback, useMemo, KeyboardEvent, Fragment } from "react";
 import { Descendant, createEditor, Editor, Text, Transforms, Range, Node } from "slate";
 import { withReact, Slate, Editable, RenderElementProps, RenderLeafProps, useSlate } from "slate-react";
 import { withHistory } from "slate-history";
@@ -7,7 +7,9 @@ import isHotkey, { isKeyHotkey } from "is-hotkey";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import { TeXBoxItem } from "../pages/Editor";
 import DynElem from "./DynElem";
-import { withInlineMath } from "../plugins/SlatePlugins";
+import { withInline } from "../plugins/SlatePlugins";
+import Toolbar from "../interface/Toolbar";
+import FormatButton from "./FormatButton";
 import ToggleInlineMathButton from "./ToggleInlineMathButton";
 
 interface TeXBoxProps {
@@ -21,6 +23,8 @@ const HOTKEYS: { [key: string]: string } = {
   "mod+b": "bold",
   "mod+i": "italic",
   "mod+r": "roman",
+  "mod+u": "underline",
+  "mod+s": "strikethru",
 };
 
 const initialValue: Descendant[] = [
@@ -28,7 +32,7 @@ const initialValue: Descendant[] = [
     type: "paragraph",
     children: [
       {
-        text: "Hello World!"
+        text: ""
       },
     ],
   },
@@ -37,7 +41,7 @@ const initialValue: Descendant[] = [
 export default function TeXBox(props: TeXBoxProps): JSX.Element {
   /* Copied from the example from the official documentation of Slate.js.
   Some sources online uses React.useMemo instead, not sure what the difference is. */
-  const [editor] = useState<Editor>(() => withInlineMath(withHistory(withReact(createEditor()))));
+  const [editor] = useState<Editor>(() => withInline(withHistory(withReact(createEditor()))));
   /* Auto-focus when a new box is created.
   Copied from Stack Overflow. No idea how it works. */
   useMemo(() => {
@@ -47,6 +51,14 @@ export default function TeXBox(props: TeXBoxProps): JSX.Element {
   return (
     <div>
       <Slate editor={editor} value={initialValue}>
+        <Toolbar>
+          <FormatButton mark="bold" editor={editor} />
+          <FormatButton mark="italic" editor={editor} />
+          <FormatButton mark="underline" editor={editor} />
+          <FormatButton mark="strikethru" editor={editor} />
+          <FormatButton mark="code" editor={editor}/>
+          <ToggleInlineMathButton />
+        </Toolbar>
         <Editable
           disableDefaultStyles
           className="display-box"
@@ -82,11 +94,7 @@ export default function TeXBox(props: TeXBoxProps): JSX.Element {
             // Insert inline mathematics when pressing "$".
             if (event.key === "$") {
               event.preventDefault();
-              if (TypesetUtil.isInlineMathActive(editor)) {
-                TypesetUtil.toggleInlineMath(editor);
-              } else {
-                TypesetUtil.insertInlineMath(editor);
-              }
+              TypesetUtil.insertInlineMath(editor);
             }
             // Add marks corresponding to the hotkeys.
             for (const hotkey in HOTKEYS) {

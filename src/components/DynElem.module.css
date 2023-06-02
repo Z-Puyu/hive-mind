@@ -1,0 +1,7 @@
+.inlineMath {
+  border: 3px;
+  background-color: rgba(205, 209, 211, 100%);
+  min-height: 22px;
+  min-width: 50px;
+  white-space: pre;
+}

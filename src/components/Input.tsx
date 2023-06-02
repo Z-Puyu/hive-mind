@@ -24,7 +24,7 @@ export default function Input(props: InputProps): JSX.Element | null {
       if (props.isVisible && !event.shiftKey && event.key === "Enter") {
         event.preventDefault();
         props.onToggleVisibility(false); // Closes current Input.
-      } 
+      }
     }}
-  ></textarea>) : null;
+  />) : null;
 }

@@ -11,7 +11,7 @@ export default function InlineMath(props: RenderElementProps) {
   const [inputValue, setInputValue] = useState<string>(props.children[0].props.text.text + "\\quad");
   const [inputVisibility, setInputVisibility] = useState<boolean>(false);
 
-  useEffect(() => {setInputVisibility(true)});
+  useEffect(() => {setInputVisibility(true)}, []);
 
   return (
     <>

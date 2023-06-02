@@ -7,20 +7,23 @@ export type FormattedPlainText = {
   bold?: true;
   italic?: true;
   roman?: true;
+  underline?: true;
+  strikethru?: true;
+  code?: true;
 };
 
 export type ParagraphElem = {
-  type: "paragraph" | null;
+  type: "paragraph" | null | string;
   children: (CustomElement | CustomText)[];
 };
 
 export type CodeBlockElem = {
-  type: "code-block" | null;
+  type: "code-block" | null | string;
   children: CustomText[];
 };
 
 export type InlineMathElem = {
-  type: "inline-math" | null;
+  type: "inline-math" | null | string;
   children: CustomText[];
 };
 

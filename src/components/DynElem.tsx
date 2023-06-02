@@ -1,7 +1,6 @@
-import { MathJax } from "better-react-mathjax";
-import { Element } from "slate";
-import { RenderElementProps, useSelected } from "slate-react";
+import { RenderElementProps } from "slate-react";
 import InlineMath from "./InlineMath";
+import classes from "./DynElem.module.css";
 
 export default function DynElem(props: RenderElementProps) {
   switch (props.element.type) {
@@ -15,11 +14,11 @@ export default function DynElem(props: RenderElementProps) {
       );
     case "inline-math":
       return (
-        <span {...props.attributes} contentEditable={false} className="inline-math-box">
+        <span {...props.attributes} contentEditable={false} className={classes.inlineMath}>
           <InlineMath {...props} />
           {props.children}
         </span>
-      )
+      );
     default:
       return (
         <p {...props.attributes}>

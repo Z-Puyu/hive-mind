@@ -1,21 +1,17 @@
+import TooltipButton from "../interface/TooltipButton"
 import { TypesetUtil } from "../utils/TypesetUtil"
 import { useSlate } from "slate-react"
 
 export default function ToggleInlineMathButton() {
-
   const editor = useSlate()
   return (
-    <button
-      onClick={event => {
+    <TooltipButton
+      onPointerDown={event => {
         event.preventDefault()
-        if (TypesetUtil.isInlineMathActive(editor)) {
-          TypesetUtil.toggleInlineMath(editor)
-        } else {
-          TypesetUtil.insertInlineMath(editor)
-        }
+        TypesetUtil.insertInlineMath(editor)
       }}
     >
-      +
-    </button>
+      <>+ Math</>
+    </TooltipButton>
   )
 }

@@ -59,13 +59,6 @@ body {
   white-space: pre-wrap;
 }
 
-.inline-math-box {
-  border: 3px;
-  background-color: rgba(205, 209, 211, 100%);
-  min-height: 22px;
-  min-width: 50px;
-}
-
 .TeX-input-box {
   resize: none;
   width: 90%;
