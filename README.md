@@ -273,6 +273,7 @@ This project is built with the following coding convention:
 - Always use **";"** and **","** wherever applicable.
 - All folders are to be named in **kebab-case**.
 - All .tsx and .css files are to be named in **PascalCase** except *index.tsx*.
+- *Classes* in CSS modules are to be named in **camelCase** (due to syntax conflicts with kebab-case naming).
 - Each React component file should contain **one and only one** top-level component function that has **the same name** as the file.
 - *Component functions*, *interfaces* and *classes* are to be named in **PascalCase** while all other *functions* and *variables* are to be named in **camelCase**.
 - *Component functions* should be declared using `export default function`, while *nested functions* should be declared using `const` and Lambda expressions.
@@ -282,4 +283,4 @@ This project is built with the following coding convention:
 - Leave one empty line between every two functions, before every return statement and after import statements.
 - An empty line should also be used to separate statements when they clearly belong to different code blocks.
 - Always write a **default branch** for switch statements.
-- Use **optional chaining** instead of contional statements.
+- Use **optional chaining** instead of contional statements for null-checks.
