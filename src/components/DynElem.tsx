@@ -1,6 +1,8 @@
-import { RenderElementProps } from "slate-react";
+import { RenderElementProps, useSelected } from "slate-react";
 import InlineMath from "./InlineMath";
 import classes from "./DynElem.module.css";
+import { InlineChromiumBugfix } from "../utils/InlineChromBugFix";
+import { LinkElem } from "../utils/CustomSlateTypes";
 
 export default function DynElem(props: RenderElementProps) {
   switch (props.element.type) {
@@ -18,6 +20,18 @@ export default function DynElem(props: RenderElementProps) {
           <InlineMath {...props} />
           {props.children}
         </span>
+      );
+    case "link":
+      // const selected = useSelected();
+      return (
+        <a
+          {...props.attributes}
+          href={(props.element as LinkElem).url}
+        >
+          <InlineChromiumBugfix />
+          {props.children}
+          <InlineChromiumBugfix />
+        </a>
       );
     default:
       return (

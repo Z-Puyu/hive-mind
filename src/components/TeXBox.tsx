@@ -11,6 +11,7 @@ import { withInline } from "../plugins/SlatePlugins";
 import Toolbar from "../interface/Toolbar";
 import FormatButton from "./FormatButton";
 import ToggleInlineMathButton from "./ToggleInlineMathButton";
+import ToggleInlineButton from "./ToggleLinkButton";
 
 interface TeXBoxProps {
   id: string;
@@ -25,6 +26,7 @@ const HOTKEYS: { [key: string]: string } = {
   "mod+r": "roman",
   "mod+u": "underline",
   "mod+s": "strikethru",
+  "mod+`": "code",
 };
 
 const initialValue: Descendant[] = [
@@ -56,7 +58,8 @@ export default function TeXBox(props: TeXBoxProps): JSX.Element {
           <FormatButton mark="italic" editor={editor} />
           <FormatButton mark="underline" editor={editor} />
           <FormatButton mark="strikethru" editor={editor} />
-          <FormatButton mark="code" editor={editor}/>
+          <FormatButton mark="code" editor={editor} />
+          <ToggleInlineButton />
           <ToggleInlineMathButton />
         </Toolbar>
         <Editable

@@ -50,8 +50,8 @@ export default function Leaf(props: LeafProps): JSX.Element {
   if (props.leaf.code) {
     styles = {
       ...styles,
-      borderRadius: "3.5px",
-      padding: "0px 5px",
+      borderRadius: "2.5px",
+      padding: "0 0.2em",
       backgroundColor: "rgba(192, 192, 192, 0.5)",
       fontWeight: "normal",
       fontStyle: "normal",
@@ -62,7 +62,15 @@ export default function Leaf(props: LeafProps): JSX.Element {
   return (
     <span
       {...props.attributes}
-      style={styles}
+      // The following is a workaround for a Chromium bug where,
+      // if you have an inline at the end of a block,
+      // clicking the end of a block puts the cursor inside the inline
+      // instead of inside the final {text: ""} node
+      // https://github.com/ianstormtaylor/slate/issues/4704#issuecomment-1006696364
+      style={props.leaf.text === "" ? {
+        ...styles,
+        paddingLeft: "0.1px",
+      } : styles}
     >
       {leaf}
     </span>

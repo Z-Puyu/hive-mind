@@ -1,4 +1,4 @@
-import { BaseEditor } from "slate";
+import { BaseEditor, Descendant } from "slate";
 import { ReactEditor } from "slate-react";
 import { HistoryEditor } from "slate-history";
 
@@ -14,22 +14,28 @@ export type FormattedPlainText = {
 
 export type ParagraphElem = {
   type: "paragraph" | null | string;
-  children: (CustomElement | CustomText)[];
+  children: Descendant[];
 };
 
 export type CodeBlockElem = {
   type: "code-block" | null | string;
-  children: CustomText[];
+  children: Descendant[];
 };
 
 export type InlineMathElem = {
   type: "inline-math" | null | string;
-  children: CustomText[];
+  children: Descendant[];
+};
+
+export type LinkElem = {
+  type: "link" | null | string;
+  url: string;
+  children: Descendant[];
 };
 
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 
-export type CustomElement = ParagraphElem | CodeBlockElem | InlineMathElem;
+export type CustomElement = ParagraphElem | CodeBlockElem | InlineMathElem | LinkElem;
 
 export type CustomText = FormattedPlainText;
 

@@ -1,4 +1,6 @@
 import { Editor, Element } from "slate";
+import isUrl from "is-url";
+import { TypesetUtil } from "../utils/TypesetUtil";
 
 export const withInline = (editor: Editor) => {
   const {
@@ -11,7 +13,7 @@ export const withInline = (editor: Editor) => {
 
   const inlineTypes: (string | null)[] = [ 
     "inline-math", 
-    "inline-code",
+    "link",
   ];
 
   editor.isInline = element =>
@@ -23,23 +25,22 @@ export const withInline = (editor: Editor) => {
   editor.isSelectable = element =>
     element.type !== "inline-math" && isSelectable(element);
 
-/*   editor.insertText = text => {
-    if (text && isUrl(text)) {
-      wrapLink(editor, text)
+  editor.insertText = (text: string) => {
+    if (!!text && isUrl(text)) {
+      TypesetUtil.wrapLink(editor, text);
     } else {
-      insertText(text)
+      insertText(text);
     }
-  }
+  };
 
-  editor.insertData = data => {
-    const text = data.getData('text/plain')
-
-    if (text && isUrl(text)) {
-      wrapLink(editor, text)
+  editor.insertData = (data: DataTransfer) => {
+    const text = data.getData('text/plain');
+    if (!!text && isUrl(text)) {
+      TypesetUtil.wrapLink(editor, text);
     } else {
-      insertData(data)
+      insertData(data);
     }
-  } */
+  };
 
   return editor;
 }
