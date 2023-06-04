@@ -1,0 +1,12 @@
+.previewBox {
+  position: absolute;
+  z-index: 1;
+  top: -10000px;
+  left: -10000px;
+  margin-top: -6px;
+  opacity: 0;
+  background-color: aliceblue;
+  padding: 0.5em;
+  display: inline-block;
+
+}

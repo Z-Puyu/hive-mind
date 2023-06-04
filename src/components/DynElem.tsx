@@ -1,10 +1,9 @@
-import { RenderElementProps, useSelected } from "slate-react";
+import { RenderElementProps } from "slate-react";
 import InlineMath from "./InlineMath";
-import classes from "./DynElem.module.css";
 import { InlineChromiumBugfix } from "../utils/InlineChromBugFix";
 import { LinkElem } from "../utils/CustomSlateTypes";
 
-export default function DynElem(props: RenderElementProps) {
+export default function DynElem(props: RenderElementProps): JSX.Element {
   switch (props.element.type) {
     case "code-block":
       return (
@@ -16,13 +15,9 @@ export default function DynElem(props: RenderElementProps) {
       );
     case "inline-math":
       return (
-        <span {...props.attributes} contentEditable={false} className={classes.inlineMath}>
-          <InlineMath {...props} />
-          {props.children}
-        </span>
+        <InlineMath {...props} />
       );
     case "link":
-      // const selected = useSelected();
       return (
         <a
           {...props.attributes}

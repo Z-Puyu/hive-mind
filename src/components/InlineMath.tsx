@@ -1,42 +1,30 @@
-import { RenderElementProps, useSelected } from "slate-react";
-import { InlineChromiumBugfix } from "../utils/InlineChromBugFix";
-import { useEffect, useState } from "react";
-import Input from "./Input";
 import { MathJax } from "better-react-mathjax";
+import { RenderElementProps, useSelected } from "slate-react";
+import MathOutput from "./MathPreview";
 
 export default function InlineMath(props: RenderElementProps) {
-  const selected = useSelected();
-  // Initialise the input's value with the text in the Element.
-  // const [inputValue, setInputValue] = useState<string>(props.children[0].props.text.text);
-  const [inputValue, setInputValue] = useState<string>(props.children[0].props.text.text + "\\quad");
-  const [inputVisibility, setInputVisibility] = useState<boolean>(false);
+  const isSelected: boolean = useSelected();
 
-  useEffect(() => {setInputVisibility(true)}, []);
-
-  return (
+  return isSelected ? (
     <>
-      <Input 
-        isVisible={inputVisibility}
-        value={inputValue}
-        onChange={setInputValue}
-        onToggleVisibility={setInputVisibility}
+      <MathOutput
+        value={props.children[0].props.text.text}
       />
-      <MathJax
-        inline
-        dynamic
-        data-playwright-selected={selected}
-        onClick={
-          () => {
-            console.log("clicked")
-            setInputVisibility(!inputVisibility)
-          }
-        }
+      <span
+        {...props.attributes}
+        style={{
+          color: "gray"
+        }}
       >
-        {/* Removed this bug fix as it cause LaTeX to be rendered incorrectly. */}
-        {/* <InlineChromiumBugfix /> */}
-        {"$" + inputValue + "$"}
-        {/* <InlineChromiumBugfix /> */} 
-      </MathJax>
+        {props.children}
+      </span>
     </>
+  ) : (
+    <MathJax 
+    inline 
+    dynamic 
+    contentEditable={false}>
+      {props.children[0].props.text.text}
+    </MathJax>
   );
 }

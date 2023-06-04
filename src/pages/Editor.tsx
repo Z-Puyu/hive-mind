@@ -44,7 +44,11 @@ export default function Editor() {
 
   return (
     <div>
-      <MathJaxContext version={3} config={mathjaxConfig}>
+      <MathJaxContext
+        version={3}
+        config={mathjaxConfig}
+        hideUntilTypeset="first"
+      >
         {TeXBoxes.map(box => <TeXBox
           key={box.id}
           id={box.id}

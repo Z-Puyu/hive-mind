@@ -97,7 +97,7 @@ export default function TeXBox(props: TeXBoxProps): JSX.Element {
             // Insert inline mathematics when pressing "$".
             if (event.key === "$") {
               event.preventDefault();
-              TypesetUtil.insertInlineMath(editor);
+              TypesetUtil.toggleInlineMath(editor);
             }
             // Add marks corresponding to the hotkeys.
             for (const hotkey in HOTKEYS) {

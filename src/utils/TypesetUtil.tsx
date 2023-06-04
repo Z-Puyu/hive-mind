@@ -15,13 +15,28 @@ export const TypesetUtil = {
     }
   },
 
+  /**
+   * Checks whether the current selection contains an active inline element.
+   * 
+   * @param editor The editor that is currently being focused.
+   * @param inlineType The type of the inline element to check for.
+   * @returns Returns true if the array of matching inline element found within
+   *          the current selection is non-empty.
+   */
   isInlineActive: (editor: Editor, inlineType: string) => {
-    const [inlineCode] = Editor.nodes(editor, {
+    const [inline] = Editor.nodes(editor, {
       match: n => !Editor.isEditor(n) && Element.isElement(n) && n.type === inlineType,
     });
-    return !!inlineCode;
+    return !!inline;
   },
 
+  /**
+   * Detect any inline elements within the current selection and unwrap them
+   * into normal texts.
+   * 
+   * @param editor The editor that is currently being focused
+   * @param inlineType The type of inline element to search for.
+   */
   unwrapInline: (editor: Editor, inlineType: string) => {
     Transforms.unwrapNodes(editor, {
       match: n =>
@@ -35,12 +50,14 @@ export const TypesetUtil = {
     }
     const { selection } = editor;
     if (!!selection && Range.isCollapsed(selection)) {
+      // If the current selection is empty, insert a new link.
       Transforms.insertNodes(editor, {
         type: "link",
         url: linkUrl,
         children: [{ text: linkUrl }],
       });
     } else {
+      // Otherwise, append the url to the currently selected texts.
       Transforms.wrapNodes(editor, {
         type: "link",
         url: linkUrl,
@@ -64,40 +81,31 @@ export const TypesetUtil = {
     }
   },
 
-  /* toggleInline: (editor: Editor, inlineType: string, initValue: string | null, 
-    linkedUrl?: string | null) => {
-    if (TypesetUtil.isInlineActive(editor, inlineType)) {
+  toggleInlineMath: (editor: Editor) => {
+    if (!TypesetUtil.isInlineActive(editor, "inline-math")) {
+      if (!!editor.selection) {
+        const { selection } = editor
+        if (!!selection && Range.isCollapsed(selection)) {
+          Transforms.insertNodes(editor, {
+            type: "inline-math",
+            children: [{ text: "$$" }],
+          });
+          Transforms.move(editor, {distance: 1, unit: "offset", reverse: true});
+        } 
+        // Wrapping is to be implemented.
+        /* else {
+          Transforms.wrapNodes(editor, {
+            type: "inline-math",
+            children: [],
+          }, { split: true });
+          Transforms.collapse(editor, { edge: "end" });
+        } */
+      }
+    } else {
       Transforms.unwrapNodes(editor, {
         match: n =>
-          !Editor.isEditor(n) && Element.isElement(n) && n.type === inlineType,
+          !Editor.isEditor(n) && Element.isElement(n) && n.type === "inline-math",
       });
-    } else if (!!editor.selection) {
-      const { selection } = editor
-      if (!!selection && Range.isCollapsed(selection)) {
-        Transforms.insertNodes(editor, {
-          type: inlineType,
-          url: !!linkedUrl ? linkedUrl : undefined,
-          children: [{ text: !!initValue ? initValue : "" }],
-        });
-      } else {
-        Transforms.wrapNodes(editor, {
-          type: inlineType,
-          children: [],
-        }, { split: true });
-        Transforms.collapse(editor, { edge: "end" });
-      }
-    }
-  }, */
-
-  insertInlineMath: (editor: Editor) => {
-    if (editor.selection) {
-      const { selection } = editor;
-      if (!!selection && Range.isCollapsed(selection)) {
-        Transforms.insertNodes(editor, {
-          type: "inline-math",
-          children: [{ text: "" }],
-        });
-      }
     }
   },
 };

@@ -7,23 +7,19 @@ export const withInline = (editor: Editor) => {
     insertData,
     insertText,
     isInline,
-    isElementReadOnly,
     isSelectable,
   } = editor;
 
-  const inlineTypes: (string | null)[] = [ 
-    "inline-math", 
+  const inlineTypes: (string | null)[] = [
     "link",
+    "inline-math",
   ];
 
   editor.isInline = element =>
     inlineTypes.includes(element.type) || isInline(element);
 
-  editor.isElementReadOnly = element =>
-    element.type === "inline-math" || isElementReadOnly(element);
-
   editor.isSelectable = element =>
-    element.type !== "inline-math" && isSelectable(element);
+    inlineTypes.includes(element.type) || isSelectable(element);
 
   editor.insertText = (text: string) => {
     if (!!text && isUrl(text)) {

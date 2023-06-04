@@ -8,7 +8,7 @@ export default function ToggleInlineMathButton() {
     <TooltipButton
       onPointerDown={event => {
         event.preventDefault()
-        TypesetUtil.insertInlineMath(editor)
+        TypesetUtil.toggleInlineMath(editor)
       }}
     >
       <>+ Math</>
