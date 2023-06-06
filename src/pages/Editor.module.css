@@ -4,4 +4,5 @@
   margin: 20px auto;
   padding: 20px;
   border: none;
+  white-space: pre-wrap; /* This line is VERY IMPORTANT!!! */
 }
