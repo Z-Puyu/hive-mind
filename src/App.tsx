@@ -3,6 +3,8 @@ import Editor from "./pages/Editor";
 
 export default function App(): JSX.Element {
   return (
-    <Editor />
+    <div>
+      <Editor />
+    </div>
   );
 }

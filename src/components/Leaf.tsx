@@ -15,6 +15,7 @@ export default function Leaf(props: LeafProps): JSX.Element {
     fontFamily: "times",
     fontWeight: "normal",
     fontStyle: "normal",
+    textAlign: "inherit",
   };
 
   if (props.leaf.bold) {

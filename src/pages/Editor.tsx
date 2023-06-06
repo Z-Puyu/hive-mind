@@ -1,6 +1,14 @@
 import { MathJaxContext } from "better-react-mathjax";
-import TeXBox from "../components/TeXBox";
-import { useState } from "react";
+import { KeyboardEvent, useCallback, useState } from "react";
+import { withInline } from "../plugins/SlatePlugins";
+import { Editable, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
+import { withHistory } from "slate-history";
+import { createEditor, Descendant, Editor as SlateEditor, Transforms, Range, Text } from "slate";
+import { TypesetUtil } from "../utils/TypesetUtil";
+import isHotkey, { isKeyHotkey } from "is-hotkey";
+import DynElem from "../components/DynElem";
+import Leaf from "../components/Leaf";
+import classes from "./Editor.module.css";
 
 const { v4: uuidv4 } = require("uuid");
 
@@ -23,39 +31,75 @@ const mathjaxConfig = {
 };
 
 export default function Editor() {
-  const [TeXBoxes, setTeXBoxes] = useState<TeXBoxItem[]>([{ id: uuidv4() }]);
+  const [editor] = useState<SlateEditor>(() => withInline(withHistory(withReact(createEditor()))));
 
-  const onAddBoxHandler = (currBox: TeXBoxItem) => {
-    const currBoxList: TeXBoxItem[] = [...TeXBoxes];
-    const currBoxIndex: number = currBoxList.findIndex(box => box.id === currBox.id);
-    const updatedBoxes: TeXBoxItem[] = [...currBoxList];
-    updatedBoxes.splice(currBoxIndex + 1, 0, { id: uuidv4() });
-    setTeXBoxes(updatedBoxes);
-  };
+  const initialValue: Descendant[] = [
+    {
+      type: "paragraph",
+      children: [
+        {
+          text: ""
+        },
+      ],
+    },
+  ];
 
-  const onDeleteBoxHandler = (currBox: TeXBoxItem) => {
-    const currBoxIndex: number = TeXBoxes.findIndex(box => box.id === currBox.id);
-    if (currBoxIndex !== 0) {
-      const updatedBoxes: TeXBoxItem[] = [...TeXBoxes];
-      updatedBoxes.splice(currBoxIndex, 1);
-      setTeXBoxes(updatedBoxes);
-    }
+  const HOTKEYS: { [key: string]: string } = {
+    "mod+b": "bold",
+    "mod+i": "italic",
+    "mod+r": "roman",
+    "mod+u": "underline",
+    "mod+s": "strikethru",
+    "mod+`": "code",
   };
 
   return (
     <div>
-      <MathJaxContext
-        version={3}
-        config={mathjaxConfig}
-        hideUntilTypeset="first"
-      >
-        {TeXBoxes.map(box => <TeXBox
-          key={box.id}
-          id={box.id}
-          onAddBox={onAddBoxHandler}
-          onDeleteBox={onDeleteBoxHandler}
-        />)}
-      </MathJaxContext>
+      <Slate editor={editor} value={initialValue}>
+        <MathJaxContext
+          version={3}
+          config={mathjaxConfig}
+          hideUntilTypeset="first"
+        >
+          <Editable
+            className={classes.notes}
+            disableDefaultStyles
+            autoFocus
+            renderElement={useCallback((props: RenderElementProps) => <DynElem {...props} />, [])}
+            renderLeaf={useCallback((props: RenderLeafProps) => <Leaf {...props} />, [])}
+            onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+              // Override cursor movement with offset as the unit.
+              const { selection } = editor;
+              if (selection && Range.isCollapsed(selection)) {
+                const { nativeEvent } = event;
+                if (isKeyHotkey("left", nativeEvent)) {
+                  event.preventDefault();
+                  Transforms.move(editor, { unit: "offset", reverse: true });
+                  return;
+                }
+                if (isKeyHotkey("right", nativeEvent)) {
+                  event.preventDefault();
+                  Transforms.move(editor, { unit: "offset" });
+                  return;
+                }
+              }
+              // Insert inline mathematics when pressing "$".
+              if (event.key === "$") {
+                event.preventDefault();
+                TypesetUtil.toggleInlineMath(editor);
+              }
+              // Add marks corresponding to the hotkeys.
+              for (const hotkey in HOTKEYS) {
+                if (isHotkey(hotkey, event)) {
+                  event.preventDefault();
+                  const mark = HOTKEYS[hotkey];
+                  TypesetUtil.toggleMark(editor, mark as keyof Omit<Text, "text">);
+                }
+              }
+            }}
+          />
+        </MathJaxContext>
+      </Slate>
     </div>
   );
 }

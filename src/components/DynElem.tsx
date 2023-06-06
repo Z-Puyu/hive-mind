@@ -2,6 +2,8 @@ import { RenderElementProps } from "slate-react";
 import InlineMath from "./InlineMath";
 import { InlineChromiumBugfix } from "../utils/InlineChromBugFix";
 import { LinkElem } from "../utils/CustomSlateTypes";
+import TeXBox from "./TeXBox";
+import classes from "./DynElem.module.css";
 
 export default function DynElem(props: RenderElementProps): JSX.Element {
   switch (props.element.type) {
@@ -14,9 +16,7 @@ export default function DynElem(props: RenderElementProps): JSX.Element {
         </pre>
       );
     case "inline-math":
-      return (
-        <InlineMath {...props} />
-      );
+      return <InlineMath {...props} />;
     case "link":
       return (
         <a
@@ -28,11 +28,7 @@ export default function DynElem(props: RenderElementProps): JSX.Element {
           <InlineChromiumBugfix />
         </a>
       );
-    default:
-      return (
-        <p {...props.attributes}>
-          {props.children}
-        </p>
-      );
+    default: // Paragraph
+      return <TeXBox {...props} />;
   }
 }

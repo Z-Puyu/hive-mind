@@ -20,10 +20,16 @@ export default function InlineMath(props: RenderElementProps) {
       </span>
     </>
   ) : (
-    <MathJax 
-    inline 
-    dynamic 
-    contentEditable={false}>
+    <MathJax
+      inline
+      dynamic
+      contentEditable={false}
+      style={{
+        fontFamily: "times",
+        fontWeight: "normal",
+        fontStyle: "normal",
+      }}
+    >
       {props.children[0].props.text.text}
     </MathJax>
   );

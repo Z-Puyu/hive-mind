@@ -1,0 +1,10 @@
+.box {
+  background-color: beige;
+  max-width: 42em;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.paragraph {
+  text-align: justify;
+}

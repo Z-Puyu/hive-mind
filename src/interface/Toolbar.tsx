@@ -6,7 +6,7 @@ interface ToolbarProps {
 
 export default function Toolbar(props: ToolbarProps) {
   return (
-    <div className={classes.toolbar}>
+    <div className={classes.toolbar} contentEditable="false">
       {props.children}
     </div>
   );
