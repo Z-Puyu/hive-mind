@@ -1,5 +1,6 @@
 import { Editor, Text, Element, Transforms, Range } from "slate";
-import { LinkElem } from "./CustomSlateTypes";
+import { LinkElem, MathElem } from "./CustomSlateTypes";
+import { Children } from "react";
 
 export const TypesetUtil = {
   isMarkActive: (editor: Editor, mark: keyof Omit<Text, "text">) => {
@@ -8,11 +9,60 @@ export const TypesetUtil = {
   },
 
   toggleMark: (editor: Editor, mark: keyof Omit<Text, "text">) => {
-    if (TypesetUtil.isMarkActive(editor, mark)) {
-      Editor.removeMark(editor, mark);
+    if (mark === "roman") {
+      Editor.removeMark(editor, "bold");
+      Editor.removeMark(editor, "italic");
     } else {
-      Editor.addMark(editor, mark, true);
+      if (TypesetUtil.isMarkActive(editor, mark)) {
+        Editor.removeMark(editor, mark);
+      } else {
+        Editor.addMark(editor, mark, true);
+      }
     }
+  },
+
+  isBlockActive: (editor: Editor, blockType: string) => {
+    const { selection } = editor;
+    if (!!selection) {
+      // If a selection exists, we check if it contains any block with the matching type.
+      const [matchingBlock] = Array.from(
+        Editor.nodes(editor, {
+          at: Editor.unhangRange(editor, selection),
+          match: n => !Editor.isEditor(n) && Element.isElement(n) && n.type === blockType,
+        })
+      );
+      return !!matchingBlock;
+    }
+    return false;
+  },
+
+  toggleBlock: (editor: Editor, blockType: string) => {
+    const { selection } = editor;
+    if (!!selection && Range.isCollapsed(selection)) {
+      Transforms.insertNodes(editor, {
+        type: blockType,
+        children: [{ text: "" }],
+      });
+    } else {
+      let newProperties: Partial<Element>;
+      if (TypesetUtil.isBlockActive(editor, blockType)) {
+        newProperties = {
+          type: "paragraph",
+        };
+      } else {
+        newProperties = {
+          type: blockType,
+        };
+      }
+      Transforms.setNodes(editor, newProperties);
+    }
+  },
+
+  toggleCodeBlock: (editor: Editor) => {
+    Transforms.setNodes<Element>(
+      editor,
+      { type: "code-block" },
+    )
   },
 
   /**
@@ -69,7 +119,7 @@ export const TypesetUtil = {
 
   toggleLink: (editor: Editor) => {
     if (!TypesetUtil.isInlineActive(editor, "link")) {
-      const url = window.prompt('Enter the URL of the link:');
+      const url = window.prompt("Enter the URL of the link:");
       if (!!url && !!editor.selection) {
         TypesetUtil.wrapLink(editor, url);
       }
@@ -81,21 +131,54 @@ export const TypesetUtil = {
     }
   },
 
-  toggleInlineMath: (editor: Editor) => {
-    if (!TypesetUtil.isInlineActive(editor, "inline-math")) {
+  toggleCode: (editor: Editor, isInline: boolean) => {
+    if (!TypesetUtil.isInlineActive(editor, "code")) {
       if (!!editor.selection) {
-        const { selection } = editor
+        const { selection } = editor;
         if (!!selection && Range.isCollapsed(selection)) {
           Transforms.insertNodes(editor, {
-            type: "inline-math",
-            children: [{ text: "$$" }],
+            type: "code",
+            inline: isInline ? true : undefined,
+            children: [{ text: "" }],
           });
-          Transforms.move(editor, {distance: 1, unit: "offset", reverse: true});
-        } 
+        } else {
+          Transforms.wrapNodes(editor, {
+            type: "code",
+            inline: isInline ? true : undefined,
+            children: [],
+          }, { split: true });
+          Transforms.collapse(editor, { edge: "end" });
+        }
+      }
+    } else {
+      Transforms.unwrapNodes(editor, {
+        match: n =>
+          !Editor.isEditor(n) && Element.isElement(n) && n.type === "code",
+      });
+    }
+  },
+
+  toggleMath: (editor: Editor, isInline: boolean) => {
+    if (!TypesetUtil.isInlineActive(editor, "math")) {
+      if (!!editor.selection) {
+        const { selection } = editor;
+        if (!!selection && Range.isCollapsed(selection)) {
+          const math: MathElem = {
+            type: "math",
+            inline: isInline,
+            children: [{
+              text: isInline ? "$$" : "",
+            }],
+          };
+          Transforms.insertNodes(editor, math);
+          if (isInline) {
+            Transforms.move(editor, { distance: 1, unit: "offset", reverse: true });
+          }
+        }
         // Wrapping is to be implemented.
         /* else {
           Transforms.wrapNodes(editor, {
-            type: "inline-math",
+            type: "math",
             children: [],
           }, { split: true });
           Transforms.collapse(editor, { edge: "end" });
@@ -104,7 +187,7 @@ export const TypesetUtil = {
     } else {
       Transforms.unwrapNodes(editor, {
         match: n =>
-          !Editor.isEditor(n) && Element.isElement(n) && n.type === "inline-math",
+          !Editor.isEditor(n) && Element.isElement(n) && n.type === "math",
       });
     }
   },

@@ -1,6 +1,6 @@
 import { MathJaxContext } from "better-react-mathjax";
 import { KeyboardEvent, useCallback, useState } from "react";
-import { withInline } from "../plugins/SlatePlugins";
+import { withInline, withBetterBreaks } from "../plugins/SlatePlugins";
 import { Editable, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
 import { withHistory } from "slate-history";
 import { createEditor, Descendant, Editor as SlateEditor, Transforms, Range, Text } from "slate";
@@ -9,8 +9,6 @@ import isHotkey, { isKeyHotkey } from "is-hotkey";
 import DynElem from "../components/DynElem";
 import Leaf from "../components/Leaf";
 import classes from "./Editor.module.css";
-
-const { v4: uuidv4 } = require("uuid");
 
 export interface TeXBoxItem {
   id: string;
@@ -31,14 +29,20 @@ const mathjaxConfig = {
 };
 
 export default function Editor() {
-  const [editor] = useState<SlateEditor>(() => withInline(withHistory(withReact(createEditor()))));
+  const [editor] = useState<SlateEditor>(() => withBetterBreaks(
+    withInline(
+      withHistory(
+        withReact(createEditor())
+      )
+    )
+  ));
 
   const initialValue: Descendant[] = [
     {
       type: "paragraph",
       children: [
         {
-          text: ""
+          text: "This is a paragraph"
         },
       ],
     },
@@ -86,7 +90,7 @@ export default function Editor() {
               // Insert inline mathematics when pressing "$".
               if (event.key === "$") {
                 event.preventDefault();
-                TypesetUtil.toggleInlineMath(editor);
+                TypesetUtil.toggleMath(editor, true);
               }
               // Add marks corresponding to the hotkeys.
               for (const hotkey in HOTKEYS) {

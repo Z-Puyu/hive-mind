@@ -1,4 +1,4 @@
-import { Editor, Element } from "slate";
+import { Editor, Transforms } from "slate";
 import isUrl from "is-url";
 import { TypesetUtil } from "../utils/TypesetUtil";
 
@@ -12,7 +12,8 @@ export const withInline = (editor: Editor) => {
 
   const inlineTypes: (string | null)[] = [
     "link",
-    "inline-math",
+    "math",
+    "code",
   ];
 
   editor.isInline = element =>
@@ -37,6 +38,29 @@ export const withInline = (editor: Editor) => {
       insertData(data);
     }
   };
+
+  return editor;
+}
+
+export const withBetterBreaks = (editor: Editor) => {
+  const {
+    insertSoftBreak,
+    insertBreak,
+  } = editor;
+
+  editor.insertSoftBreak = () => {
+    Editor.insertText(editor, "\n");
+  };
+
+  editor.insertBreak = () => {
+    const { selection } = editor;
+    if (!!selection) {
+      Transforms.insertNodes(editor, {
+        children: [{ text: "" }],
+        type: "paragraph"
+      });
+    }
+  }
 
   return editor;
 }

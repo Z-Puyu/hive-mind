@@ -3,24 +3,24 @@ import HoveringWindow from "../interface/HoveringWindow";
 import PreviewBox from "../interface/PreviewBox";
 import { MathJax } from "better-react-mathjax";
 
-interface MathOutputProps {
+interface MathPreviewProps {
   value: string;
+  displayStyle?: true;
 }
 
-export default function MathPreview(props: MathOutputProps): JSX.Element {
+export default function MathPreview(props: MathPreviewProps): JSX.Element {
   const mathRef = useRef<HTMLDivElement>(null);
   return (
     <HoveringWindow>
       <PreviewBox ref={mathRef}>
         <MathJax
-          inline
           dynamic
           contentEditable={false}
           style={{
             fontFamily: "times"
           }}
         >
-          {props.value}
+          {props.displayStyle ? "\\begin{displaymath}" + props.value + "\\end{displaymath}" : props.value}
         </MathJax>
       </PreviewBox>
     </HoveringWindow>

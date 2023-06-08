@@ -12,9 +12,9 @@ export default function Leaf(props: LeafProps): JSX.Element {
     borderRadius: "0",
     padding: "0",
     backgroundColor: "",
-    fontFamily: "times",
-    fontWeight: "normal",
-    fontStyle: "normal",
+    fontFamily: "",
+    fontWeight: "",
+    fontStyle: "",
     textAlign: "inherit",
   };
 
@@ -32,13 +32,13 @@ export default function Leaf(props: LeafProps): JSX.Element {
     };
   }
 
-  if (props.leaf.roman) {
+  /* if (props.leaf.roman) {
     styles = {
       ...styles,
       fontWeight: "normal",
       fontStyle: "normal",
     };
-  }
+  } */
 
   if (props.leaf.underline) {
     leaf = <u>{leaf}</u>;

@@ -7,12 +7,3 @@
   /* Margin is necessary to clearly show the cursor */
   margin: 0 0.001em;
 }
-
-.inlineCode {
-  border: none;
-  background-color: rgba(0, 192, 192, 0.5);
-  border-radius: 2.5px;
-  padding: 0px, 2px;
-  /* Margin is necessary to clearly show the cursor */
-  margin: 0 0.1em;
-}

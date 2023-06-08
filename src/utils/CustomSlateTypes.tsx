@@ -22,10 +22,21 @@ export type CodeBlockElem = {
   children: Descendant[];
 };
 
-export type InlineMathElem = {
-  type: "inline-math" | null | string;
+export type CodeElem = {
+  type: "code" | null | string;
   children: Descendant[];
 };
+
+export type QuoteElem = {
+  type: "quote" | null | string;
+  children: Descendant[];
+}
+
+export type MathElem = {
+  type: "math" | null | string;
+  inline: boolean;
+  children: Descendant[];
+}
 
 export type LinkElem = {
   type: "link" | null | string;
@@ -33,9 +44,22 @@ export type LinkElem = {
   children: Descendant[];
 };
 
+export type HeadingElem = {
+  type: "heading" | null | string;
+  level: "part" | "chapter" | "section" | "subsection" | "subsubsection";
+  children: Descendant[];
+}
+
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 
-export type CustomElement = ParagraphElem | CodeBlockElem | InlineMathElem | LinkElem;
+export type CustomElement =
+  | ParagraphElem
+  | CodeBlockElem
+  | LinkElem
+  | MathElem
+  | CodeElem
+  | QuoteElem
+  | HeadingElem;
 
 export type CustomText = FormattedPlainText;
 
