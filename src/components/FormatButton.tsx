@@ -4,18 +4,21 @@ import { TypesetUtil } from "../utils/TypesetUtil";
 import { useSlate } from "slate-react";
 
 interface FormatButtonProps {
-  // editor: Editor;
   mark: string;
+  // icon
 }
 
 export default function FormatButton(props: FormatButtonProps) {
-  const editor = useSlate();
+  const editor: Editor = useSlate();
+
+  const onPointerDownHandler = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    TypesetUtil.toggleMark(editor, props.mark as keyof Omit<Text, "text">);
+  };
+
   return (
     <TooltipButton
-      onPointerDown={event => {
-        event.preventDefault();
-        TypesetUtil.toggleMark(editor, props.mark as keyof Omit<Text, "text">);
-      }}
+      onPointerDown={onPointerDownHandler}
     >
       <>{props.mark}</>
     </TooltipButton>

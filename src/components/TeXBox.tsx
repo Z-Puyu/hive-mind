@@ -7,8 +7,9 @@ import CodeButton from "./CodeButton";
 import BlockButton from "./BlockButton";
 import TextCard from "../interface/TextCard";
 
-export default function TeXBox(props: RenderElementProps) {
-  const isSelected = useSelected();
+export default function TeXBox(props: RenderElementProps): JSX.Element {
+  const isSelected: boolean = useSelected();
+
   return (
     <TextCard>
       <>
@@ -26,12 +27,10 @@ export default function TeXBox(props: RenderElementProps) {
           <MathButton inline />
           <MathButton />
         </Toolbar> : null}
-        <p
-          {...props.attributes}
-        >
+        <p {...props.attributes}>
           {props.children}
         </p>
       </>
     </TextCard>
   );
-}
+};

@@ -10,6 +10,7 @@ interface MathPreviewProps {
 
 export default function MathPreview(props: MathPreviewProps): JSX.Element {
   const mathRef = useRef<HTMLDivElement>(null);
+  
   return (
     <HoveringWindow>
       <PreviewBox ref={mathRef}>
@@ -17,12 +18,14 @@ export default function MathPreview(props: MathPreviewProps): JSX.Element {
           dynamic
           contentEditable={false}
           style={{
-            fontFamily: "times"
+            fontFamily: "times",
           }}
         >
-          {props.displayStyle ? "\\begin{displaymath}" + props.value + "\\end{displaymath}" : props.value}
+          {props.displayStyle
+            ? "\\begin{displaymath}" + props.value + "\\end{displaymath}"
+            : props.value}
         </MathJax>
       </PreviewBox>
     </HoveringWindow>
   );
-}
+};

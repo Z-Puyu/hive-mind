@@ -1,6 +1,6 @@
 import { Editor, Text, Element, Transforms, Range } from "slate";
-import { LinkElem, MathElem } from "./CustomSlateTypes";
-import { Children } from "react";
+import { MathElem } from "./CustomSlateTypes";
+import { nanoid } from "nanoid";
 
 export const TypesetUtil = {
   isMarkActive: (editor: Editor, mark: keyof Omit<Text, "text">) => {
@@ -40,6 +40,7 @@ export const TypesetUtil = {
     const { selection } = editor;
     if (!!selection && Range.isCollapsed(selection)) {
       Transforms.insertNodes(editor, {
+        id: nanoid(),
         type: blockType,
         children: [{ text: "" }],
       });
@@ -91,7 +92,7 @@ export const TypesetUtil = {
     Transforms.unwrapNodes(editor, {
       match: n =>
         !Editor.isEditor(n) && Element.isElement(n) && n.type === inlineType,
-    })
+    });
   },
 
   wrapLink: (editor: Editor, linkUrl: string) => {
@@ -102,6 +103,7 @@ export const TypesetUtil = {
     if (!!selection && Range.isCollapsed(selection)) {
       // If the current selection is empty, insert a new link.
       Transforms.insertNodes(editor, {
+        id: nanoid(),
         type: "link",
         url: linkUrl,
         children: [{ text: linkUrl }],
@@ -109,6 +111,7 @@ export const TypesetUtil = {
     } else {
       // Otherwise, append the url to the currently selected texts.
       Transforms.wrapNodes(editor, {
+        id: nanoid(),
         type: "link",
         url: linkUrl,
         children: [],
@@ -137,12 +140,14 @@ export const TypesetUtil = {
         const { selection } = editor;
         if (!!selection && Range.isCollapsed(selection)) {
           Transforms.insertNodes(editor, {
+            id: nanoid(),
             type: "code",
             inline: isInline ? true : undefined,
             children: [{ text: "" }],
           });
         } else {
           Transforms.wrapNodes(editor, {
+            id: nanoid(),
             type: "code",
             inline: isInline ? true : undefined,
             children: [],
@@ -164,6 +169,7 @@ export const TypesetUtil = {
         const { selection } = editor;
         if (!!selection && Range.isCollapsed(selection)) {
           const math: MathElem = {
+            id: nanoid(),
             type: "math",
             inline: isInline,
             children: [{
@@ -189,6 +195,6 @@ export const TypesetUtil = {
         match: n =>
           !Editor.isEditor(n) && Element.isElement(n) && n.type === "math",
       });
-    }
+    } 
   },
 };

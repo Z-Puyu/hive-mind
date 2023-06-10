@@ -315,8 +315,12 @@ This project is built with the following coding convention:
 - *Component functions* should be declared using `export default function`, while *nested functions* should be declared using `const` and Lambda expressions.
 - All variables and functions should have their types **explicitly** declared whenever possible.
 - Types of props for component functions are to be defined as interfaces.
-- Functions passed on as props must be **declared beforehand**, rather than anonymous Lambda expressions.
+- Functions passed on as props must be **declared beforehand**, rather than anonymous Lambda expressions, except functions which contain only a single statement.
 - Leave one empty line between every two functions, before every return statement and after import statements.
-- An empty line should also be used to separate statements when they clearly belong to different code blocks.
+- An empty line should also be used to separate statements when they clearly belong to different semantic blocks.
 - Always write a **default branch** for switch statements.
 - Use **optional chaining** instead of contional statements for null-checks.
+- When an HTML tag contains more than 2 properties or the line containing the HTML tag is longer than 100 characters, each property should occupy its own line.
+- Every line of code should be **within 100 characters** in length.
+- The chaining operator "." **must not be at the end** of a line should a statement breaks.
+- When a string concatenation statement breaks, the "+" operator should always be placed **at the end** of each line where it breaks.

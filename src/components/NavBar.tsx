@@ -1,13 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, NavigateFunction } from "react-router-dom";
 import { auth } from "../config/Firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { AuthStateHook, useAuthState } from "react-firebase-hooks/auth";
 import { signOut } from "firebase/auth";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
 
-export default function Navbar() {
-  const [user] = useAuthState(auth);
-  const navigate = useNavigate();
+export default function Navbar(): JSX.Element {
+  const [user]: AuthStateHook = useAuthState(auth);
+  const navigate: NavigateFunction = useNavigate();
 
   async function signUserOut() {
     await signOut(auth);
@@ -17,22 +17,22 @@ export default function Navbar() {
   return (
     <div className="navbar">
       <div className="links">
-        <Link to="/"> Home </Link>
+        <Link to="/">Home</Link>
         {user ? (
-          <Link to="/Editor"> Editor </Link>
+          <Link to="/Editor">Editor</Link>
         ) : (
-          <Link to="/Login"> Login </Link>
+          <Link to="/Login">Login</Link>
         )}
       </div>
       <div className="user">
-        {user && (
+        {!!user ? (
           <>
             <p>{auth.currentUser?.displayName}</p>
-            <img src={user?.photoURL || ""} alt=""/>
+            <img src={user?.photoURL || ""} alt="" />
             <button onClick={signUserOut}>Log Out</button>
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );
-}
+};

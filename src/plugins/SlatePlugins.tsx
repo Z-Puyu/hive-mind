@@ -1,6 +1,7 @@
-import { Editor, Transforms } from "slate";
+import { Editor, Transforms, Element } from "slate";
 import isUrl from "is-url";
 import { TypesetUtil } from "../utils/TypesetUtil";
+import { nanoid } from "nanoid";
 
 export const withInline = (editor: Editor) => {
   const {
@@ -40,7 +41,7 @@ export const withInline = (editor: Editor) => {
   };
 
   return editor;
-}
+};
 
 export const withBetterBreaks = (editor: Editor) => {
   const {
@@ -56,6 +57,7 @@ export const withBetterBreaks = (editor: Editor) => {
     const { selection } = editor;
     if (!!selection) {
       Transforms.insertNodes(editor, {
+        id: nanoid(),
         children: [{ text: "" }],
         type: "paragraph"
       });
@@ -63,4 +65,28 @@ export const withBetterBreaks = (editor: Editor) => {
   }
 
   return editor;
-}
+};
+
+export const withNodeUids = (editor: Editor) => {
+  const { apply } = editor;
+  /* const assignId = (node: Node) => {
+    if (Element.isElement(node)) {
+      node.id = "";
+      node.children.forEach(child => assignId(child as Node));
+    }
+  } */
+  editor.apply = (operation) => {
+    if (operation.type === "insert_node") {
+      if (Element.isElement(operation.node)) {
+        operation.node.id = nanoid();
+      }
+      return apply(operation);
+    }
+    if (operation.type === "split_node") {
+      (operation.properties as Partial<Element>).id = "";
+      return apply(operation);
+    }
+    return apply(operation);
+  };
+  return editor;
+};

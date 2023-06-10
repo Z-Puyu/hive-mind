@@ -8,7 +8,7 @@ interface LeafProps {
 
 export default function Leaf(props: LeafProps): JSX.Element {
   let leaf: JSX.Element = props.children;
-  let styles = {
+  let styles: { [key: string]: string } = {
     borderRadius: "0",
     padding: "0",
     backgroundColor: "",
@@ -22,7 +22,7 @@ export default function Leaf(props: LeafProps): JSX.Element {
     styles = {
       ...styles,
       fontWeight: "bold",
-    }
+    };
   }
 
   if (props.leaf.italic) {
@@ -45,7 +45,7 @@ export default function Leaf(props: LeafProps): JSX.Element {
   }
 
   if (props.leaf.strikethru) {
-    leaf = <s>{leaf}</s>
+    leaf = <s>{leaf}</s>;
   }
 
   if (props.leaf.code) {
@@ -56,8 +56,8 @@ export default function Leaf(props: LeafProps): JSX.Element {
       backgroundColor: "rgba(192, 192, 192, 0.5)",
       fontWeight: "normal",
       fontStyle: "normal",
-    }
-    leaf = <code>{leaf}</code>
+    };
+    leaf = <code>{leaf}</code>;
   }
 
   return (
@@ -76,4 +76,4 @@ export default function Leaf(props: LeafProps): JSX.Element {
       {leaf}
     </span>
   );
-}
+};

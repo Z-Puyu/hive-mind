@@ -1,14 +1,12 @@
 import { PointerEvent } from "react";
 import classes from "./TooltipButton.module.css";
-import { Editor, Text } from "slate";
-import { TypesetUtil } from "../utils/TypesetUtil";
 
 interface TooltipButtonProps {
   children: JSX.Element;
   onPointerDown: (event: PointerEvent<HTMLButtonElement>) => void;
 }
 
-export default function TooltipButton(props: TooltipButtonProps) {
+export default function TooltipButton(props: TooltipButtonProps): JSX.Element {
   return (
     <button 
       className={classes.tooltipButton}
@@ -17,4 +15,4 @@ export default function TooltipButton(props: TooltipButtonProps) {
       {props.children}
     </button>
   );
-}
+};

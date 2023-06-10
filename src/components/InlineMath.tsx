@@ -10,13 +10,11 @@ export default function InlineMath(props: RenderElementProps) {
 
   return isVisible || isSelected ? (
     <span>
-      <MathPreview
-        value={props.children[0].props.text.text}
-      />
+      <MathPreview value={props.children[0].props.text.text}/>
       <span
         {...props.attributes}
         style={{
-          color: "gray"
+          color: "gray",
         }}
       >
         {props.children}
@@ -37,4 +35,4 @@ export default function InlineMath(props: RenderElementProps) {
       {props.children[0].props.text.text}
     </MathJax>
   );
-}
+};

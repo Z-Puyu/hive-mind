@@ -3,39 +3,40 @@ import { HeadingElem } from "../utils/CustomSlateTypes";
 import TextCard from "../interface/TextCard";
 
 export default function Heading(props: RenderElementProps) {
-  let styles;
+  let styles: { [key: string]: string };
   switch ((props.element as HeadingElem).level) {
     case "part":
       styles = {
-        fontSize: "24.88pt"
-      }
+        fontSize: "24.88pt",
+      };
       break;
     case "chapter":
       styles = {
-        fontSize: "24.88pt"
-      }
+        fontSize: "24.88pt",
+      };
       break;
     case "section":
       styles = {
-        fontSize: "17.28pt"
-      }
+        fontSize: "17.28pt",
+      };
       break;
     case "subsection":
       styles = {
-        fontSize: "14.4pt"
-      }
+        fontSize: "14.4pt",
+      };
       break;
     case "subsubsection":
       styles = {
-        fontSize: "12pt"
-      }
+        fontSize: "12pt",
+      };
       break;
     default:
       styles = {
-        fontSize: "17.28pt"
-      }
+        fontSize: "17.28pt",
+      };
       break;
   }
+  
   return (
     <TextCard>
       <h1>
@@ -43,4 +44,4 @@ export default function Heading(props: RenderElementProps) {
       </h1>
     </TextCard>
   );
-}
+};
