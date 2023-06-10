@@ -296,6 +296,21 @@ This project demonstrates some basic features and interactions in the notes edit
 - Press Enter in the input field to insert a new TeXBox below the current working TeXBox;
 - Press Backspace in an empty TeXBox to delete it.
 
+## Proof-of-concept
+
+The [project poster](https://drive.google.com/file/d/1iGHT04W8h5N5H2RU6KsVlVeNxAIIhOCD/view?usp=share_link) and [project video](https://drive.google.com/file/d/11urJgv1n9FsqEqYKHdD4jG00sjB7-DRh/view?usp=share_link) can be accessed from here.
+
+We have also deployed a [mini-demonstration project](https://hive-mind-inky.vercel.app/).
+
+To enter the editor, press "Login" from the top navigation bar, and then click on "Editor" to view the sample page.
+
+This project demonstrates some basic features and interactions in the notes editor of HiveMind, including:
+
+- Click on a TeXBox to open and auto-focus to the input field for $\LaTeX$;
+- Type $\LaTeX$ in the input field to see it rendered in real time;
+- Press Enter in the input field to insert a new TeXBox below the current working TeXBox;
+- Press Backspace in an empty TeXBox to delete it.
+
 ## Timeline and Development Plan
 
 - **7-15 May**
@@ -330,6 +345,7 @@ This project demonstrates some basic features and interactions in the notes edit
   - Prepare for Milestone III.
 
 The **Project Log** is attached [here](https://docs.google.com/spreadsheets/d/1vAOZ7g_3GZcTc47UXCHAcNvJ3GAxhJOIIIlv9_ZGqss/edit#gid=0)
+
 
 ## Git Workflow
 
@@ -369,3 +385,8 @@ This project is built with the following coding convention:
 - The chaining operator "." **must not be at the end** of a line should a statement breaks.
 - When a string concatenation statement breaks, the "+" operator should always be placed **at the end** of each line where it breaks.
 - **Nested** HTML tags in return statements should be wrapped inside parentheses.
+- Functions passed on as props must be **declared beforehand**, rather than anonymous Lambda expressions.
+- Leave one empty line between every two functions, before every return statement and after import statements.
+- An empty line should also be used to separate statements when they clearly belong to different code blocks.
+- Always write a **default branch** for switch statements.
+- Use **optional chaining** instead of contional statements for null-checks.
