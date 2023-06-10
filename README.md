@@ -127,15 +127,37 @@ On start-up, the editor is initialised with a single TeXBox containing an empty 
 
 We have also implemented a variety of formatting options and a toolbar, which works just like any othe rich text editor. For example, to bold some texts, the user just needs to select those texts and press the "boldface" button in the toolbar. The currently supported formatting options are: **boldface**, *italic*, <u>underline</u>, <s>strike-through</s>, `inline code`, <a>link</a> and $\LaTeX \textrm{-rendered mathematics}$. These formats, except $\LaTeX$, can be composed onto one another freely, so a user can easily write <a><strong><i><u><s><code>some underlined inline code struck through and wrapped into a link with a boldface italic font</code></s></u></i></strong></a>, which can be more than a bit tiring to achieve in a markdown document like this (you have to nest 6 HTML tags to get it properly displayed but pressing 6 buttons will do the trick with our application).
 
+Beside these inline rich-text formatting, we have also implemented special formatting options to block-level contents, including `code block`, block quote and displayed mathematics. These also have their respective tooltip buttons in the toolbar to switch between different blocks.
+
 We could have implemented support for different fonts into our application so that the user can freely choose the font to use from those installed in his or her device. However, we eventually decided to abort this idea. This is because most fonts do not have sufficient support for mathematical and other scientific symbols, which means even if we allow users to change the font of normal texts, these fonts will not be able to be applied to $\LaTeX$ rendering, causing a unsightly difference between texts and mathematics just like you have seen in this document. So we resolved to fixing the font used in our editor ― but what font should we use then? There are two fonts that offer comprehensive support for scientific symbols, namely Times New Roman and STIX Two. We have chosen to use Times New Roman because it is the default font used by $\LaTeX$.
+
+The drag-and-drop mechanism has been implemented using **dnd-kit**. We chose to use this package instead of writing our own logic because of two reasons:
+
+- First, we wish the mechanism to be complex enough to be able to sustain smooth user interactions. As such, using a mature package with pre-engineered methods would be much less bug-prone than building our own logic from scratch, especially considering our lack of experience with such mechanisms. We can instead make minor tweaks using the pre-existing methods to more easily achieve our desired behaviour.
+
+- Second, dnd-kit allows all draggable components to be wrapped in its context provider. This means we can easily build a universal mechanism which is general enough to be extended onto every component we add to our application, thus reducing repetitive work. These context providers can then be nested, which means we can achieve different drag-and-drop behaviours for different blocks by simply overriding certain properties or methods without the need to write separate logic.
+
+The user can hold the mouse on any block-level component in the notes to drag it around. Meanwhile, an opaque clone will stay at the original position of the dragged component for the user to compare the paragraph ordering before and after the component is dropped. 
 
 #### [Future Plan]
 
-On to the next phase, we have to major tasks:
+On to the next phase, we have two major tasks:
 
-1. Incorporate more formatting options into our editor. The most important items include: titles, displayed mathematics, block quotes, theorem blocks and code blocks.
+1. Incorporate more formatting options into our editor. The most important items include: (ordered and unordered) lists, proofs, definitions and theorem blocks.
 
-2. Implement the drag-and-drop mechanism on the various components in our editor. Primarily, these will include TeXBoxes, displayed mathematics, block quotes, code blocks, paragraphs, titles and theorem- and proof-like blocks.
+2. Implement and improve the drag-and-drop mechanism on the various components in our editor. Primarily, these will include TeXBoxes, displayed mathematics, block quotes, code blocks, paragraphs, titles and theorem- and proof-like blocks. 
+
+#### [Potential Addtions]
+
+Here we list a few good-to-have features:
+
+1. Syntax highlighting for code blocks which support different programming languages.
+
+2. Smooth animations during dragging and dropping blocks.
+
+3. "Transfer Station" which hosts temporary copies of blocks deemed potentially useful by the user, such that the user can retrieve them directly from the station to paste in the appropriate position without needing to browse back and forth to search for the blocks. 
+
+4. Ability to merge neighbouring blocks into one block to be moved around together.
 
 ### Intuitive and Smooth User-Interface Interactions
 
@@ -172,11 +194,19 @@ Besides implementing $\LaTeX$ input, we have also added hotkey bindings for the 
 
 All of the above hotkeys have their tooltip button equivalents in the toolbar. Toggling a format with texts selected will apply the format onto the currently selected texts, whereas toggling a format with a collapsed selection will cause the proceding input from the caret position to be applied with the format.
 
+Regarding the toolbar, we initially append it to every block in the editor, but this soon led to a problem: most text formats such as boldface and italic texts are not used at all in certain special types of blocks such as a code block, so it is redundant to still show the toolbar. Therefore, we decided to make the visibility of the toolbar conditional such that it only shows up in a text block (i.e. paragraph, heading) while it is focused. An unexpected benefit this has brought is that the editor now looks cleaner because there can only be at most one visible toolbar concurrently. 
+
 #### [Future Plan]
 
 We will keep updating the hotkey bindings and tooltip buttons to synchronise with new formatting options added. For $\LaTeX$ input, we wish to upgrade it such that toggling math mode with texts selected will wrap the selected texts into $\LaTeX$ environment.
 
+Meanwhile, we are planning to split the toolbar. Currently, both text- and block-level formatting buttons are in the same toolbar. However, since the toolbar is invisible in certain special blocks such as a code block, this makes hotkey the only possible way to switch back from a special block to a text block, which compromises much flexibility. Hence, the block-toggling buttons should be placed at a separate toolbar which is always visible as long as the block is focused.
+
 We would also continue to improve the various interactions and hotkeys with regard to webpage navigation. We expect this to be a continuous and long-term process in a sense that new interactions and UI components will be implemented wherever and whenever they are deemed appropriate.
+
+#### [Potential Additions]
+
+Inspired by Notion, we have found that slash commands are a very useful feature to reduce the frequency of mouse-clicking while using the application, which offers a great boost to efficiency. Besides, many custom $\LaTeX$ environments are also delimited with slash commands (\begin{...} and \end{...}), so this potentially makes it possible to integrate more $\LaTeX$ environment into our application.
 
 ### Real-time Rendering of $\LaTeX$ Contents
 
@@ -197,7 +227,7 @@ For long mathematics like this (which is yet to be considered as "complex"), the
 
 #### [Current Progress]
 
-We have employed the "better-mathjax-react" Node package to help implement $\LaTeX$ rendering. After entering math mode, the mathematics rendered by MathJax as preview will synchronise with the $\LaTeX$ statements typed.
+We have employed the **better-mathjax-react** Node package to help implement $\LaTeX$ rendering. After entering math mode, the mathematics rendered by MathJax as preview will synchronise with the $\LaTeX$ statements typed.
 
 We wished to improve further such that the rendered mathematics only updates when the $\LaTeX$ statements in the input area is legal and complete. Otherwise, the mathematics displayed remains the same as before the change in $\LaTeX$ code. The intent of this proposed improvement was to prevent the user from seeing flashes of incomplete rendering or error messages from $\LaTeX$ compiler. However, "better-mathjax-react" is engineered with the technical pitfall where only static contents are allowed if we were to configure the rendering process to be such, i.e. the user will not be able to edit the $\LaTeX$ code to be rendered once it is initialised. Therefore, we had to discard this idea.
 
@@ -301,6 +331,20 @@ This project demonstrates some basic features and interactions in the notes edit
 
 The **Project Log** is attached [here](https://docs.google.com/spreadsheets/d/1vAOZ7g_3GZcTc47UXCHAcNvJ3GAxhJOIIIlv9_ZGqss/edit#gid=0)
 
+## Git Workflow
+
+In this project, our team follows the following Git workflow:
+
+- After every major feature implementation or bug fix, the updated files should be immediately commited and pushed to the respective branch.
+
+- All new features and major changes to existing code should be experimented and implemented in a new branch first before they are merged into the main branch.
+
+- Branches should be named succintly with the main feature they serve to implement.
+
+- In principle, the main branch should not be commited directly.
+
+- The README should be updated accordingly along with every major update or addition of features to prevent omission of details.
+
 ## Appendix: Coding Convention
 
 This project is built with the following coding convention:
@@ -324,3 +368,4 @@ This project is built with the following coding convention:
 - Every line of code should be **within 100 characters** in length.
 - The chaining operator "." **must not be at the end** of a line should a statement breaks.
 - When a string concatenation statement breaks, the "+" operator should always be placed **at the end** of each line where it breaks.
+- **Nested** HTML tags in return statements should be wrapped inside parentheses.
