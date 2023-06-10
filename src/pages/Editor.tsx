@@ -1,99 +1,157 @@
-import { useState, useEffect } from 'react';
-import { MathJaxContext } from 'better-react-mathjax';
-import TeXBox from '../components/TeXBox'
-
-const { v4: uuidv4 } = require('uuid');
-
-const mathjaxConfig = {
-  loader: { load: ["[tex]/html"] },
-  tex: {
-    packages: { "[+]": ["html"] },
-    inlineMath: [
-      ["$", "$"]
-    ],
-    displayMath: [
-      ["\\[", "\\]"],
-      ["\\begin{displaymath}", "\\end{displaymath}"]
-    ]
-  }
-};
-
-export interface TeXBoxItem {
-  id: string;
-  html: string;
-  initInputVisibility: boolean;
-  ref?: HTMLElement | null;
-}
+import { MathJaxContext } from "better-react-mathjax";
+import { KeyboardEvent, useCallback, useMemo, useState } from "react";
+import { withInline, withBetterBreaks, withNodeUids } from "../plugins/SlatePlugins";
+import { Editable, ReactEditor, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
+import { withHistory } from "slate-history";
+import { createEditor, Descendant, Editor as SlateEditor, Transforms, Range, Text, Element } from "slate";
+import { TypesetUtil } from "../utils/TypesetUtil";
+import isHotkey, { isKeyHotkey } from "is-hotkey";
+import DynElem from "../components/DynElem";
+import Leaf from "../components/Leaf";
+import classes from "./Editor.module.css";
+import SortableElement from "../components/SortableElement";
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, UniqueIdentifier } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { nanoid } from "nanoid";
+import ReactDOM from "react-dom";
+import DraggedContent from "../components/DraggedContent";
+import { mathjaxConfig } from "../config/MathJax";
 
 export default function Editor(): JSX.Element {
-  const initBox: TeXBoxItem = {
-    id: uuidv4(),
-    html: "On starting the editor, there will be an initial TeXBox. Click on this box, and an input field will pop up for you to edit the contents in this TeXBox with $\\LaTeX$. Try to type \\$\\int\\! \\frac{e^x}{x} \\,\\mathrm{d}x\\$ after THIS WORD: ",
-    initInputVisibility: false,
-  };
+  const [editor] = useState<SlateEditor>(() => withNodeUids(
+    withBetterBreaks(
+      withInline(
+        withHistory(
+          withReact(createEditor())
+        )
+      )
+    )));
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const itemlist = useMemo<string[]>(() => (editor.children as Element[])
+    .map((element) => element.id), [editor.children]);
 
-  const FOR_ILLUSTRATION: TeXBoxItem[] = [
-    initBox,
+  const activeElement: Descendant | undefined = editor.children
+    .find(child => (child as Element).id === activeId);
+
+  const initialValue: Descendant[] = [
     {
-      id: uuidv4(),
-      html: "Click the 1st TeXBox again to close its input field. Now, click here to switch to the 2nd TeXBox. You will notice that the caret is automatically placed at the end of the input field. Without exiting the input field, press Enter key, and a 3rd TeXBox will be instantiated and auto-focused.",
-      initInputVisibility: false,
+      id: nanoid(),
+      type: "paragraph",
+      children: [
+        {
+          text: "This is a paragraph"
+        },
+      ],
     },
-  ]
+  ];
 
-  const [[TeXBoxes, nextTargetBox], setTeXBoxes] = useState<[TeXBoxItem[],
-    HTMLElement | null | undefined]>([FOR_ILLUSTRATION, undefined]);
-
-  useEffect(() => nextTargetBox?.focus(), [TeXBoxes, nextTargetBox]);
-
-  const onUpdatePageHandler = (updatedBox: TeXBoxItem) => {
-    const currBoxList: TeXBoxItem[] = [...TeXBoxes];
-    const updatedBoxIndex: number = currBoxList.map(box => box.id).indexOf(updatedBox.id);
-    const updatedBoxes: TeXBoxItem[] = [...TeXBoxes];
-    updatedBoxes[updatedBoxIndex] = {
-      ...updatedBoxes[updatedBoxIndex],
-      html: updatedBox.html,
-    };
-    setTeXBoxes([updatedBoxes, nextTargetBox]);
+  const HOTKEYS: { [key: string]: string } = {
+    "mod+b": "bold",
+    "mod+i": "italic",
+    "mod+r": "roman",
+    "mod+u": "underline",
+    "mod+s": "strikethru",
+    "mod+`": "code",
   };
 
-  const onAddBoxHandler = (currBox: TeXBoxItem) => {
-    const currBoxList: TeXBoxItem[] = [...TeXBoxes];
-    const currBoxIndex: number = currBoxList.findIndex(box => box.id === currBox.id);
-    const updatedBoxes: TeXBoxItem[] = [...currBoxList];
-    updatedBoxes.splice(currBoxIndex + 1, 0, { 
-      id: uuidv4(), 
-      html: currBox.html, 
-      initInputVisibility: currBox.initInputVisibility, 
-    });
-    setTeXBoxes([updatedBoxes, currBox.ref?.nextElementSibling as HTMLElement]);
+  const clearSelection = () => {
+    ReactEditor.blur(editor);
+    Transforms.deselect(editor);
+    window.getSelection()?.empty();
   };
 
-  const onDeleteBoxHandler = (currBox: TeXBoxItem) => {
-    const prevBox: HTMLElement | null = currBox.ref?.previousElementSibling as HTMLElement;
-    console.log(currBox.id);
-    console.log(initBox.id);
-    if (prevBox !== null) {
-      const currBoxIndex: number = TeXBoxes.findIndex(box => box.id === currBox.id);
-      const updatedBoxes: TeXBoxItem[] = [...TeXBoxes];
-      updatedBoxes.splice(currBoxIndex, 1);
-      setTeXBoxes([updatedBoxes, prevBox]);
+  const onDragStartHandler = (event: DragStartEvent) => {
+    if (event.active) {
+      clearSelection();
+      setActiveId(event.active.id);
     }
-  }
+  };
+
+  const onDragEndHandler = (event: DragEndEvent) => {
+    const overId: UniqueIdentifier | undefined = event.over?.id;
+    const overIndex: number = (editor.children as Element[]).findIndex(x => x.id === overId);
+
+    if (overId !== activeId && overIndex !== -1) {
+      Transforms.moveNodes(editor, {
+        at: [],
+        match: (node) => (node as Element).id === activeId,
+        to: [overIndex]
+      });
+    }
+
+    setActiveId(null);
+  };
+
+  const renderElementHandler = useCallback((props: RenderElementProps) => {
+    const isTopLevel = ReactEditor.findPath(editor, props.element).length === 1;
+    return isTopLevel ? <SortableElement {...props} /> : <DynElem {...props} />;
+  }, []);
+
+  const renderLeafHandler = useCallback((props: RenderLeafProps) => <Leaf {...props} />, []);
+
+  const onKeyDownHandler = (event: KeyboardEvent<HTMLDivElement>) => {
+    // Override cursor movement with offset as the unit.
+    const { selection } = editor;
+    if (selection && Range.isCollapsed(selection)) {
+      const { nativeEvent } = event;
+      if (isKeyHotkey("left", nativeEvent)) {
+        event.preventDefault();
+        Transforms.move(editor, { unit: "offset", reverse: true });
+      } else if (isKeyHotkey("right", nativeEvent)) {
+        event.preventDefault();
+        Transforms.move(editor, { unit: "offset" });
+      }
+    }
+    // Insert inline mathematics when pressing "$".
+    if (event.key === "$") {
+      event.preventDefault();
+      TypesetUtil.toggleMath(editor, true);
+    }
+    // Add marks corresponding to the hotkeys.
+    for (const hotkey in HOTKEYS) {
+      if (isHotkey(hotkey, event)) {
+        event.preventDefault();
+        const mark = HOTKEYS[hotkey];
+        TypesetUtil.toggleMark(editor, mark as keyof Omit<Text, "text">);
+      }
+    }
+  };
 
   return (
     <div>
-      <MathJaxContext version={3} config={mathjaxConfig}>
-        {TeXBoxes.map(box => <TeXBox
-          key={box.id}
-          id={box.id}
-          html={box.html}
-          initInputVisibility={box.initInputVisibility}
-          onAddBox={onAddBoxHandler}
-          onUpdatePage={onUpdatePageHandler}
-          onDeleteBox={onDeleteBoxHandler}
-        />)}
-      </MathJaxContext>
+      <Slate editor={editor} value={initialValue}>
+        <DndContext
+          onDragStart={onDragStartHandler}
+          onDragEnd={onDragEndHandler}
+          onDragCancel={() => setActiveId(null)}
+        >
+          <MathJaxContext
+            version={3}
+            config={mathjaxConfig}
+            hideUntilTypeset="first"
+          >
+            <SortableContext items={itemlist} strategy={verticalListSortingStrategy}>
+              <Editable
+                className={classes.notes}
+                disableDefaultStyles
+                autoFocus
+                renderElement={renderElementHandler}
+                renderLeaf={renderLeafHandler}
+                onKeyDown={onKeyDownHandler}
+              />
+            </SortableContext>
+            {ReactDOM.createPortal(
+              <DragOverlay adjustScale={false}>
+                {!!activeElement ? <DraggedContent
+                  element={activeElement}
+                  renderElement={renderElementHandler}
+                /> : null}
+              </DragOverlay>,
+              document.body
+            )}
+          </MathJaxContext>
+        </DndContext>
+      </Slate>
     </div>
   );
-}
+};
