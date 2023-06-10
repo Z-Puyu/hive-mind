@@ -115,6 +115,10 @@ export default function Editor(): JSX.Element {
         TypesetUtil.toggleMark(editor, mark as keyof Omit<Text, "text">);
       }
     }
+    // Alternate Soft-break.
+    if (event.ctrlKey && event.key === "Enter") {
+      SlateEditor.insertSoftBreak(editor);
+    }
   };
 
   return (
