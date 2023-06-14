@@ -8,7 +8,7 @@ import Login from "./pages/Login";
 export default function App(): JSX.Element {
   return (
     <div>
-      <Router>
+      {/* <Router>
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -16,7 +16,8 @@ export default function App(): JSX.Element {
           <Route path="/Editor" element={<Editor />} />
           <Route path="*" element={<h1>PAGE NOT FOUND</h1>} />
         </Routes>
-      </Router>
+      </Router> */}
+      <Editor />
     </div>
   );
 };

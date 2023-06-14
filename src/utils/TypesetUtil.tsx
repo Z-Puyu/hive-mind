@@ -37,7 +37,18 @@ export const TypesetUtil = {
   },
 
   toggleBlock: (editor: Editor, blockType: string) => {
-    const { selection } = editor;
+    let newProperties: Partial<Element>;
+      if (TypesetUtil.isBlockActive(editor, blockType)) {
+        newProperties = {
+          type: "paragraph",
+        };
+      } else {
+        newProperties = {
+          type: blockType,
+        };
+      }
+      Transforms.setNodes(editor, newProperties);
+    /* const { selection } = editor;
     if (!!selection && Range.isCollapsed(selection)) {
       Transforms.insertNodes(editor, {
         id: nanoid(),
@@ -56,14 +67,7 @@ export const TypesetUtil = {
         };
       }
       Transforms.setNodes(editor, newProperties);
-    }
-  },
-
-  toggleCodeBlock: (editor: Editor) => {
-    Transforms.setNodes<Element>(
-      editor,
-      { type: "code-block" },
-    )
+    } */
   },
 
   /**

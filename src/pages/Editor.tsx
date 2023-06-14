@@ -16,6 +16,9 @@ import { nanoid } from "nanoid";
 import ReactDOM from "react-dom";
 import DraggedContent from "../components/DraggedContent";
 import { mathjaxConfig } from "../config/MathJax";
+import { useMouse } from "ahooks";
+import { Coords } from "../utils/UtilityInterfaces";
+import BlockSelection from "../components/BlockSelection";
 
 export default function Editor(): JSX.Element {
   const [editor] = useState<SlateEditor>(() => withNodeUids(
@@ -27,8 +30,35 @@ export default function Editor(): JSX.Element {
       )
     )));
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const [selectMenuIsOpen, setSelectMenuIsOpen] = useState<boolean>(false);
+  const [selectMenuPos, setSelectMenuPos] = useState<Coords>({ x: 0, y: 0 })
+
+  // Initialise block type select menu.
+  const initItems: { [key: string]: string }[] = [
+    {
+      name: "paragraph",
+      blockType: "paragraph",
+      desc: "Paragraph",
+    },
+    {
+      name: "code",
+      blockType: "code-block",
+      desc: "Code Block",
+    },
+    {
+      name: "quote",
+      blockType: "quote",
+      desc: "Block Quote",
+    },
+  ];
+  const [selectMenuItems, setSelectMenuItems] = useState<{ [key: string]: string }[]>(initItems);
+  const [selectedItem, setSelectedItem] = useState<{ [key: string]: string }>(selectMenuItems[0]);
+
+  // Initialise drag-and-drop configs.
   const itemlist = useMemo<string[]>(() => (editor.children as Element[])
     .map((element) => element.id), [editor.children]);
+
+  const mouse = useMouse();
 
   const activeElement: Descendant | undefined = editor.children
     .find(child => (child as Element).id === activeId);
@@ -119,6 +149,56 @@ export default function Editor(): JSX.Element {
     if (event.ctrlKey && event.key === "Enter") {
       SlateEditor.insertSoftBreak(editor);
     }
+    // Handle selection menu interactions.
+    if (selectMenuIsOpen) {
+      const selectedItemIndex: number = selectMenuItems.indexOf(selectedItem);
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          setSelectedItem(selectMenuItems[selectedItemIndex === selectMenuItems.length - 1
+            ? 0
+            : selectedItemIndex + 1]);
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          setSelectedItem(selectMenuItems[selectedItemIndex === 0
+            ? selectMenuItems.length - 1
+            : selectedItemIndex - 1]);
+          break;
+        case "Enter":
+        case "Tab":
+          event.preventDefault();
+          TypesetUtil.toggleBlock(editor, selectedItem.blockType);
+          break;
+        case "Backspace":
+        case " ":
+        case "ArrowRight": 
+        case "ArrowLeft":
+          setSelectMenuIsOpen(false);
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
+  const onKeyUpHandler = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "\\") {
+      setSelectMenuIsOpen(true);
+      setSelectMenuPos({ x: mouse.pageX, y: mouse.pageY });
+    }
+  };
+
+  const onSelectHandler = (blockType: string) => {
+    Transforms.setNodes(editor, {
+      type: blockType,
+      children: [],
+    });
+  };
+
+  const onCloseSelectMenuHandler = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setSelectMenuIsOpen(false);
   };
 
   return (
@@ -134,6 +214,14 @@ export default function Editor(): JSX.Element {
             config={mathjaxConfig}
             hideUntilTypeset="first"
           >
+            {selectMenuIsOpen
+              ? <BlockSelection
+                pos={selectMenuPos}
+                items={selectMenuItems}
+                currSelection={selectedItem}
+                onSelect={onSelectHandler}
+                onClose={onCloseSelectMenuHandler}
+              /> : null}
             <SortableContext items={itemlist} strategy={verticalListSortingStrategy}>
               <Editable
                 className={classes.notes}
@@ -142,6 +230,7 @@ export default function Editor(): JSX.Element {
                 renderElement={renderElementHandler}
                 renderLeaf={renderLeafHandler}
                 onKeyDown={onKeyDownHandler}
+                onKeyUp={onKeyUpHandler}
               />
             </SortableContext>
             {ReactDOM.createPortal(
