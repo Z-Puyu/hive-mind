@@ -6,6 +6,7 @@ import Link from "./Link";
 import CodeBlock from "./CodeBlock";
 import Quote from "./Quote";
 import Heading from "./Heading";
+import Command from "./Command";
 
 export default function DynElem(props: RenderElementProps): JSX.Element {
   switch (props.element.type) {
@@ -21,6 +22,8 @@ export default function DynElem(props: RenderElementProps): JSX.Element {
       return <Quote {...props} />;
     case "heading":
       return <Heading {...props} />;
+    case "cmd":
+      return <Command {...props} />;
     default: // Paragraph
       return <TeXBox {...props} />;
   }

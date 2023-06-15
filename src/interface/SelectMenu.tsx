@@ -14,19 +14,14 @@ export default function SelectMenu(props: SelectMenuProps): JSX.Element {
   const mouse: CursorState = useMouse();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    menuRef.current!.style.left = `${mouse.clientX}px`;
-    menuRef.current!.style.top = `${mouse.clientY}px`;
-  })
-
   return (
     <div
       ref={menuRef}
       /* className={classes.menu} */
       style={{
         position: "absolute",
-        left: "100px",
-        top: "100px",
+        left: `${props.position.x}px`,
+        top: `${props.position.y}px`,
         backgroundColor: "white",
         borderRadius: "5%",
         boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",

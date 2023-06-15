@@ -1,6 +1,7 @@
 import { BaseEditor, Descendant } from "slate";
 import { ReactEditor } from "slate-react";
 import { HistoryEditor } from "slate-history";
+import { Dispatch, SetStateAction } from "react";
 
 export type FormattedPlainText = {
   text: string;
@@ -57,6 +58,12 @@ export type HeadingElem = {
   children: Descendant[];
 };
 
+export type CommandElem = {
+  id: string;
+  type: "cmd" | null | string;
+  children: Descendant[];
+};
+
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 
 export type CustomElement =
@@ -66,7 +73,8 @@ export type CustomElement =
   | MathElem
   | CodeElem
   | QuoteElem
-  | HeadingElem;
+  | HeadingElem
+  | CommandElem;
 
 export type CustomText = FormattedPlainText;
 

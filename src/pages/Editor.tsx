@@ -3,7 +3,7 @@ import { KeyboardEvent, useCallback, useMemo, useState } from "react";
 import { withInline, withBetterBreaks, withNodeUids } from "../plugins/SlatePlugins";
 import { Editable, ReactEditor, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
 import { withHistory } from "slate-history";
-import { createEditor, Descendant, Editor as SlateEditor, Transforms, Range, Text, Element } from "slate";
+import { createEditor, Descendant, Editor as SlateEditor, Transforms, Range, Text, Element, Point, Path, BasePoint } from "slate";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import isHotkey, { isKeyHotkey } from "is-hotkey";
 import DynElem from "../components/DynElem";
@@ -53,6 +53,7 @@ export default function Editor(): JSX.Element {
   ];
   const [selectMenuItems, setSelectMenuItems] = useState<{ [key: string]: string }[]>(initItems);
   const [selectedItem, setSelectedItem] = useState<{ [key: string]: string }>(selectMenuItems[0]);
+  const [commandStart, setCommandStart] = useState<number | undefined>(0);
 
   // Initialise drag-and-drop configs.
   const itemlist = useMemo<string[]>(() => (editor.children as Element[])
@@ -168,14 +169,16 @@ export default function Editor(): JSX.Element {
         case "Enter":
         case "Tab":
           event.preventDefault();
+          setSelectMenuIsOpen(false);
           TypesetUtil.toggleBlock(editor, selectedItem.blockType);
           break;
         case "Backspace":
-        case " ":
-        case "ArrowRight": 
+        case "ArrowRight":
         case "ArrowLeft":
-          setSelectMenuIsOpen(false);
           break;
+        case " ":
+            setSelectMenuIsOpen(false);
+            break;
         default:
           break;
       }
@@ -184,8 +187,19 @@ export default function Editor(): JSX.Element {
 
   const onKeyUpHandler = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "\\") {
+      setSelectedItem(selectMenuItems[0]);
       setSelectMenuIsOpen(true);
-      setSelectMenuPos({ x: mouse.pageX, y: mouse.pageY });
+      const currElem: HTMLElement = ReactEditor.toDOMNode(
+        editor,
+        SlateEditor.node(
+          editor,
+          editor.selection?.anchor!
+        )[0]
+      );
+      setSelectMenuPos({
+        x: currElem.offsetLeft + currElem.offsetWidth,
+        y: currElem.offsetTop + currElem.offsetHeight + 5,
+      });
     }
   };
 

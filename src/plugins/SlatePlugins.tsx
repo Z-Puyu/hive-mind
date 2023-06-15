@@ -15,6 +15,7 @@ export const withInline = (editor: Editor) => {
     "link",
     "math",
     "code",
+    "cmd",
   ];
 
   editor.isInline = element =>
