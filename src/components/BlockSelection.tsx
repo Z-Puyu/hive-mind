@@ -1,5 +1,4 @@
 import SelectMenu from "../interface/SelectMenu";
-import { useState, KeyboardEvent, useEffect } from "react";
 import VerticalList from "../interface/VerticalList";
 import { Coords } from "../utils/UtilityInterfaces";
 import classes from "./BlockSelection.module.css";

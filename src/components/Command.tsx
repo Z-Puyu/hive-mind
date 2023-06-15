@@ -1,23 +1,19 @@
-import { RenderElementProps, useFocused, useSelected, useSlate } from "slate-react";
-import { useState, KeyboardEvent } from "react";
-import BlockSelection from "./BlockSelection";
-import { Editor, Transforms } from "slate";
-import { TypesetUtil } from "../utils/TypesetUtil";
+import { RenderElementProps, useSelected, useSlate } from "slate-react";
+import { Editor } from "slate";
 import { CommandElem } from "../utils/CustomSlateTypes";
 import { useEffect } from "react";
 
-export default function Command(props: RenderElementProps) {
+export default function Command(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
+  const editor: Editor = useSlate();
 
-  /* useEffect(() => {
-    if (isSelected) {
-      console.log("toggle true");
-      (props.element as CommandElem).toggleMenu(false);
+  useEffect(() => {
+    if (!isSelected || (isSelected && editor.selection?.anchor.offset === 0)) {
+      (props.element as CommandElem).onSelect(false);
     } else {
-      console.log("toggle false");
-    (props.element as CommandElem).toggleMenu(false);
+      (props.element as CommandElem).onSelect(true);
     }
-  }, [isSelected]); */
+  });
 
   return isSelected ? (
     <code

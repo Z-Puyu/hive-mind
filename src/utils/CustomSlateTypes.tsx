@@ -61,6 +61,7 @@ export type HeadingElem = {
 export type CommandElem = {
   id: string;
   type: "cmd" | null | string;
+  onSelect: (bool: boolean) => void;
   children: Descendant[];
 };
 

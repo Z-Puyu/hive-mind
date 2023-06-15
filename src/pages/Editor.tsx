@@ -3,7 +3,7 @@ import { KeyboardEvent, useCallback, useMemo, useState } from "react";
 import { withInline, withBetterBreaks, withNodeUids } from "../plugins/SlatePlugins";
 import { Editable, ReactEditor, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
 import { withHistory } from "slate-history";
-import { createEditor, Descendant, Editor as SlateEditor, Transforms, Range, Text, Element, Point, Path, BasePoint } from "slate";
+import { createEditor, Descendant, Editor as SlateEditor, Transforms, Range, Text, Element, Node } from "slate";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import isHotkey, { isKeyHotkey } from "is-hotkey";
 import DynElem from "../components/DynElem";
@@ -53,13 +53,10 @@ export default function Editor(): JSX.Element {
   ];
   const [selectMenuItems, setSelectMenuItems] = useState<{ [key: string]: string }[]>(initItems);
   const [selectedItem, setSelectedItem] = useState<{ [key: string]: string }>(selectMenuItems[0]);
-  const [commandStart, setCommandStart] = useState<number | undefined>(0);
 
   // Initialise drag-and-drop configs.
   const itemlist = useMemo<string[]>(() => (editor.children as Element[])
     .map((element) => element.id), [editor.children]);
-
-  const mouse = useMouse();
 
   const activeElement: Descendant | undefined = editor.children
     .find(child => (child as Element).id === activeId);
@@ -151,6 +148,9 @@ export default function Editor(): JSX.Element {
       SlateEditor.insertSoftBreak(editor);
     }
     // Handle selection menu interactions.
+    if (event.key === "\\") {
+      event.preventDefault();
+    }
     if (selectMenuIsOpen) {
       const selectedItemIndex: number = selectMenuItems.indexOf(selectedItem);
       switch (event.key) {
@@ -177,8 +177,11 @@ export default function Editor(): JSX.Element {
         case "ArrowLeft":
           break;
         case " ":
-            setSelectMenuIsOpen(false);
-            break;
+          event.preventDefault();
+          Transforms.move(editor, { unit: "offset" });
+          Transforms.insertText(editor, " ");
+          setSelectMenuIsOpen(false);
+          break;
         default:
           break;
       }
@@ -187,18 +190,35 @@ export default function Editor(): JSX.Element {
 
   const onKeyUpHandler = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "\\") {
+      Transforms.unwrapNodes(
+        editor,
+        {
+          at: SlateEditor.parent(editor, editor.selection?.anchor!)[1],
+          match: n => !SlateEditor.isEditor(n) && Element.isElement(n) && n.type === "cmd",
+        },
+      );
+      Transforms.insertNodes(editor, {
+        id: nanoid(),
+        type: "cmd",
+        onSelect: (bool: boolean) => setSelectMenuIsOpen(bool),
+        children: [{ text: "\\" }],
+      })
+      const prevNeighbour: Node = SlateEditor.node(
+        editor,
+        SlateEditor.before(
+          editor,
+          SlateEditor.before(
+            editor,
+            editor.selection?.anchor!
+          )!
+        )!
+      )[0];
+      const prevElem: HTMLElement = ReactEditor.toDOMNode(editor, prevNeighbour as Element);
       setSelectedItem(selectMenuItems[0]);
       setSelectMenuIsOpen(true);
-      const currElem: HTMLElement = ReactEditor.toDOMNode(
-        editor,
-        SlateEditor.node(
-          editor,
-          editor.selection?.anchor!
-        )[0]
-      );
       setSelectMenuPos({
-        x: currElem.offsetLeft + currElem.offsetWidth,
-        y: currElem.offsetTop + currElem.offsetHeight + 5,
+        x: prevElem.offsetLeft + prevElem.offsetWidth,
+        y: prevElem.offsetTop + prevElem.offsetHeight + 5,
       });
     }
   };
