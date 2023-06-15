@@ -1,7 +1,10 @@
 .textCard {
+  display: block;
+  float: left;
   background-color: beige;
+  width: 97.5%;
   max-width: 42em;
-  margin: 20px auto;
+  margin: 20px 0 20px auto;
   padding: 20px;
   font-family: "Times New Roman";
   font-size: 12pt;

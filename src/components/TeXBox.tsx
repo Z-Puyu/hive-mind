@@ -27,7 +27,7 @@ export default function TeXBox(props: RenderElementProps): JSX.Element {
           <MathButton inline />
           <MathButton />
         </Toolbar> : null}
-        <p {...props.attributes}>
+        <p {...props.attributes} autoFocus>
           {props.children}
         </p>
       </>

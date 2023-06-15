@@ -6,7 +6,11 @@ interface ToolbarProps {
 
 export default function Toolbar(props: ToolbarProps): JSX.Element {
   return (
-    <div className={classes.toolbar} contentEditable="false">
+    <div
+      className={classes.toolbar}
+      contentEditable="false"
+      onClick={event => event.preventDefault()}
+    >
       {props.children}
     </div>
   );

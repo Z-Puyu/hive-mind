@@ -1,6 +1,8 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { RenderElementProps } from "slate-react";
 import DynElem from "./DynElem";
+import { css } from "@emotion/css";
+import classes from "./SortableElement.module.css";
 
 export default function SortableElement(props: RenderElementProps): JSX.Element {
   const sortableObj = useSortable({
@@ -11,12 +13,19 @@ export default function SortableElement(props: RenderElementProps): JSX.Element 
     <div
       {...sortableObj.attributes}
       ref={sortableObj.setNodeRef}
-      style={{
-        opacity: sortableObj.isDragging ? 0.5 : 1
-      }}
+      className={css`
+        opacity: ${sortableObj.isDragging ? 0.5 : 1};
+        display: flex;
+        flex-direction: row;
+        align-content: stretch;
+      `}
     >
-      <button {...sortableObj.listeners}>@</button>
       <DynElem {...props} />
+      <div
+        {...sortableObj.listeners}
+        className={classes.handle}
+        contentEditable="false"
+      />
     </div>
   );
 };

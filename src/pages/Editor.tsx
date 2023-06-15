@@ -169,12 +169,24 @@ export default function Editor(): JSX.Element {
         case "Enter":
         case "Tab":
           event.preventDefault();
-          setSelectMenuIsOpen(false);
-          TypesetUtil.toggleBlock(editor, selectedItem.blockType);
+          if (selectedItem.blockType !== (SlateEditor.parent(editor,
+            SlateEditor.parent(editor, editor.selection?.anchor!)[1])[0] as Element).type) {
+            TypesetUtil.toggleBlock(editor, selectedItem.blockType);
+            Transforms.removeNodes(
+              editor,
+              { at: SlateEditor.parent(editor, editor.selection?.anchor!)[1] },
+            );
+            setSelectMenuIsOpen(false);
+          }
           break;
         case "Backspace":
-        case "ArrowRight":
-        case "ArrowLeft":
+          if (editor.selection?.anchor.offset === 1) {
+            Transforms.unwrapNodes(
+              editor,
+              { at: SlateEditor.parent(editor, editor.selection.anchor)[1] },
+            );
+            setSelectMenuIsOpen(false);
+          }
           break;
         case " ":
           event.preventDefault();
