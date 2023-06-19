@@ -28,6 +28,7 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
       <MathJax
         dynamic
         contentEditable={false}
+        suppressContentEditableWarning={true}
         style={{
           fontFamily: "times",
           fontWeight: "normal",

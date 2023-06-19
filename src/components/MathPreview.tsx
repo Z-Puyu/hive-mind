@@ -49,6 +49,7 @@ export default function MathPreview(props: MathPreviewProps): JSX.Element {
         <MathJax
           dynamic
           contentEditable={false}
+          suppressContentEditableWarning={true}
           style={{
             fontFamily: "times",
           }}

@@ -23,7 +23,7 @@ export default function SelectMenu(props: SelectMenuProps): JSX.Element {
         left: `${props.position.x}px`,
         top: `${props.position.y}px`,
         backgroundColor: "white",
-        borderRadius: "5%",
+        borderRadius: "0.8em",
         boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",
         padding: "12px 16px",
         minWidth: "100px",

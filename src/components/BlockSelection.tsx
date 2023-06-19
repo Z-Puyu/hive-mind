@@ -14,24 +14,6 @@ interface BlockSelectionProps {
 }
 
 export default function BlockSelection(props: BlockSelectionProps): JSX.Element {
-  const initItems: { [key: string]: string }[] = [
-    {
-      name: "paragraph",
-      blockType: "paragraph",
-      desc: "Paragraph",
-    },
-    {
-      name: "code",
-      blockType: "code-block",
-      desc: "Code Block",
-    },
-    {
-      name: "quote",
-      blockType: "quote",
-      desc: "Block Quote",
-    },
-  ];
-
   return (
     <>
       <ModalOverlay onClick={props.onClose} color={css``}/>

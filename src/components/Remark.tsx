@@ -1,19 +1,17 @@
-import { RenderElementProps, useSelected, useSlate } from "slate-react";
-import Toolbar from "../interface/Toolbar";
-import FormatButton from "./FormatButton";
-import ToggleLinkButton from "./ToggleLinkButton";
-import MathButton from "./MathButton";
-import CodeButton from "./CodeButton";
-import BlockButton from "./BlockButton";
+import { RenderElementProps, useSelected } from "slate-react";
 import TextCard from "../interface/TextCard";
+import Toolbar from "../interface/Toolbar";
+import BlockButton from "./BlockButton";
+import CodeButton from "./CodeButton";
+import FormatButton from "./FormatButton";
+import MathButton from "./MathButton";
+import ToggleLinkButton from "./ToggleLinkButton";
+import { css } from "@emotion/css";
+import { ThmElem } from "../utils/CustomSlateTypes";
 import Paragraph from "../interface/Paragraph";
-import HoveringWindow from "../interface/HoveringWindow";
-import Bookmark from "./Bookmark";
-import { Editor, Transforms } from "slate";
 
-export default function TeXBox(props: RenderElementProps): JSX.Element {
+export default function Remark(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
-  const editor: Editor = useSlate();
 
   return (
     <TextCard>
@@ -25,14 +23,17 @@ export default function TeXBox(props: RenderElementProps): JSX.Element {
           <FormatButton mark="underline" />
           <FormatButton mark="strikethru" />
           <CodeButton />
-          <BlockButton blockType="code-block" />
-          <BlockButton blockType="quote" />
-          <BlockButton blockType="heading" />
           <ToggleLinkButton />
           <MathButton inline />
           <MathButton />
         </Toolbar> : null}
         <Paragraph attributes={props.attributes}>
+          <i
+            contentEditable="false"
+            suppressContentEditableWarning={true}
+          >
+            Remark.
+          </i>
           {props.children}
         </Paragraph>
       </>

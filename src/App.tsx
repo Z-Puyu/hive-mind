@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 
 export default function App(): JSX.Element {
   return (
-    <div>
+    <div suppressContentEditableWarning={true}>
       {/* <Router>
         <Navbar />
         <Routes>

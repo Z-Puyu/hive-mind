@@ -3,7 +3,7 @@ import { ChildrenProps } from "../utils/UtilityInterfaces";
 import { ReactPortal } from "react";
 
 interface HoveringWindowProps {
-  children: JSX.Element;
+  children: JSX.Element | JSX.Element[];
 }
 
 export default function HoveringWindow(props: HoveringWindowProps): ReactPortal | null {

@@ -36,18 +36,22 @@ export const TypesetUtil = {
     return false;
   },
 
-  toggleBlock: (editor: Editor, blockType: string) => {
+  toggleBlock: (editor: Editor, blockType: string, thmStyle?: string) => {
     let newProperties: Partial<Element>;
-      if (TypesetUtil.isBlockActive(editor, blockType)) {
-        newProperties = {
-          type: "paragraph",
-        };
-      } else {
-        newProperties = {
-          type: blockType,
-        };
-      }
-      Transforms.setNodes(editor, newProperties);
+    if (TypesetUtil.isBlockActive(editor, blockType) && blockType !== "thm") {
+      newProperties = {
+        type: "paragraph",
+      };
+    } else {
+      newProperties = {
+        type: blockType,
+        style: !!thmStyle && ["thm", "dfn", "remark"].includes(thmStyle)
+          ? thmStyle as "thm" | "dfn" | "remark"
+          : undefined,
+      };
+      console.log(newProperties)
+    }
+    Transforms.setNodes(editor, newProperties);
     /* const { selection } = editor;
     if (!!selection && Range.isCollapsed(selection)) {
       Transforms.insertNodes(editor, {
@@ -167,6 +171,20 @@ export const TypesetUtil = {
     }
   },
 
+  insertBookmark: (editor: Editor) => {
+    if (!!editor.selection) {
+      Transforms.insertNodes(editor, {
+        id: nanoid(),
+        type: "bookmark",
+        title: "bookmark",
+        customDesc: "",
+        children: [{ 
+          text: "bookmark" 
+        }],
+      });
+    }
+  },
+
   toggleMath: (editor: Editor, isInline: boolean) => {
     if (!TypesetUtil.isInlineActive(editor, "math")) {
       if (!!editor.selection) {
@@ -199,6 +217,6 @@ export const TypesetUtil = {
         match: n =>
           !Editor.isEditor(n) && Element.isElement(n) && n.type === "math",
       });
-    } 
+    }
   },
 };
