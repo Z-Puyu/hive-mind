@@ -1,0 +1,5 @@
+.container {
+  display: block;
+  max-width: 100%;
+  margin: 20px 0 0 auto;
+}

@@ -1,6 +1,7 @@
 import { BaseEditor, Descendant } from "slate";
 import { ReactEditor } from "slate-react";
 import { HistoryEditor } from "slate-history";
+import { Dispatch, SetStateAction } from "react";
 
 export type FormattedPlainText = {
   text: string;
@@ -15,46 +16,71 @@ export type FormattedPlainText = {
 export type ParagraphElem = {
   id: string;
   type: "paragraph" | null | string;
-  children: Descendant[];
+  children: any[];
 };
 
 export type CodeBlockElem = {
   id: string;
   type: "code-block" | null | string;
-  children: Descendant[];
+  children: any[];
 };
 
 export type CodeElem = {
   id: string;
   type: "code" | null | string;
-  children: Descendant[];
+  children: any[];
 };
 
 export type QuoteElem = {
   id: string;
   type: "quote" | null | string;
-  children: Descendant[];
+  children: any[];
 };
 
 export type MathElem = {
   id: string;
   type: "math" | null | string;
   inline: boolean;
-  children: Descendant[];
+  children: any[];
 };
 
 export type LinkElem = {
   id: string;
   type: "link" | null | string;
   url: string;
-  children: Descendant[];
+  children: any[];
 };
 
 export type HeadingElem = {
   id: string;
   type: "heading" | null | string;
   level: "part" | "chapter" | "section" | "subsection" | "subsubsection";
-  children: Descendant[];
+  children: any[];
+};
+
+export type CommandElem = {
+  id: string;
+  type: "cmd" | null | string;
+  onSelect: (bool: boolean) => void;
+  children: any[];
+};
+
+export type ThmElem = {
+  id: string;
+  type: "thm" | null | string;
+  style: "dfn" | "thm" | "remark";
+  title?: string; 
+  children: any[];
+};
+
+export type BookmarkElem = {
+  key: string
+  id: string;
+  type: "bookmark" | null | string;
+  title: string;
+  dest?: BookmarkElem;
+  customDesc: string;
+  children: any[];
 };
 
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
@@ -66,7 +92,10 @@ export type CustomElement =
   | MathElem
   | CodeElem
   | QuoteElem
-  | HeadingElem;
+  | HeadingElem
+  | CommandElem
+  | ThmElem
+  | BookmarkElem;
 
 export type CustomText = FormattedPlainText;
 

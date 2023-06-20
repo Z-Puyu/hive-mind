@@ -1,5 +1,13 @@
 .blockCode {
+  display: block;
+  float: left;
+  width: 88%;
+  margin: auto;
   padding: 1.5em 1.5em;
   background: rgba(192, 192, 192, 0.5);
+  border-radius: 0.5em;
+}
+
+.codeLines {
   font-size: large;
 }

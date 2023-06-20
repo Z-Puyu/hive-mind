@@ -72,6 +72,7 @@ export default function Leaf(props: LeafProps): JSX.Element {
         ...styles,
         paddingLeft: "0.1px",
       } : styles}
+      suppressContentEditableWarning={true}
     >
       {leaf}
     </span>
