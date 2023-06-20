@@ -8,16 +8,15 @@ import Login from "./pages/Login";
 export default function App(): JSX.Element {
   return (
     <div suppressContentEditableWarning={true}>
-      {/* <Router>
+      <Router>
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/Login" element={<Login />} />
-          <Route path="/Editor" element={<Editor />} />
+          <Route path="/Editor/:userId/:projId" element={<Editor />} />
           <Route path="*" element={<h1>PAGE NOT FOUND</h1>} />
         </Routes>
-      </Router> */}
-      <Editor />
+      </Router>
     </div>
   );
 };

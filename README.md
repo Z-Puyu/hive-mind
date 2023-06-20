@@ -245,6 +245,22 @@ For example, the user can set up a marker at a formula, and set up another marke
 
 Ideally, a marker should be able to be set at an arbitrary number of locations. This means that the user can link ten different equations with one marker, such that when this marker is activated, it calls out a menu where the user can select which location to jump to. The user can annotate each of the locations with a custom tag to serve as a brief description of the contents over at the referenced position.
 
+#### [Current Progress]
+
+While our original plan seemed reasonable, we soon discovered that some parts of it were not as practical as we expected. For instance, we wished that one single hyperlink marker could link up any number of parts in a set of notes, but in practice, such a system over-complicates the mechanics of note-editing. In particular, it requires highly complex state management to build the hyperlinks, which appears not very efficient. Moreover, it poses another challenge to implement the user interfaces for such a system as there could be too many markers associated to one hyperlink to be displayed succintly. As such, although we still think it is a good idea to have a system like what we originally proposed, we decided to simplify the implementation details and build a simpler version first.
+
+Currently, the user can insert *bookmarks* which are read-only inline elements beside sections deemed as important. We spent some extra care designing the display of the bookmark. Each bookmark has three attributes: **a title**, **a destination** and **a custom description**. By default, every bookmark has a title which will be displayed. The destination is an optional attribute which refers to the section to which the bookmark is linked. For example, if bookmark A has a destination of bookmark B, then the former will be displayed as "Refer to bookmark B" and the latter, "Refer to bookmark A". Finally, if a bookmark has a custom description, that description will take the highest priority as its display name. By doing so, we have created a display mechanism for the bookmarks with three layers of fallbacks, which enables more dynamic user control over the appearance of the bookmarks.
+
+Double-clicking on a bookmark calls up a configuration menu where the user can customise all three attributes by simply editing in the corresponding input fields. The destination section has an extra filter which will display all matching bookmarks from a drop-down menu filtered based on the current user input. For example, if the user has typed in "abc" in the input, then only bookmarks whose titles start with "abc" will show up for selection. This allows the user to locate and select the target bookmark faster.
+
+The destination is by default bi-lateral, meaning that once bookmark A is defined with its destination as bookmark B, bookmark B will automatically be updated to have bookmark A as its destination as well. This means that clicking on these two bookmarks allows the user to quickly toggle back and forth between the two sections.
+
+#### [Future Plan]
+
+We would continue exploring to see whether there is an efficient way to upgrade the bookmark linkage such that an arbitrary number of bookmarks can be linked.
+
+Furthermore, a new inspiration derived from working on the bookmark and hyperlink feature is an **index page** for notes. Based on the headings present in the current notes, we could build a mechanism that auto-generates an index page at the very beginning of the document, where each entry is hyperlinked with the corresponding heading. This hyperlink should behave very similar to the current bookmark feature we have implemented, so we could extend it in the future.
+
 ### GUI-based Illustration Maker
 
 #### [Proposed]
@@ -345,7 +361,6 @@ This project demonstrates some basic features and interactions in the notes edit
   - Prepare for Milestone III.
 
 The **Project Log** is attached [here](https://docs.google.com/spreadsheets/d/1vAOZ7g_3GZcTc47UXCHAcNvJ3GAxhJOIIIlv9_ZGqss/edit#gid=0)
-
 
 ## Git Workflow
 
