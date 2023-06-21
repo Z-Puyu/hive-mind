@@ -4,10 +4,13 @@ import Navbar from "./components/NavBar";
 import Editor from "./pages/Editor";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import { css } from "@emotion/css";
 
 export default function App(): JSX.Element {
   return (
-    <div suppressContentEditableWarning={true}>
+    <div 
+      suppressContentEditableWarning={true} 
+    >
       <Router>
         <Navbar />
         <Routes>

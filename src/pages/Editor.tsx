@@ -21,8 +21,9 @@ import BlockSelection from "../components/BlockSelection";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import { matchSorter } from "match-sorter";
 import { useParams } from "react-router-dom";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../config/Firebase";
+import { Paper } from "@mui/material";
 
 export default function Editor(): JSX.Element | null {
   const [editor] = useState<SlateEditor>(() => withNodeUids(
@@ -38,26 +39,22 @@ export default function Editor(): JSX.Element | null {
   const [selectMenuIsOpen, setSelectMenuIsOpen] = useState<boolean>(false);
   const [selectMenuPos, setSelectMenuPos] = useState<Coords>({ x: 0, y: 0 });
   const params = useParams();
-  const [initVal, setInitVal] = useState<string>("");
+  const [initVal, setInitVal] = useState<Descendant[] | undefined>(undefined);
+  const currDoc = doc(db, "userProjects", params.userId!, "projects", params.projId!);
   useEffect(() => {
-    const getData = async () => {
-      const document = await getDoc(doc(db, "userProjects", params.userId!, "projects", params.projId!));
-      setInitVal(document.data()?.fileName);
-      console.log(initVal);
-    }
-    getData();
+    getDoc(currDoc).then(doc => setInitVal(doc.data()?.slateValue))
   }, [])
-  const initialValue = [
+  const initialValue = initVal ? initVal : [
     {
       id: nanoid(),
       type: "paragraph",
       children: [
         {
-          text: initVal ? initVal : ""
+          text: ""
         }
       ]
     }
-  ]
+  ];
 
   // Initialise block type select menu.
   const initItems: { [key: string]: string }[] = [
@@ -101,18 +98,6 @@ export default function Editor(): JSX.Element | null {
 
   const activeElement: Descendant | undefined = editor.children
     .find(child => (child as Element).id === activeId);
-
-  /* const initialValue: Descendant[] = [
-    {
-      id: nanoid(),
-      type: "paragraph",
-      children: [
-        {
-          text: "This is a paragraph"
-        },
-      ],
-    },
-  ]; */
 
   const HOTKEYS: { [key: string]: string } = {
     "mod+b": "bold",
@@ -334,17 +319,26 @@ export default function Editor(): JSX.Element | null {
     setSelectMenuIsOpen(false);
   };
 
-  const onChangeHandler = () => {
-
+  const autoSave = (value: Descendant[]) => {
+    const isAtChange = editor.operations.some(
+      op => "set_selection" !== op.type
+    );
+    if (isAtChange) {
+      updateDoc(currDoc, { slateValue: value });
+    }
   }
 
   return initVal ? (
-    <div 
-    suppressContentEditableWarning={true}>
+    <Paper
+      elevation={3}
+      square
+      className={classes.notes}
+      suppressContentEditableWarning={true}
+    >
       <Slate
         editor={editor}
         value={initialValue}
-        onChange={onChangeHandler}
+        onChange={value => autoSave(value)}
       >
         <DndContext
           onDragStart={onDragStartHandler}
@@ -387,7 +381,6 @@ export default function Editor(): JSX.Element | null {
           </MathJaxContext>
         </DndContext>
       </Slate>
-
-    </div>
+    </Paper>
   ) : null;
 };

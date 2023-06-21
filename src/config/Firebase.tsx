@@ -25,8 +25,8 @@ export const db = getFirestore(app); */
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, getApp, getApps, initializeApp } from "firebase/app";
 import { Analytics, getAnalytics } from "firebase/analytics";
-import { DocumentData, Firestore, Query, QuerySnapshot, addDoc, collection, doc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore"
-import { Auth, getAuth, GoogleAuthProvider, signInWithPopup, User, UserCredential } from "firebase/auth";
+import { DocumentData, Firestore, Query, QuerySnapshot, addDoc, collection, deleteDoc, doc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore"
+import { Auth, getAuth, GoogleAuthProvider, signInWithPopup, signOut, User, UserCredential } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -79,4 +79,9 @@ export const signInWithGoogle = async () => {
       alert((e as Error).message);
     }
   }
+}
+
+export const signUserOut = async () => {
+  await signOut(auth);
+  await deleteDoc(doc(db, "sessions", "active-session"));
 }

@@ -1,9 +1,11 @@
 import { css } from "@emotion/css";
-import { Box, Button, Modal, TextField } from "@mui/material";
+import { Box, Button, Modal, Paper, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { db } from "../config/Firebase";
 import { DocumentData, DocumentSnapshot, Query, QuerySnapshot, addDoc, collection, doc, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, where } from "firebase/firestore";
 import { NavigateFunction, useNavigate } from "react-router-dom";
+import DocumentRow from "../components/DocumentRow";
+import { nanoid } from "nanoid";
 
 export default function Home(): JSX.Element {
   const [isAddingDoc, setIsAddingDoc] = useState<boolean>(false);
@@ -38,6 +40,17 @@ export default function Home(): JSX.Element {
               addDoc(collection(db, "userProjects", userId, "projects"), {
                 fileName: newDocName,
                 timeStamp: serverTimestamp(),
+                slateValue: [
+                  {
+                    id: nanoid(),
+                    type: "paragraph",
+                    children: [
+                      {
+                        text: ""
+                      }
+                    ]
+                  }
+                ],
               });
             }
           });
@@ -50,13 +63,33 @@ export default function Home(): JSX.Element {
   }
 
   return (
-    <div>
+    <div
+      className={css`
+        padding: 2.5em;
+      `}
+    >
+      <Paper
+        elevation={3}
+        className={css`
+          margin: auto;
+          max-width: 75%;
+          min-height: 75%;
+        `}
+      >
       <section>
-        <h1>Home</h1>
-      </section>
-      <section>
-        <div>Start a new document</div>
-        <button onClick={() => setIsAddingDoc(true)}>Add new document</button>
+        <Box
+          className={css`
+            text-align: right;
+            padding: 1em;
+            box-shadow: 0 2.5px 5px rgb(128, 128, 128, 0.5);
+          `}
+        >
+          <Button 
+          variant="contained"
+          onClick={() => setIsAddingDoc(true)}>
+            Add new document
+          </Button>
+        </Box>
         <Modal
           open={isAddingDoc}
           onClose={() => setIsAddingDoc(false)}
@@ -104,13 +137,10 @@ export default function Home(): JSX.Element {
       </section>
       <section>
         {docsData.map(data =>
-          <div
-            onClick={() => navigate(`/Editor/${data.user}/${data.id}`)}
-          >
-            {data.fileName}
-          </div>
+          <DocumentRow key={data.id} docData={data} />
         )}
       </section>
+      </Paper>
     </div>
   );
 }
