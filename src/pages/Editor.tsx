@@ -1,5 +1,5 @@
 import { MathJaxContext } from "better-react-mathjax";
-import { KeyboardEvent, useCallback, useMemo, useState } from "react";
+import { KeyboardEvent, useCallback, useMemo, useState, useEffect } from "react";
 import { withInline, withBetterBreaks, withNodeUids } from "../plugins/SlatePlugins";
 import { Editable, ReactEditor, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
 import { withHistory } from "slate-history";
@@ -16,15 +16,16 @@ import { nanoid } from "nanoid";
 import ReactDOM from "react-dom";
 import DraggedContent from "../components/DraggedContent";
 import { mathjaxConfig } from "../config/MathJax";
-import { useMouse } from "ahooks";
 import { Coords } from "../utils/UtilityInterfaces";
 import BlockSelection from "../components/BlockSelection";
-import { BookmarkElem, ThmElem } from "../utils/CustomSlateTypes";
-import Bookmark from "../components/Bookmark";
-import HoveringWindow from "../interface/HoveringWindow";
+import { ThmElem } from "../utils/CustomSlateTypes";
 import { matchSorter } from "match-sorter";
+import { useParams } from "react-router-dom";
+import { getDoc, doc, updateDoc } from "firebase/firestore";
+import { db } from "../config/Firebase";
+import { Paper } from "@mui/material";
 
-export default function Editor(): JSX.Element {
+export default function Editor(): JSX.Element | null {
   const [editor] = useState<SlateEditor>(() => withNodeUids(
     withBetterBreaks(
       withInline(
@@ -32,13 +33,28 @@ export default function Editor(): JSX.Element {
           withReact(createEditor())
         )
       )
-    )));
+    )
+  ));
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [selectMenuIsOpen, setSelectMenuIsOpen] = useState<boolean>(false);
-  const [selectMenuPos, setSelectMenuPos] = useState<Coords>({ x: 0, y: 0 })
-
-  // Initialise bookmarks.
-  const [bmList, setBmList] = useState<string[]>([]);
+  const [selectMenuPos, setSelectMenuPos] = useState<Coords>({ x: 0, y: 0 });
+  const params = useParams();
+  const [initVal, setInitVal] = useState<Descendant[] | undefined>(undefined);
+  const currDoc = doc(db, "userProjects", params.userId!, "projects", params.projId!);
+  useEffect(() => {
+    getDoc(currDoc).then(doc => setInitVal(doc.data()?.slateValue))
+  }, [])
+  const initialValue = initVal ? initVal : [
+    {
+      id: nanoid(),
+      type: "paragraph",
+      children: [
+        {
+          text: ""
+        }
+      ]
+    }
+  ];
 
   // Initialise block type select menu.
   const initItems: { [key: string]: string }[] = [
@@ -82,18 +98,6 @@ export default function Editor(): JSX.Element {
 
   const activeElement: Descendant | undefined = editor.children
     .find(child => (child as Element).id === activeId);
-
-  const initialValue: Descendant[] = [
-    {
-      id: nanoid(),
-      type: "paragraph",
-      children: [
-        {
-          text: "This is a paragraph"
-        },
-      ],
-    },
-  ];
 
   const HOTKEYS: { [key: string]: string } = {
     "mod+b": "bold",
@@ -173,9 +177,9 @@ export default function Editor(): JSX.Element {
     if (event.ctrlKey && event.key === "m") {
       event.preventDefault();
       TypesetUtil.insertBookmark(editor);
-/*       const updatedBmList: string[] = bmList;
-      updatedBmList.push("bookmark");
-      setBmList(updatedBmList); */
+      /*       const updatedBmList: string[] = bmList;
+            updatedBmList.push("bookmark");
+            setBmList(updatedBmList); */
     }
     // Handle selection menu interactions.
     if (event.key === "\\") {
@@ -315,16 +319,26 @@ export default function Editor(): JSX.Element {
     setSelectMenuIsOpen(false);
   };
 
-  const onChangeHandler = () => {
-
+  const autoSave = (value: Descendant[]) => {
+    const isAtChange = editor.operations.some(
+      op => "set_selection" !== op.type
+    );
+    if (isAtChange) {
+      updateDoc(currDoc, { slateValue: value });
+    }
   }
 
-  return (
-    <div suppressContentEditableWarning={true}>
+  return initVal ? (
+    <Paper
+      elevation={3}
+      square
+      className={classes.notes}
+      suppressContentEditableWarning={true}
+    >
       <Slate
         editor={editor}
         value={initialValue}
-        onChange={onChangeHandler}
+        onChange={value => autoSave(value)}
       >
         <DndContext
           onDragStart={onDragStartHandler}
@@ -364,13 +378,9 @@ export default function Editor(): JSX.Element {
               </DragOverlay>,
               document.body
             )}
-            {/* <div style={{color: "red"}}
-              onClick={() => window.scrollTo(0, document.getElementById((initialValue[0] as Element).id)!.offsetTop)}
-            >BookMark</div> */}
           </MathJaxContext>
         </DndContext>
       </Slate>
-
-    </div>
-  );
+    </Paper>
+  ) : null;
 };

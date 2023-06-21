@@ -1,8 +1,7 @@
 .notes {
-  background-color: ghostwhite;
-  max-width: 42em;
+  max-width: 75%;
   margin: 20px auto;
-  padding: 20px;
+  padding: 10px 0;
   border: none;
   white-space: pre-wrap; /* This line is VERY IMPORTANT!!! */
 }
