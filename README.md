@@ -119,33 +119,43 @@ Graphs, tables, code blocks and other types of components in the notes should be
 We employed **Slate.js** to implement the notes editor. This decision was made based on two main reasons:
 
 - First, Slate.js is a relatively new library for making rich text editors with a very active user community, which means that it offers better support for more modern rich text functionalities and it is easier to find up-to-date resources and guide regarding the features we wish to implement.
-- Second, the design philosophy behind Slate.js coincides with our project in many ways. One prominent instance is that Slate.js organises rich text components into different nodes, which are packed into a tree structure based on their subsetting relationship. This highly resembles our idea of a modular editor consisting of different movable parts of contents.
+- Second, the design philosophy behind Slate.js coincides with our project in many ways. One prominent instance is that Slate.js organises rich text components into different nodes, which are then packed into a tree structure based on their subsetting relationship. This highly resembles our idea of a modular editor consisting of different movable parts of contents.
 
-With the extremely flexible components and methods provided by Slate.js, we quickly managed to transform the functionalities we have been experimenting on into a working prototype. 
+With the extremely flexible components and methods provided by Slate.js, we quickly managed to transform the functionalities we have been experimenting on into a working prototype. Now we shall introduce the various functionalities implemented:
 
-On start-up, the editor is initialised with a single TeXBox containing an empty paragraph. When the user press the Enter key while the TeXBox is focused, a new TeXBox will be instantiated right after the current working TeXBox and get automatically focused. Furthermore, pressing Backspace in an empty input field will delete the current working TeXBox.
+##### TeXBox:
+
+Paragraphs, headings and special text blocks like code blocks or quotes are packaged into modular containers known as **TeXBoxes**. On start-up, the editor is initialised with a single TeXBox containing an empty paragraph. All new paragraphs created by inserting line breaks will be automatically wrapped in a new TeXBox, and pressing Backspace at the start of a TeXBox will merge it with the previous TeXBox just like any normal text editor.
+
+We do realise that sometimes there is a need for the user to insert a *soft break* (e.g. when writing code blocks, the user would not want to have every line of code in a separate box), so we also provide support for those use cases. To break a line without instantiating a new TeXBox, the user just needs to hold *Shift* or *Ctrl* while pressing Enter.
 
 We have also implemented a variety of formatting options and a toolbar, which works just like any othe rich text editor. For example, to bold some texts, the user just needs to select those texts and press the "boldface" button in the toolbar. The currently supported formatting options are: **boldface**, *italic*, <u>underline</u>, <s>strike-through</s>, `inline code`, <a>link</a> and $\LaTeX \textrm{-rendered mathematics}$. These formats, except $\LaTeX$, can be composed onto one another freely, so a user can easily write <a><strong><i><u><s><code>some underlined inline code struck through and wrapped into a link with a boldface italic font</code></s></u></i></strong></a>, which can be more than a bit tiring to achieve in a markdown document like this (you have to nest 6 HTML tags to get it properly displayed but pressing 6 buttons will do the trick with our application).
 
-Beside these inline rich-text formatting, we have also implemented special formatting options to block-level contents, including `code block`, block quote and displayed mathematics. These also have their respective tooltip buttons in the toolbar to switch between different blocks.
+Beside these inline rich-text formatting, we have also implemented special formatting options to block-level contents, including, `code block`, block quote, theorems, definitions, remarks and displayed mathematics. These also have their respective tooltip buttons in the toolbar to switch between different blocks. However, we realise that it is troublesome to frequently click on buttons to switch between block types, so we have added support for **slash commands**. The user can choose to, without leaving the keyboard, type in a **backslash** followed by a code snippet for the target block type, and press enter to instantly toggle the current TeXBox to the desired block type (More on this in section **Intuitive and Smooth User-Interface Interactions**).
 
-We could have implemented support for different fonts into our application so that the user can freely choose the font to use from those installed in his or her device. However, we eventually decided to abort this idea. This is because most fonts do not have sufficient support for mathematical and other scientific symbols, which means even if we allow users to change the font of normal texts, these fonts will not be able to be applied to $\LaTeX$ rendering, causing a unsightly difference between texts and mathematics just like you have seen in this document. So we resolved to fixing the font used in our editor ― but what font should we use then? There are two fonts that offer comprehensive support for scientific symbols, namely Times New Roman and STIX Two. We have chosen to use Times New Roman because it is the default font used by $\LaTeX$.
+We have also built rendering logic for heading blocks. We categorise headings into Part, Chapter, Section, Subsection and Sub-subsection, which are in line with the original heading options provided by $\LaTeX$. However, these have not been formally added into the editor for the time being, as we are still fine-tuning the indexing behaviour.
 
-The drag-and-drop mechanism has been implemented using **dnd-kit**. We chose to use this package instead of writing our own logic because of two reasons:
+We have considered implementing support for different fonts into our application so that the user can freely choose the font to use from those installed in his or her device. However, we eventually decided to abort this idea. This is because most fonts *do not have sufficient support for mathematical and other scientific symbols*, which means even if we allow users to change the font of normal texts, these fonts will not be able to be applied to $\LaTeX$ rendering, causing a **unsightly inconsistency** between fonts of texts and mathematics just like you have seen in this document. So we resolved to fixing the font used in our editor ― but what font should we use then? There are two fonts that offer comprehensive support for scientific symbols, namely *Times New Roman* and *STIX Two*. We have chosen to use Times New Roman because it is the default font used by $\LaTeX$.
+
+##### Drag-and-drop:
+
+All top-level blocks of the document, i.e. TeXBoxes, are **draggable**. This means that should the user wishes to re-order the paragraphs, instead of copying and pasting big chunks of texts cautiously, he or she can just drag a TeXBox to the desired location in the document and drop it there. 
+
+This mechanism has been implemented using **dnd-kit**. We chose to use this package instead of writing our own logic because of two reasons:
 
 - First, we wish the mechanism to be complex enough to be able to sustain smooth user interactions. As such, using a mature package with pre-engineered methods would be much less bug-prone than building our own logic from scratch, especially considering our lack of experience with such mechanisms. We can instead make minor tweaks using the pre-existing methods to more easily achieve our desired behaviour.
 
 - Second, dnd-kit allows all draggable components to be wrapped in its context provider. This means we can easily build a universal mechanism which is general enough to be extended onto every component we add to our application, thus reducing repetitive work. These context providers can then be nested, which means we can achieve different drag-and-drop behaviours for different blocks by simply overriding certain properties or methods without the need to write separate logic.
 
-The user can hold the mouse on any block-level component in the notes to drag it around. Meanwhile, an opaque clone will stay at the original position of the dragged component for the user to compare the paragraph ordering before and after the component is dropped. 
+To ensure that the editor keeps track of the order of TeXBoxes correctly, we assign each TeXBox with a unique ID, so that the editor identifies each element to be rendered using this ID instead of an array index which changes frequently under the drag-and-drop setting.
 
 #### [Future Plan]
 
-On to the next phase, we have two major tasks:
+On to the next phase, we should continuously incorporate more formatting options into our editor. The most important items include (ordered and unordered) lists and proofs. Other than those, text colouring and shading might also be useful functionalities to add in.
 
-1. Incorporate more formatting options into our editor. The most important items include: (ordered and unordered) lists, proofs, definitions and theorem blocks.
+We should finish building the indexing mechanics for heading blocks as soon as possible. The indexes of headings should be static so as to be compatible with our drag-and-drop feature, meaning that no matter how the user decides to re-order the headings, their indexes should always stay in numerical order (i.e. dragging "Chapter 1" and placing it after "Chapter 3" will only change the texts in the titles and not the numbering).
 
-2. Implement and improve the drag-and-drop mechanism on the various components in our editor. Primarily, these will include TeXBoxes, displayed mathematics, block quotes, code blocks, paragraphs, titles and theorem- and proof-like blocks. 
+The theorems and definitions should be implemented with a similar behaviour and have their indexes automatically generated based on their locations in the document. For instance, if the user inserts a definition block under Section 1.2, the definition will have a default title of "Definition 1.2.x" where *x* is the number of definitions in the same section before this new definition plus one, and dragging and dropping theorems and definitions should not disrupt this numbering.
 
 #### [Potential Addtions]
 
@@ -153,11 +163,11 @@ Here we list a few good-to-have features:
 
 1. Syntax highlighting for code blocks which support different programming languages.
 
-2. Smooth animations during dragging and dropping blocks.
+2. Smoother animations during dragging and dropping blocks.
 
 3. "Transfer Station" which hosts temporary copies of blocks deemed potentially useful by the user, such that the user can retrieve them directly from the station to paste in the appropriate position without needing to browse back and forth to search for the blocks. 
 
-4. Ability to merge neighbouring blocks into one block to be moved around together.
+4. Ability to chain up neighbouring blocks and move them around together.
 
 ### Intuitive and Smooth User-Interface Interactions
 
@@ -172,41 +182,71 @@ It is great pain when one has to frequently switch between the keyboard and the 
 
 #### [Current Progress]
 
-$\LaTeX$ rendering is of particular importance to our application so we decided to first tackle the various interactions with it. We have spent much time and effort contemplating and experimenting in order to find out the best way to implement it for the optimal user experience. In the very initial implementation, a input box will pop up and get focused when inserting an inline math component for the user to type in $\LaTeX$ code, and the rendered result will be displayed in the TeXBox. However, $\LaTeX$ cannot be rendered in the browser in the same way as texts and it blocks cursor movement (the caret will disappear when one attempts to move it across the inline mathematics). Hence, to ensure browser-compatibility such that the caret is not obstructed, we had to make the rendered inline mathematics a **read-only** block so that the caret "jumps over" it when direction keys are pressed. One severe problem this had led to was that a read-only block cannot be selected (actually there might be a possible walk-around but it could be highly tedious and bug-prone), so the user has to click on the block to activate the input box, and click on the paragraph after closing the input box to focus on the texts again. This deviated from our vision of a mouse-free user experience.
+##### $\LaTeX$ Rendering and Display:
 
-In searching for an alternative, an inspiration struck: instead of using an **inline display + hovering input box**, can we switch them and use an **inline input + hovering preview box** instead? Following this idea, we rebuilt the input mechanism for $\LaTeX$ such that the user can insert a $\LaTeX$ block by either clicking the math-mode tooltip button or pressing "\$", after which the user can directly type in $\LaTeX$ and preview the output in a hovering box that pops up automatically. When the user completed, he or she can return to normal text mode by pressing Enter or moves the caret away from the $\LaTeX$ code, which will then be replaced by the rendered mathematics. Note that in this implementation, the $\LaTeX$ component is no longer read-only but an editable inline element. This means that it can be selected and focused just like any other texts. Therefore, when the user moves the caret into the inline mathematics, the $\LaTeX$ code will become visible and the preview box will appear again automatically, and mouse clicking is no longer necessary.
+$\LaTeX$ rendering is of particular importance to our application so we decided to first tackle the various interactions with it. We have spent much time and effort contemplating and experimenting in order to find out the best way to implement it for the optimal user experience. In the very initial implementation, an input box will pop up and get focused when inserting an inline math component for the user to type in $\LaTeX$ code, and the rendered result will be displayed in the TeXBox. 
+
+However, $\LaTeX$ cannot be rendered in the browser in the same way as texts and it *blocks cursor movement* (the caret will disappear when one attempts to move it across the inline mathematics). Hence, to ensure browser-compatibility such that the caret is not obstructed, we had to make the rendered inline mathematics a **read-only** block so that the caret "jumps over" it when direction keys are pressed. One severe problem this had led to was that a read-only block *cannot be selected* (actually there might be a possible walk-around but it could be highly tedious and bug-prone), so the user has to click on the block to activate the input box, and click on the paragraph after closing the input box to focus on the texts again. **This deviated from our vision of a mouse-free user experience.**
+
+In searching for an alternative, an inspiration struck: instead of using an **inline display + hovering input box**, can we switch them and use an **inline input + hovering preview box** instead? Following this idea, we rebuilt the input mechanics for $\LaTeX$ such that the user can insert a $\LaTeX$ block by either clicking the math-mode tooltip button or pressing "\$", after which the user can directly type in $\LaTeX$ code. Since $\LaTeX$ code consists of just regular characters, it can be typed just like any other normal text. This $\LaTeX$ code then gets automatically wrapped inside an inline element, from which a hovering box will pop up to display the rendering result of the code. 
+
+When the user completed, he or she can return to normal text mode by simply moving the caret away from the inline element containing the $\LaTeX$ code, which will then be replaced by the rendered mathematics. Note that in this implementation, the $\LaTeX$ component is no longer read-only but an **editable inline element**. This means that it can be selected and focused in the regular way. Therefore, when the user moves the caret into the inline mathematics, the $\LaTeX$ code will become visible and the preview box will appear again automatically, and mouse clicking is no longer necessary.
+
+##### Hotkeys and Toolbar
 
 Besides implementing $\LaTeX$ input, we have also added hotkey bindings for the text formats currently supported in our editor. The list is as follows:
 
-- mod + B: boldface
+- mod + b: boldface
 
-- mod + I: italic
+- mod + i: italic
 
-- mod + R: regular
+- mod + r: regular
 
-- mod + U: underline
+- mod + u: underline
 
-- mod + S: strike-through
+- mod + s: strike-through
 
 - mod + `: inline code
 
-- mod + K: link
+- mod + k: link
 
 All of the above hotkeys have their tooltip button equivalents in the toolbar. Toggling a format with texts selected will apply the format onto the currently selected texts, whereas toggling a format with a collapsed selection will cause the proceding input from the caret position to be applied with the format.
 
-Regarding the toolbar, we initially append it to every block in the editor, but this soon led to a problem: most text formats such as boldface and italic texts are not used at all in certain special types of blocks such as a code block, so it is redundant to still show the toolbar. Therefore, we decided to make the visibility of the toolbar conditional such that it only shows up in a text block (i.e. paragraph, heading) while it is focused. An unexpected benefit this has brought is that the editor now looks cleaner because there can only be at most one visible toolbar concurrently. 
+Regarding the toolbar, we initially appended it to every block in the editor, but this soon led to a problem: most text formats such as boldface and italic texts are not used at all in certain special types of blocks such as a code block, so it is **redundant** to still show the toolbar in those blocks. Therefore, we decided to make the visibility of the toolbar conditional such that it only shows up in a text block (e.g. paragraph and heading) while it is focused. An unexpected benefit this has brought is that the editor now looks cleaner because there can only be at most one visible toolbar concurrently. 
+
+##### Slash Commands:
+
+Inspired by Notion, we have found that slash commands are a very useful feature to reduce the frequency of mouse-clicking while using the application, which offers a great boost to efficiency. So we decided to incorporate it into our application as well.
+
+To initiate a slash command, the user simply types a **backslash**. The reason why we chose to use a backslash ("\") rather than a slash ("/") is that many custom $\LaTeX$ environments are also delimited with slash commands (\begin{...} and \end{...}), so a $\LaTeX$ user would be more accustomed to inputing a command with a backslash. Additionally, this also potentially makes it possible to integrate more $\LaTeX$ environment into our application.
+
+Once a backslash is typed, an inline input for commands will be triggered. At the same time, a select menu will appear right below the command input to show all the possible commands available. As the user types in the command input, the options in this menu will be **filtered** in real time such that *only commands which contain the current input will be displayed*, which behaves just like the code suggestion menu in many IDEs like VSCode.
+
+The user can click on a command from the select menu to apply it to the currently focused block. For now, this refers to toggling the block type, but we may add other kinds of commands in the future. Alternatively, the user can also use the ArrowUp and ArrowDown keys to browse the menu and change the selected command, and press Enter to apply the selected command.
+
+We did predict that the user may want to type something after a backslash only as regular texts instead of a command. To address such a use case, we have designed the command input such that it will only become active when the caret is next to any character of the command. Hence, when the user moves the caret away from the slash command, it will just display as normal texts. Moreover, whenever the user initiate a new command input, the editor will first iterate through all texts within the same block and *unwrap all existing command inputs into plain texts*. By doing so, we aimed to avoid potential bugs caused by multiple active commands present in the same block.
+
+##### User Interface (UI):
+
+We recognise that good UI design forms a major part of positive user experiences, and is therefore essential for implementing smooth user interactions. Hence, we decided to build the UI in parallel to the logic of our application, rather than adding interface styling only after a prototype has been completed. This had the following advantages:
+
+- By drafting out the basic layout of various UI components, this helped us as developers better visualise the appearance of our application and thus predict how a user would react to the webpage, so that we could make more informed decisions on the most ideal kind of interactions to implement for the various interfaces.
+
+- To the users who test our application, having relatively complete UI components would help simulate what the application might turn out to be in the final version, so that their experiences with the prototype would be closer to the actual product, which helps them make more concrete comments on the various features of our application. As developers, this means when we start overhauling the UI in the next phase of development, we would already have a lot more of useful information and feedbacks in mind.
+
+Initially, we planned to design most of the UI components from scratch. However, we proved to have underestimated the complexity of UI design, which has led to problems. For instance, we created some unnecessary nesting of components which over-complicate the structure of our code. Furthermore, there were some components which were initially abstracted into stand-alone files but later discovered to be unlikely to get reused, so such abstraction barriers seem redundant. These UI components built from scratch were also unstable and prone to changes in styling, which made our application harder to maintain.
+
+Therefore, we decided to switch to a UI library instead. We have chosen to use MUI to build our user interface. This decision was mainly because MUI by default uses Emotion to style its components, which we had already been using earlier in many of our own components, so it would be easier to migrate those components to newer versions based on MUI. Furthermore, MUI has a minimalistic design which suits the overall theme of our application's aesthetics.
 
 #### [Future Plan]
 
 We will keep updating the hotkey bindings and tooltip buttons to synchronise with new formatting options added. For $\LaTeX$ input, we wish to upgrade it such that toggling math mode with texts selected will wrap the selected texts into $\LaTeX$ environment.
 
-Meanwhile, we are planning to split the toolbar. Currently, both text- and block-level formatting buttons are in the same toolbar. However, since the toolbar is invisible in certain special blocks such as a code block, this makes hotkey the only possible way to switch back from a special block to a text block, which compromises much flexibility. Hence, the block-toggling buttons should be placed at a separate toolbar which is always visible as long as the block is focused.
+Meanwhile, we are planning to split the toolbar. Currently, both text- and block-level formatting buttons are in the same toolbar. However, since the toolbar is invisible in certain special blocks such as a code block, this makes hotkey the only possible way to switch back from a special block to a text block, which compromises flexibility. Hence, the block-toggling buttons should be placed at a separate toolbar which is always visible as long as the block is focused.
 
 We would also continue to improve the various interactions and hotkeys with regard to webpage navigation. We expect this to be a continuous and long-term process in a sense that new interactions and UI components will be implemented wherever and whenever they are deemed appropriate.
 
-#### [Potential Additions]
-
-Inspired by Notion, we have found that slash commands are a very useful feature to reduce the frequency of mouse-clicking while using the application, which offers a great boost to efficiency. Besides, many custom $\LaTeX$ environments are also delimited with slash commands (\begin{...} and \end{...}), so this potentially makes it possible to integrate more $\LaTeX$ environment into our application.
+Regarding the UI, we would continue rebuilding all of our interface components with MUI and simplify the code structures by removing unnecessary abstractions and reducing nesting of components as much as possible. 
 
 ### Real-time Rendering of $\LaTeX$ Contents
 
@@ -253,13 +293,13 @@ Currently, the user can insert *bookmarks* which are read-only inline elements b
 
 Double-clicking on a bookmark calls up a configuration menu where the user can customise all three attributes by simply editing in the corresponding input fields. The destination section has an extra filter which will display all matching bookmarks from a drop-down menu filtered based on the current user input. For example, if the user has typed in "abc" in the input, then only bookmarks whose titles start with "abc" will show up for selection. This allows the user to locate and select the target bookmark faster.
 
-The destination is by default bi-lateral, meaning that once bookmark A is defined with its destination as bookmark B, bookmark B will automatically be updated to have bookmark A as its destination as well. This means that clicking on these two bookmarks allows the user to quickly toggle back and forth between the two sections.
+The destination is by default **bi-lateral**, meaning that once bookmark A is defined with its destination as bookmark B, bookmark B will automatically be updated to have bookmark A as its destination as well. This means that clicking on these two bookmarks allows the user to quickly toggle back and forth between the two sections.
 
 #### [Future Plan]
 
 We would continue exploring to see whether there is an efficient way to upgrade the bookmark linkage such that an arbitrary number of bookmarks can be linked.
 
-Furthermore, a new inspiration derived from working on the bookmark and hyperlink feature is an **index page** for notes. Based on the headings present in the current notes, we could build a mechanism that auto-generates an index page at the very beginning of the document, where each entry is hyperlinked with the corresponding heading. This hyperlink should behave very similar to the current bookmark feature we have implemented, so we could extend it in the future.
+Furthermore, a new inspiration derived from working on the bookmark and hyperlink feature is an **index page** for notes. Based on the headings present in the current notes, we could build a mechanism that auto-generates an index page at the very beginning of the document, where each entry is hyperlinked with the corresponding heading. This hyperlink should behave very similar to the current bookmark feature we have implemented.
 
 ### GUI-based Illustration Maker
 
@@ -280,6 +320,50 @@ The project manager of HiveMind is inspired by Overleaf. Instead of behaving lik
 
 The user first create some custom tags, and then assign the tags to the projects to indicate some shared characteristics among them. For example, a user might want to tag all his maths notes with "Math" and all his physics notes with "Physics". The advantage of using tags is that the same project can be placed to a number of different groups. For instance, the notes for computational genomics may appear under "CS", "Math", "Statistics" and "Biology" tags such that clicking on any of the four groups is able to access the project.
 
+#### [Current Progress]
+
+We chose to use Firestore to build our back-end server for data storage.
+
+##### User Authentication:
+
+Currently, we have built the authentication page and incorporated sign-in with Google. We store all the user information under the "users" collection in Firestore. When a user logs in, we first query the database for documents under the collection which has the same ID as the current user credential. If such documents do not exist, we follow up by adding a new document containing the current user's information to the "users" collection.
+
+Then, we create a collection named "sessions" with only one document named "active-session". In this document, we store the credential of the user who is currently logged in and all other relevant authentication information such as the authentication provider, so that we can later retrieve these information. Note that when the current user has signed out, this collection will be deleted, which ensures that the collection is always up-to-date with every user log-in request as every time we re-create a new collection.
+
+If the user has successfully logged in, we will redirect him or her to the Dashboard. Otherwise, the website will alert the user with an error message.
+
+##### Project Manager:
+
+On Firestore, we created a "userProjects" collection, which contains all users that have been registered with our application. Each user points to a sub-collection named "projects" where all the projects owned by the user are stored. Once the user is directed to the Dashboard, he or she will see the project manager. The application will send a request to the database to retrieve the data of all of the user's projects and display them as entries of a vertical list. 
+
+Currently, every entry will display the project name and date of last update, and the projects are ranked in order of last update time by default. Clicking on the entry will re-direct the user to the editor page with the corresponding project loaded. All changes of project contents thereafter will be automatically saved in real time to the database.
+
+The user can click on the "Create New Project" button to set up a new project, which pops up a window for the user to enter the project name. On pressing "confirm" button, the application will first check the validity of the project name. If the project name is empty or is the same as another existing project, the webpage will alert the user with a message. Otherwise, the new project will be created successfully and its data will be send to the database.
+
+The user can also rename or delete a project by clicking on the corresponding button beside the entry in the manager. When renaming, the same validation process for project name applies.
+
+#### [Future Plan]
+
+Currently, the project manager is not very interesting as only the most basic actions about file management have been implemented. In the next phase of development, we will extend the project manager with the following additions:
+
+1. The user should be able to rank projects differently, such as by file name or by file size. Each ranking method should also have "ascending" and "descending" options.
+
+2. The user should be able to export the projects, for example as PDFs.
+
+3. The time stamp displayed for each project should be more precise to minutes instead of just dates.
+
+4. The "tag" feature should be implemented.
+
+Furthermore, we would continue building on the authentication process. We plan to add other login methods such as Facebook and Github, and create user registration and sign-in using general e-mail and password.
+
+#### [Potential Additions]
+
+There are a few potentially complex features that could be added to the project manager. For instance, since our editor supports $\LaTeX$ input, it would be good if a user can import $\LaTeX$ source code, which can then be converted to a project.
+
+It would also be good if the user can export $\LaTeX$ source code directly from an existing project so as to transfer the notes to other platforms such as Overleaf.
+
+Regarding project management, we could add a functionality which allows the user to mark certain projects as "important" so that these projects will always be pinned to the top of the project manager regardless of ranking rules.
+
 ### Collaborative Note-taking
 
 #### [Proposed]
@@ -292,10 +376,11 @@ Thus, we propose to incorporate collaborative editing into HiveMind. Users may c
 
 1. React.js
 2. JavaScript, TypeScript
-3. Node.js
-4. Slate.js
-5. MathJax
-6. $\LaTeX$
+3. Firebase
+4. Node.js
+5. Slate.js
+6. MathJax
+7. $\LaTeX$
 
 ## Proof-of-concept
 
@@ -364,17 +449,25 @@ The **Project Log** is attached [here](https://docs.google.com/spreadsheets/d/1v
 
 ## Git Workflow
 
-In this project, our team follows the following Git workflow:
+We did not have a specific Git workflow at the beginning of the project as we expected it to be light-weight and not require conscientious workflow control. However, as we approach milestone 2, we realise that the size of the project has grown tremendously with a significantly more complex code structure. For higher maintenability, we decided to set up the following Git workflow:
 
-- After every major feature implementation or bug fix, the updated files should be immediately commited and pushed to the respective branch.
+1. The `main` branch is **protected** and all pull requests merging to it require **code reviews** from both members of the team.
 
-- All new features and major changes to existing code should be experimented and implemented in a new branch first before they are merged into the main branch.
+2. The `dev` branch is a non-protected branch hosting a stable working build of the application. It is the **only** branch that is allowed to be merged into `main` via pull requests.
 
-- Branches should be named succintly with the main feature they serve to implement.
+3. Every new feature with a certain level of complexity needs to be implemented in a **separate non-protected** branch first.
 
-- In principle, the main branch should not be commited directly.
+4. Branches for implementing new features should be named with the feature name or a succint description, and attached with "(WIP)" at the end of branch name to indicate it is a *work-in-progress*.
 
-- The README should be updated accordingly along with every major update or addition of features to prevent omission of details.
+5. Branches for experimenting new features and ideas should be named with a succint description and attached with "(EXP)" at the end of branch name to indicate its *experimental* nature.
+
+6. All branches should be named in **kebab-case**.
+
+7. When a new feature has been implemented, its work-in-progress branch should be merged into `dev` via pull requests. The code in `dev` should then be **immediately tested** to ensure that it works as expected.
+
+8. After ensuring that the code in `dev` is without major issues, review the code and merge it with `main`. 
+
+9. The README shoud be updated timely to avoid any omission of details.
 
 ## Appendix: Coding Convention
 
