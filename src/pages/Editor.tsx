@@ -6,10 +6,10 @@ import { withHistory } from "slate-history";
 import { createEditor, Descendant, Editor as SlateEditor, Transforms, Range, Text, Element, Node } from "slate";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import isHotkey, { isKeyHotkey } from "is-hotkey";
-import DynElem from "../components/DynElem";
-import Leaf from "../components/Leaf";
+import DynElem from "../components/editor-components/DynElem";
+import Leaf from "../components/editor-components/Leaf";
 import classes from "./Editor.module.css";
-import SortableElement from "../components/SortableElement";
+import SortableElement from "../components/editor-components/SortableElement";
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, UniqueIdentifier } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { nanoid } from "nanoid";
@@ -20,12 +20,20 @@ import { Coords } from "../utils/UtilityInterfaces";
 import BlockSelection from "../components/BlockSelection";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import { matchSorter } from "match-sorter";
-import { useParams } from "react-router-dom";
-import { getDoc, doc, updateDoc } from "firebase/firestore";
+import { Params, useParams } from "react-router-dom";
+import { getDoc, doc, updateDoc, query, collection, DocumentReference, DocumentData } from "firebase/firestore";
 import { db } from "../config/Firebase";
 import { Paper } from "@mui/material";
+import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
 
 export default function Editor(): JSX.Element | null {
+  const params: Readonly<Params<string>> = useParams();
+
+  // Import Firestore.
+  const auth: Auth = getAuth();
+  const [currDoc, setCurrDoc] = useState<DocumentReference<DocumentData> | null>(null);
+  
+  // Initialise Slate editor.
   const [editor] = useState<SlateEditor>(() => withNodeUids(
     withBetterBreaks(
       withInline(
@@ -35,26 +43,14 @@ export default function Editor(): JSX.Element | null {
       )
     )
   ));
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const [selectMenuIsOpen, setSelectMenuIsOpen] = useState<boolean>(false);
-  const [selectMenuPos, setSelectMenuPos] = useState<Coords>({ x: 0, y: 0 });
-  const params = useParams();
   const [initVal, setInitVal] = useState<Descendant[] | undefined>(undefined);
-  const currDoc = doc(db, "userProjects", params.userId!, "projects", params.projId!);
-  useEffect(() => {
-    getDoc(currDoc).then(doc => setInitVal(doc.data()?.slateValue))
-  }, [])
-  const initialValue = initVal ? initVal : [
-    {
-      id: nanoid(),
-      type: "paragraph",
-      children: [
-        {
-          text: ""
-        }
-      ]
-    }
-  ];
+
+  const renderElementHandler = useCallback((props: RenderElementProps) => {
+    const isTopLevel = ReactEditor.findPath(editor, props.element).length === 1;
+    return isTopLevel ? <SortableElement {...props} /> : <DynElem {...props} />;
+  }, []);
+
+  const renderLeafHandler = useCallback((props: RenderLeafProps) => <Leaf {...props} />, []);
 
   // Initialise block type select menu.
   const initItems: { [key: string]: string }[] = [
@@ -89,15 +85,48 @@ export default function Editor(): JSX.Element | null {
       desc: "Theorem Box",
     },
   ];
+
   const [selectMenuItems, setSelectMenuItems] = useState<{ [key: string]: string }[]>(initItems);
   const [selectedItem, setSelectedItem] = useState<{ [key: string]: string }>(selectMenuItems[0]);
+  const [selectMenuIsOpen, setSelectMenuIsOpen] = useState<boolean>(false);
+  const [selectMenuPos, setSelectMenuPos] = useState<Coords>({ x: 0, y: 0 });
 
-  // Initialise drag-and-drop configs.
+  // Initialise drag-and-drop.
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+
   const itemlist = useMemo<string[]>(() => (editor.children as Element[])
     .map((element) => element.id), [editor.children]);
 
   const activeElement: Descendant | undefined = editor.children
     .find(child => (child as Element).id === activeId);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        const currDoc: DocumentReference<DocumentData> = doc(db, "userProjects",
+          user.uid, "projects", params.projId!);
+        setCurrDoc(currDoc);
+        getDoc(currDoc).then(doc => {
+          const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
+          setInitVal(slateValue ? slateValue : [
+            {
+              id: nanoid(),
+              type: "paragraph",
+              children: [
+                {
+                  text: ""
+                }
+              ]
+            }
+          ]);
+        })
+      }
+    })
+  }, [])
+
+  if (!initVal) {
+    return null;
+  }
 
   const HOTKEYS: { [key: string]: string } = {
     "mod+b": "bold",
@@ -136,13 +165,6 @@ export default function Editor(): JSX.Element | null {
     setActiveId(null);
   };
 
-  const renderElementHandler = useCallback((props: RenderElementProps) => {
-    const isTopLevel = ReactEditor.findPath(editor, props.element).length === 1;
-    return isTopLevel ? <SortableElement {...props} /> : <DynElem {...props} />;
-  }, []);
-
-  const renderLeafHandler = useCallback((props: RenderLeafProps) => <Leaf {...props} />, []);
-
   const onKeyDownHandler = (event: KeyboardEvent<HTMLDivElement>) => {
     // Override cursor movement with offset as the unit.
     const { selection } = editor;
@@ -177,9 +199,6 @@ export default function Editor(): JSX.Element | null {
     if (event.ctrlKey && event.key === "m") {
       event.preventDefault();
       TypesetUtil.insertBookmark(editor);
-      /*       const updatedBmList: string[] = bmList;
-            updatedBmList.push("bookmark");
-            setBmList(updatedBmList); */
     }
     // Handle selection menu interactions.
     if (event.key === "\\") {
@@ -324,20 +343,21 @@ export default function Editor(): JSX.Element | null {
       op => "set_selection" !== op.type
     );
     if (isAtChange) {
-      updateDoc(currDoc, { slateValue: value });
+      console.log(value);
+      updateDoc(currDoc!, { slateValue: JSON.stringify(value) });
     }
   }
 
-  return initVal ? (
+  return (
     <Paper
       elevation={3}
       square
-      className={classes.notes}
+      className={classes.paper}
       suppressContentEditableWarning={true}
     >
       <Slate
         editor={editor}
-        value={initialValue}
+        value={initVal}
         onChange={value => autoSave(value)}
       >
         <DndContext
@@ -345,42 +365,37 @@ export default function Editor(): JSX.Element | null {
           onDragEnd={onDragEndHandler}
           onDragCancel={() => setActiveId(null)}
         >
-          <MathJaxContext
-            version={3}
-            config={mathjaxConfig}
-            hideUntilTypeset="first"
-          >
-            {selectMenuIsOpen
-              ? <BlockSelection
-                pos={selectMenuPos}
-                items={selectMenuItems}
-                currSelection={selectedItem}
-                onSelect={onSelectHandler}
-                onClose={onCloseSelectMenuHandler}
-              /> : null}
-            <SortableContext items={itemlist} strategy={verticalListSortingStrategy}>
-              <Editable
-                className={classes.notes}
-                disableDefaultStyles
-                autoFocus
+          {selectMenuIsOpen
+            ? <BlockSelection
+              pos={selectMenuPos}
+              items={selectMenuItems}
+              currSelection={selectedItem}
+              onSelect={onSelectHandler}
+              onClose={onCloseSelectMenuHandler}
+            />
+            : null}
+          <SortableContext items={itemlist} strategy={verticalListSortingStrategy}>
+            <Editable
+              className={classes.notes}
+              disableDefaultStyles
+              autoFocus
+              renderElement={renderElementHandler}
+              renderLeaf={renderLeafHandler}
+              onKeyDown={onKeyDownHandler}
+              onKeyUp={onKeyUpHandler}
+            />
+          </SortableContext>
+          {ReactDOM.createPortal(
+            <DragOverlay adjustScale={false}>
+              {!!activeElement ? <DraggedContent
+                element={activeElement}
                 renderElement={renderElementHandler}
-                renderLeaf={renderLeafHandler}
-                onKeyDown={onKeyDownHandler}
-                onKeyUp={onKeyUpHandler}
-              />
-            </SortableContext>
-            {ReactDOM.createPortal(
-              <DragOverlay adjustScale={false}>
-                {!!activeElement ? <DraggedContent
-                  element={activeElement}
-                  renderElement={renderElementHandler}
-                /> : null}
-              </DragOverlay>,
-              document.body
-            )}
-          </MathJaxContext>
+              /> : null}
+            </DragOverlay>,
+            document.body
+          )}
         </DndContext>
       </Slate>
     </Paper>
-  ) : null;
+  );
 };

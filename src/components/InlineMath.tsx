@@ -37,7 +37,7 @@ export default function InlineMath(props: RenderElementProps) {
     <MathJax
       inline
       dynamic
-      contentEditable={false}
+      contentEditable="false"
       style={{
         fontFamily: "times",
         fontWeight: "normal",

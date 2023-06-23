@@ -1,19 +1,17 @@
 import { useSortable } from "@dnd-kit/sortable";
-import { RenderElementProps } from "slate-react";
+import { RenderElementProps, useSelected } from "slate-react";
 import DynElem from "./DynElem";
 import { css } from "@emotion/css";
 import classes from "./SortableElement.module.css";
-import BlockContainer from "../interface/BlockContainer";
-import Bookmark from "./Bookmark";
-import HoveringWindow from "../interface/HoveringWindow";
+import BlockContainer from "../../interface/BlockContainer";
 
 export default function SortableElement(props: RenderElementProps): JSX.Element {
   const sortableObj = useSortable({
     id: !!props.element.id ? props.element.id : "",
   });
+  const isSelected: boolean = useSelected();
 
   return (
-    <BlockContainer>
       <div
         {...sortableObj.attributes}
         id={props.element.id}
@@ -21,7 +19,8 @@ export default function SortableElement(props: RenderElementProps): JSX.Element 
         className={css`
           opacity: ${sortableObj.isDragging ? 0.5 : 1};
           display: flex;
-          flex-direction: row;
+          width: 80%;
+          margin: 0.5em auto;
           align-content: stretch;
         `}
       >
@@ -33,6 +32,5 @@ export default function SortableElement(props: RenderElementProps): JSX.Element 
           suppressContentEditableWarning={true}
         />
       </div>
-    </BlockContainer>
   );
 };

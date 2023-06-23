@@ -1,15 +1,19 @@
+import { Box } from "@mui/material";
 import { ChildrenProps } from "../utils/UtilityInterfaces";
 import BlockContainer from "./BlockContainer";
+import { PropsWithChildren } from "react";
 import classes from "./TextCard.module.css";
+import { useSelected } from "slate-react";
 
-export default function TextCard(props: ChildrenProps): JSX.Element {
+export default function TextCard(props: PropsWithChildren): JSX.Element {
+  const isSelected: boolean = useSelected();
+
   return (
-    <div
-      className={classes.textCard}
-      onClick={event => event.preventDefault()}
+    <Box
+      className={ isSelected ? classes.textCard : classes.transparentCard }
       suppressContentEditableWarning={true}
     >
       {props.children}
-    </div>
+    </Box>
   );
 };

@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, isExistingUser, signIn, signInWithGoogle } from "../config/Firebase"
+import { auth, isExistingUser, signIn, signInWithGoogle, signUp } from "../config/Firebase";
 import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import { css } from "@emotion/css";
-import { Box, Button, Divider, FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField } from "@mui/material";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { Box, TextField, Button, Divider, IconButton, InputAdornment, FormControl, OutlinedInput, FormHelperText, InputLabel } from "@mui/material";
 import classes from "./AuthenticationPages.module.css";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 
-export default function Login(): JSX.Element {
+export default function Registration() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [user, loading, error] = useAuthState(auth);
-  const navigate = useNavigate();
+
+  const navigate: NavigateFunction = useNavigate();
 
   useEffect(() => {
     if (!loading) {
       if (user) {
-        navigate("/");
+        navigate("/dashboard");
       }
     }
-    // maybe trigger a loading screen
   }, [user, loading]);
 
   return (
@@ -31,13 +31,29 @@ export default function Login(): JSX.Element {
       <Box
         className={classes.box}
       >
-        <h2>Sign-in</h2>
+        <h2>User Registration</h2>
         <TextField
+          required
           variant="outlined"
-          label="Email"
+          label="User name"
           fullWidth
           margin="normal"
-          placeholder="E-mail address"
+          placeholder="Enter your user name"
+          onChange={event => setUserName(event.target.value)}
+        />
+        <TextField
+          required
+          variant="outlined"
+          label="Email"
+          error={email !== "" && !/\S+@\S+\.\S+/.test(email)}
+          helperText={
+            email !== "" && !/\S+@\S+\.\S+/.test(email)
+              ? "Please enter a valid e-mail address"
+              : ""
+          }
+          fullWidth
+          margin="normal"
+          placeholder="Enter your e-mail address"
           onChange={event => setEmail(event.target.value)}
         />
         <FormControl>
@@ -52,12 +68,12 @@ export default function Login(): JSX.Element {
             placeholder="Set your password"
             endAdornment={
               <InputAdornment position="end">
-                {<IconButton
+                <IconButton
                   onPointerDown={() => setIsPasswordVisible(!isPasswordVisible)}
                   edge="end"
                 >
                   {isPasswordVisible ? <VisibilityOff /> : <Visibility />}
-                </IconButton>}
+                </IconButton>
               </InputAdornment>
             }
             onChange={event => setPassword(event.target.value)}
@@ -74,20 +90,12 @@ export default function Login(): JSX.Element {
             margin: "1em 0",
             textTransform: "none",
           }}
-          onClick={() => isExistingUser(undefined, email)
-            .then(exists => exists
-              ? signIn(email, password)
-              : alert("This e-mail has not been registered!")
-            )
-          }
+          onClick={() => signUp(userName, email, password)}
         >
-          Sign in with e-mail and password
+          Register
         </Button>
         <div>
-          <Link to="/reset-password">Forgot password</Link>
-        </div>
-        <div>
-          Don't have an account? <Link to="/register">Register</Link> now.
+          Already have an account? <Link to={"/authentication"}>Sign in</Link>.
         </div>
         <Divider className={css`color: gray`}>or</Divider>
         <Button

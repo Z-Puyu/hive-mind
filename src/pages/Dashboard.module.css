@@ -1,0 +1,10 @@
+.manager {
+  margin: 2.5em auto;
+  max-width: 75%;
+  min-height: 75%;
+}
+
+.topBar {
+  text-align: right;
+  box-shadow: 0 2.5px 5px rgb(128, 128, 128, 0.5);
+}

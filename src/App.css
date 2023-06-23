@@ -76,3 +76,7 @@ body {
   border-radius: 3px;
   border-color: black;
 }
+
+*:focus {
+  outline: none;
+}

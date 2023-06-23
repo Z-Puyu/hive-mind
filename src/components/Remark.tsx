@@ -9,6 +9,7 @@ import ToggleLinkButton from "./ToggleLinkButton";
 import { css } from "@emotion/css";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import Paragraph from "../interface/Paragraph";
+import { FormatBoldSharp, FormatItalicSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp } from "@mui/icons-material";
 
 export default function Remark(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -17,11 +18,11 @@ export default function Remark(props: RenderElementProps): JSX.Element {
     <TextCard>
       <>
         {isSelected ? <Toolbar>
-          <FormatButton mark="bold" />
-          <FormatButton mark="italic" />
-          <FormatButton mark="roman" />
-          <FormatButton mark="underline" />
-          <FormatButton mark="strikethru" />
+          <FormatButton mark="bold" icon={<FormatBoldSharp />} />
+          <FormatButton mark="italic" icon={<FormatItalicSharp />} />
+          <FormatButton mark="roman" icon={<FormatClearSharp />} />
+          <FormatButton mark="underline" icon={<FormatUnderlinedSharp />} />
+          <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />} />
           <CodeButton />
           <ToggleLinkButton />
           <MathButton inline />
