@@ -1,4 +1,4 @@
-import { Editor, Transforms, Element, elementReadOnly } from "slate";
+import { Editor, Transforms, Element, elementReadOnly, NodeEntry, Ancestor, Point } from "slate";
 import isUrl from "is-url";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import { nanoid } from "nanoid";
@@ -26,7 +26,7 @@ export const withInline = (editor: Editor) => {
   editor.isSelectable = element =>
     element.type !== "bookmark" && isSelectable(element);
 
-  editor.isElementReadOnly = element => 
+  editor.isElementReadOnly = element =>
     element.type === "bookmark" || isElementReadOnly(element);
 
   editor.insertText = (text: string) => {
@@ -60,13 +60,18 @@ export const withBetterBreaks = (editor: Editor) => {
   };
 
   editor.insertBreak = () => {
-    const { selection } = editor;
-    if (!!selection) {
+    const currBlock: NodeEntry<Ancestor> = Editor.parent(editor, editor.selection?.anchor!);
+    const isValidBreak: boolean = !Editor.isInline(editor, currBlock[0] as Element);
+    if (isValidBreak) {
       Transforms.insertNodes(editor, {
         id: nanoid(),
         children: [{ text: "" }],
         type: "paragraph"
       });
+    } else {
+      const endPoint: Point = Editor.end(editor, currBlock[1]);
+      Transforms.select(editor, endPoint);
+      Transforms.move(editor, { unit: "offset" });
     }
   }
 

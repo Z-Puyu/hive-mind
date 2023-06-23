@@ -108,21 +108,16 @@ export default function Editor(): JSX.Element | null {
         setCurrDoc(currDoc);
         getDoc(currDoc).then(doc => {
           const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
-          setInitVal(slateValue ? slateValue : [
-            {
-              id: nanoid(),
-              type: "paragraph",
-              children: [
-                {
-                  text: ""
-                }
-              ]
-            }
-          ]);
+          setInitVal(slateValue);
         })
       }
     })
   }, [])
+
+  /* useEffect(() => {
+    
+    Transforms.select(editor, [0])
+  }, []) */
 
   if (!initVal) {
     return null;
@@ -343,7 +338,6 @@ export default function Editor(): JSX.Element | null {
       op => "set_selection" !== op.type
     );
     if (isAtChange) {
-      console.log(value);
       updateDoc(currDoc!, { slateValue: JSON.stringify(value) });
     }
   }

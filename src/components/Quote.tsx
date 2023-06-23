@@ -3,8 +3,10 @@ import classes from "./Quote.module.css"
 
 export default function Quote(props: RenderElementProps): JSX.Element {
   return (
-    <blockquote {...props.attributes} className={classes.quote}>
+    <div {...props.attributes} className={classes.quote}>
+    <blockquote className={classes.quoteContents}>
       {props.children}
     </blockquote>
+    </div>
   );
 };

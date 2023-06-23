@@ -34,7 +34,9 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
   ) : (
     <div
       className={css`
+        text-align: center;
         margin: auto;
+        width: fit-content;
         font-family: "Times New Roman";
         cursor: pointer;
       `}

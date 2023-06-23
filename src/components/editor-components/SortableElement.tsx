@@ -9,7 +9,6 @@ export default function SortableElement(props: RenderElementProps): JSX.Element 
   const sortableObj = useSortable({
     id: !!props.element.id ? props.element.id : "",
   });
-  const isSelected: boolean = useSelected();
 
   return (
       <div
