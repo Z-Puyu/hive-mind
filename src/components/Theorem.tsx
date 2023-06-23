@@ -10,6 +10,7 @@ import { css } from "@emotion/css";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import TheoremTitle from "./TheoremTitle";
 import Paragraph from "../interface/Paragraph";
+import { FormatBoldSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp } from "@mui/icons-material";
 
 export default function Theorem(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -17,12 +18,12 @@ export default function Theorem(props: RenderElementProps): JSX.Element {
   return (
     <TextCard>
       <>
-        <TheoremTitle title={(props.element as ThmElem).title}/>
+        <TheoremTitle title={(props.element as ThmElem).title} />
         {isSelected ? <Toolbar>
-          <FormatButton mark="bold" />
-          <FormatButton mark="roman" />
-          <FormatButton mark="underline" />
-          <FormatButton mark="strikethru" />
+          <FormatButton mark="bold" icon={<FormatBoldSharp />} />
+          <FormatButton mark="roman" icon={<FormatClearSharp />} />
+          <FormatButton mark="underline" icon={<FormatUnderlinedSharp />} />
+          <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />} />
           <CodeButton />
           <ToggleLinkButton />
           <MathButton inline />

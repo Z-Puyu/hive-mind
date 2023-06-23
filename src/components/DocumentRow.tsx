@@ -42,7 +42,7 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
               cursor: pointer;
             }
           `}
-          onClick={() => navigate(`/Editor/${props.docData.user}/${props.docData.id}`)}
+          onClick={() => navigate(`/Editor/${props.docData.id}`)}
         >
           {props.docData.fileName}
         </p>

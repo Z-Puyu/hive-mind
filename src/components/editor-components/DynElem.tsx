@@ -1,17 +1,17 @@
 import { RenderElementProps } from "slate-react";
+import Math from "../Math";
+import Code from "../Code";
+import Link from "../Link";
+import CodeBlock from "../CodeBlock";
+import Quote from "../Quote";
+import Heading from "../Heading";
+import Command from "../Command";
+import Theorem from "../Theorem";
+import { ThmElem } from "../../utils/CustomSlateTypes";
+import Definition from "../Definition";
+import Remark from "../Remark";
+import Bookmark from "../Bookmark";
 import TeXBox from "./TeXBox";
-import Math from "./Math";
-import Code from "./Code";
-import Link from "./Link";
-import CodeBlock from "./CodeBlock";
-import Quote from "./Quote";
-import Heading from "./Heading";
-import Command from "./Command";
-import Theorem from "./Theorem";
-import { ThmElem } from "../utils/CustomSlateTypes";
-import Definition from "./Definition";
-import Remark from "./Remark";
-import Bookmark from "./Bookmark";
 
 export default function DynElem(props: RenderElementProps): JSX.Element {
   switch (props.element.type) {

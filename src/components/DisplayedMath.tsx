@@ -2,9 +2,8 @@ import { MathJax } from "better-react-mathjax";
 import { RenderElementProps, useSelected } from "slate-react";
 import MathPreview from "./MathPreview";
 import { useEffect, useState, useRef } from "react";
-import MathCard from "../interface/MathCard";
 import classes from "./DisplayedMath.module.css"
-import LaTeXCard from "../interface/LaTeXCard";
+import { css } from "@emotion/css";
 
 export default function DisplayedMath(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -19,15 +18,30 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
         owner={mathRef}
         displayStyle
       />
-      <LaTeXCard ref={mathRef}>
+      <div
+        className={css`
+          text-align: left;
+          margin: auto;
+          width: fit-content;
+          padding: 0.8em 0;
+          font-family: "Times New Roman";
+      ` }
+        ref={mathRef}
+      >
         {props.children}
-      </LaTeXCard>
+      </div>
     </div>
   ) : (
-    <MathCard>
+    <div
+      className={css`
+        margin: auto;
+        font-family: "Times New Roman";
+        cursor: pointer;
+      `}
+    >
       <MathJax
         dynamic
-        contentEditable={false}
+        contentEditable="false"
         suppressContentEditableWarning={true}
         style={{
           fontFamily: "times",
@@ -43,6 +57,6 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
         {props.children[0].props.text.text}
         {"\\end{displaymath}"}
       </MathJax>
-    </MathCard>
+    </div>
   );
 };

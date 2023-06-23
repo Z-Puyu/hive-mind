@@ -3,6 +3,7 @@ import { Descendant, Editor, createEditor } from "slate";
 import { Editable, RenderElementProps, Slate, withReact } from "slate-react";
 import { withBetterBreaks, withInline, withNodeUids } from "../plugins/SlatePlugins";
 import { withHistory } from "slate-history";
+import { css } from "@emotion/css";
 
 interface DraggedContentProps {
   element: Descendant;
@@ -28,7 +29,11 @@ export default function DraggedContent(props: DraggedContentProps): JSX.Element 
   }, []); */
 
   return (
-    <div>
+    <div
+      className={css`
+        width: 48em;
+      `}
+    >
       <Slate editor={currEditor} value={clonedValue}>
         <Editable readOnly={true} renderElement={props.renderElement} />
       </Slate>
