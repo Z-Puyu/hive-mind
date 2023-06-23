@@ -326,11 +326,11 @@ We chose to use Firestore to build our back-end server for data storage.
 
 ##### User Authentication:
 
-Currently, we have built the authentication page and incorporated sign-in with Google. We store all the user information under the "users" collection in Firestore. When a user logs in, we first query the database for documents under the collection which has the same ID as the current user credential. If such documents do not exist, we follow up by adding a new document containing the current user's information to the "users" collection.
+Currently, we have built the authentication page. The user can choose to register and log in with an e-mail and a password, or sign in with a Google account. To register a new account, the user inputs his or her user name, an e-mail address and a password. We have implemented simple validation rules for the user e-mail (it has to be a string in the form of <span>x@y&#8203;.z</span>) and password (it has to be at least 8 characters long). If the user input does not pass the validation checks, a helper text will be displayed under the input field.
 
-Then, we create a collection named "sessions" with only one document named "active-session". In this document, we store the credential of the user who is currently logged in and all other relevant authentication information such as the authentication provider, so that we can later retrieve these information. Note that when the current user has signed out, this collection will be deleted, which ensures that the collection is always up-to-date with every user log-in request as every time we re-create a new collection.
+After successful registration, the user will be automatically signed in. Afterwards, the user can use the registered e-mail and password to log in any time. If the user forgets his or her password, he or she can request a password-reset e-mail be sent to a designated e-mail address.
 
-If the user has successfully logged in, we will redirect him or her to the Dashboard. Otherwise, the website will alert the user with an error message.
+We store all the user information under the "users" collection in Firestore. When a user logs in, we first query the database for documents under the collection which has the same ID as the current user credential (for Google sign-in) ot the same user e-mail (for regular e-mail and password sign-in). If such documents do not exist, we follow up by adding a new document containing the current user's information to the "users" collection. If the user has successfully logged in, we will redirect him or her to the Dashboard. Otherwise, the website will alert the user with an error message.
 
 ##### Project Manager:
 
@@ -354,7 +354,7 @@ Currently, the project manager is not very interesting as only the most basic ac
 
 4. The "tag" feature should be implemented.
 
-Furthermore, we would continue building on the authentication process. We plan to add other login methods such as Facebook and Github, and create user registration and sign-in using general e-mail and password.
+Furthermore, we would continue building on the authentication process. We plan to add other login methods such as Facebook and Github. There should also be a user profile page where the user can configure his or her personal credential such as avatar icon, description, user name, e-mail address etc.
 
 #### [Potential Additions]
 
@@ -465,9 +465,29 @@ We did not have a specific Git workflow at the beginning of the project as we ex
 
 7. When a new feature has been implemented, its work-in-progress branch should be merged into `dev` via pull requests. The code in `dev` should then be **immediately tested** to ensure that it works as expected.
 
-8. After ensuring that the code in `dev` is without major issues, review the code and merge it with `main`. 
+8. After ensuring that the code in `dev` is without major issues, review the code and merge it with `main`. Then, the feature and experiment branches should be deleted accordingly.
 
 9. The README shoud be updated timely to avoid any omission of details.
+
+## Testing
+
+To reduce the difficulty of the debugging process, we decided to run a brief test and debugging session once a feature has been changed significantly or a new functionality has been implemented, so that we aim to discover and address as many bugs as possible at an early stage. During testing, we should consider two key perspectives:
+
+1. Does the feature/functionality work as intended on its own?
+2. Does the feature/functionality interfere with other parts of the application built earlier?
+
+Every bug spotted should be *immediately* recorded in **Github issues** with the following format:
+
+>#### Description
+>A succint description of the bug.
+>#### Steps to Reproduce the Bug
+>What steps can be followed to reproduce the described bug on another device.
+>#### Expected Behaviour
+>What was expected to happen under the user's actions in place of the bug.
+>#### Other Useful Information
+>Any other information or contexts that might be relevant to the bug or useful for finding a fix.
+
+The bug reports should then be investigated, after which a comment should be made to the original issue describing the cause of the bug. Once a bug has been fixed, we comment to the corresponding bug report issue to explain the methods and steps taken to tackle it, as well as any change in the application's behaviour after the fix. If after investigating the bug report, it is found that the bug cannot be fixed in a straightforward manner, a comment should also be made to explain the reason behind it and any applicable alternatives to avoid the bug.
 
 ## Appendix: Coding Convention
 
