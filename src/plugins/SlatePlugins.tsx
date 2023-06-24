@@ -1,4 +1,4 @@
-import { Editor, Transforms, Element } from "slate";
+import { Editor, Transforms, Element, elementReadOnly, NodeEntry, Ancestor, Point } from "slate";
 import isUrl from "is-url";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import { nanoid } from "nanoid";
@@ -9,19 +9,25 @@ export const withInline = (editor: Editor) => {
     insertText,
     isInline,
     isSelectable,
+    isElementReadOnly,
   } = editor;
 
   const inlineTypes: (string | null)[] = [
     "link",
     "math",
     "code",
+    "cmd",
+    "bookmark"
   ];
 
   editor.isInline = element =>
     inlineTypes.includes(element.type) || isInline(element);
 
   editor.isSelectable = element =>
-    inlineTypes.includes(element.type) || isSelectable(element);
+    element.type !== "bookmark" && isSelectable(element);
+
+  editor.isElementReadOnly = element =>
+    element.type === "bookmark" || isElementReadOnly(element);
 
   editor.insertText = (text: string) => {
     if (!!text && isUrl(text)) {
@@ -54,13 +60,18 @@ export const withBetterBreaks = (editor: Editor) => {
   };
 
   editor.insertBreak = () => {
-    const { selection } = editor;
-    if (!!selection) {
+    const currBlock: NodeEntry<Ancestor> = Editor.parent(editor, editor.selection?.anchor!);
+    const isValidBreak: boolean = !Editor.isInline(editor, currBlock[0] as Element);
+    if (isValidBreak) {
       Transforms.insertNodes(editor, {
         id: nanoid(),
         children: [{ text: "" }],
         type: "paragraph"
       });
+    } else {
+      const endPoint: Point = Editor.end(editor, currBlock[1]);
+      Transforms.select(editor, endPoint);
+      Transforms.move(editor, { unit: "offset" });
     }
   }
 
@@ -76,12 +87,12 @@ export const withNodeUids = (editor: Editor) => {
     }
   } */
   editor.apply = (operation) => {
-    if (operation.type === "insert_node") {
+    /* if (operation.type === "insert_node") {
       if (Element.isElement(operation.node)) {
         operation.node.id = nanoid();
       }
       return apply(operation);
-    }
+    } */
     if (operation.type === "split_node") {
       (operation.properties as Partial<Element>).id = "";
       return apply(operation);

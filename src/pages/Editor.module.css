@@ -1,8 +1,15 @@
+.paper {
+  max-width: 48em;
+  margin: 30px auto;
+  padding: 5% 0;
+}
+
 .notes {
-  background-color: ghostwhite;
-  max-width: 42em;
-  margin: 20px auto;
-  padding: 20px;
-  border: none;
+  font-size: 12pt;
+  line-height: 14.4pt;
+  text-align: left;
+  text-justify: distribute-all-lines;
+  text-align-last: left;
+  hyphens: auto;
   white-space: pre-wrap; /* This line is VERY IMPORTANT!!! */
 }

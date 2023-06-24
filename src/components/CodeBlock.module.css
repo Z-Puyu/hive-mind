@@ -1,5 +1,18 @@
 .blockCode {
+  display: block;
+  float: left;
+  margin: 0 auto;
+  width: 80%;
   padding: 1.5em 1.5em;
-  background: rgba(192, 192, 192, 0.5);
+  background: rgba(192, 192, 192, 0.25);
+  border-radius: 0.5em;
+  flex-grow: 100;
+  &:hover {
+    background-color: rgba(192, 192, 192, 0.5);
+    transition: background-color 0.5s;
+  }
+}
+
+.codeLines {
   font-size: large;
 }

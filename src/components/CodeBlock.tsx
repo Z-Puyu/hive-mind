@@ -3,10 +3,10 @@ import classes from "./CodeBlock.module.css"
 
 export default function CodeBlock(props: RenderElementProps): JSX.Element {
   return (
-    <pre {...props.attributes} className={classes.blockCode}>
-      <code>
+    <div className={classes.blockCode}>
+      <code className={classes.codeLines}>
         {props.children}
       </code>
-    </pre>
+    </div>
   );
 };
