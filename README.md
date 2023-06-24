@@ -1,4 +1,4 @@
-# Orbital 2023 Milestone I
+# Orbital 2023 Milestone II
 
 ## Team Name
 
@@ -478,14 +478,21 @@ To reduce the difficulty of the debugging process, we decided to run a brief tes
 
 Every bug spotted should be *immediately* recorded in **Github issues** with the following format:
 
->#### Description
->A succint description of the bug.
->#### Steps to Reproduce the Bug
->What steps can be followed to reproduce the described bug on another device.
->#### Expected Behaviour
->What was expected to happen under the user's actions in place of the bug.
->#### Other Useful Information
->Any other information or contexts that might be relevant to the bug or useful for finding a fix.
+> #### Description
+> 
+> A succint description of the bug.
+> 
+> #### Steps to Reproduce the Bug
+> 
+> What steps can be followed to reproduce the described bug on another device.
+> 
+> #### Expected Behaviour
+> 
+> What was expected to happen under the user's actions in place of the bug.
+> 
+> #### Other Useful Information
+> 
+> Any other information or contexts that might be relevant to the bug or useful for finding a fix.
 
 The bug reports should then be investigated, after which a comment should be made to the original issue describing the cause of the bug. Once a bug has been fixed, we comment to the corresponding bug report issue to explain the methods and steps taken to tackle it, as well as any change in the application's behaviour after the fix. If after investigating the bug report, it is found that the bug cannot be fixed in a straightforward manner, a comment should also be made to explain the reason behind it and any applicable alternatives to avoid the bug.
 

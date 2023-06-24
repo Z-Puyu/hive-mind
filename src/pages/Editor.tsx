@@ -129,7 +129,6 @@ export default function Editor(): JSX.Element | null {
     "mod+r": "roman",
     "mod+u": "underline",
     "mod+s": "strikethru",
-    "mod+`": "code",
   };
 
   const clearSelection = () => {
@@ -177,6 +176,11 @@ export default function Editor(): JSX.Element | null {
     if (event.key === "$") {
       event.preventDefault();
       TypesetUtil.toggleMath(editor, true);
+    }
+    // Insert inline code when pressing Ctrl + `
+    if (event.ctrlKey && event.key === "`") {
+      event.preventDefault();
+      TypesetUtil.toggleCode(editor, true);
     }
     // Add marks corresponding to the hotkeys.
     for (const hotkey in HOTKEYS) {
