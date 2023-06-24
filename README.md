@@ -386,31 +386,19 @@ Thus, we propose to incorporate collaborative editing into HiveMind. Users may c
 
 The [project poster](https://drive.google.com/file/d/1iGHT04W8h5N5H2RU6KsVlVeNxAIIhOCD/view?usp=share_link) and [project video](https://drive.google.com/file/d/11urJgv1n9FsqEqYKHdD4jG00sjB7-DRh/view?usp=share_link) can be accessed from here.
 
-We have also deployed a [mini-demonstration project](https://hive-mind-inky.vercel.app/).
+We have also deployed our application [here](https://hive-mind-inky.vercel.app/).
 
-To enter the editor, press "Login" from the top navigation bar, and then click on "Editor" to view the sample page.
+On the authentication page, use either a registered e-mail account or Google to log in and be re-directed to the dashboard. After that, create a new project to enter the editor and see the various features implemented there.
 
-This project demonstrates some basic features and interactions in the notes editor of HiveMind, including:
+The production build now includes the following main features:
 
-- Click on a TeXBox to open and auto-focus to the input field for $\LaTeX$;
-- Type $\LaTeX$ in the input field to see it rendered in real time;
-- Press Enter in the input field to insert a new TeXBox below the current working TeXBox;
-- Press Backspace in an empty TeXBox to delete it.
-
-## Proof-of-concept
-
-The [project poster](https://drive.google.com/file/d/1iGHT04W8h5N5H2RU6KsVlVeNxAIIhOCD/view?usp=share_link) and [project video](https://drive.google.com/file/d/11urJgv1n9FsqEqYKHdD4jG00sjB7-DRh/view?usp=share_link) can be accessed from here.
-
-We have also deployed a [mini-demonstration project](https://hive-mind-inky.vercel.app/).
-
-To enter the editor, press "Login" from the top navigation bar, and then click on "Editor" to view the sample page.
-
-This project demonstrates some basic features and interactions in the notes editor of HiveMind, including:
-
-- Click on a TeXBox to open and auto-focus to the input field for $\LaTeX$;
-- Type $\LaTeX$ in the input field to see it rendered in real time;
-- Press Enter in the input field to insert a new TeXBox below the current working TeXBox;
-- Press Backspace in an empty TeXBox to delete it.
+- Rich-text formatting using toolbar or hotkeys.
+- Press "$" to activate mathematical mode and input inline $\LaTeX$.
+- Type a slash to activate the slash command menu to toggle block types.
+- Press ctrl + m to generate a new bookmark and double-click on it to configure it.
+- Drag and drop the top-level blocks to re-order paragraphs.
+- Animated styling to enhance user interactions.
+- Auto-saving of editor contents.
 
 ## Timeline and Development Plan
 
@@ -429,7 +417,7 @@ This project demonstrates some basic features and interactions in the notes edit
   - Continue to work on hotkey binding.
   - Implement hyperlink between notes components.
 - **21-26 June**
-  - Implement tags into the project manager.
+  - Implement tags into the project manager (to be completed later than expected).
   - Test and fix potential bugs.
   - Prepare for Milestone II.
 - **27 June-10 July**
