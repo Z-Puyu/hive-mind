@@ -26,6 +26,7 @@ import { db } from "../config/Firebase";
 import { Paper } from "@mui/material";
 import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
 import { timeStamp } from "console";
+import BlockToggler from "../components/editor-components/BlockToggler";
 
 export default function Editor(): JSX.Element | null {
   const params: Readonly<Params<string>> = useParams();
@@ -119,11 +120,6 @@ export default function Editor(): JSX.Element | null {
       }
     })
   }, [])
-
-  /* useEffect(() => {
-    
-    Transforms.select(editor, [0])
-  }, []) */
 
   if (!initVal) {
     return null;
@@ -388,6 +384,7 @@ export default function Editor(): JSX.Element | null {
               onKeyUp={onKeyUpHandler}
             />
           </SortableContext>
+          <BlockToggler />
           {ReactDOM.createPortal(
             <DragOverlay adjustScale={false}>
               {!!activeElement ? <DraggedContent

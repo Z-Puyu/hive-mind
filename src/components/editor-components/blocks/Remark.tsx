@@ -6,6 +6,7 @@ import TextCard from "../../../interface/TextCard";
 import FormatButton from "../FormatButton";
 import MathButton from "../MathButton";
 import ToggleLinkButton from "../ToggleLinkButton";
+import BookmarkButton from "../BookmarkButton";
 
 export default function Remark(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -23,13 +24,14 @@ export default function Remark(props: RenderElementProps): JSX.Element {
           <ToggleLinkButton />
           <MathButton inline />
           <MathButton />
+          <BookmarkButton />
         </Toolbar> : null}
         <Paragraph attributes={props.attributes}>
           <i
             contentEditable="false"
             suppressContentEditableWarning={true}
           >
-            Remark.
+            {"Remark. "}
           </i>
           {props.children}
         </Paragraph>

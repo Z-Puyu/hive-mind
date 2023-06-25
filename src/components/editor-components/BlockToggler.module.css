@@ -1,0 +1,9 @@
+.blockButtons {
+  position: fixed;
+  left: 80%;
+  top: 33%;
+  width: 3em;
+  padding: 0.75% 0.25% 0.25% 0.55%;
+  text-align: center;
+  border-radius: 1em;
+}

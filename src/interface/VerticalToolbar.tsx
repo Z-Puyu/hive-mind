@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react"
-import classes from "./Toolbar.module.css";
+import classes from "./VerticalToolbar.module.css";
 
-export default function VerticalToolbar(props: PropsWithChildren): JSX.Element {
+export default function Toolbar(props: PropsWithChildren): JSX.Element {
   return (
     <div
       className={classes.toolbar}

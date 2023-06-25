@@ -10,6 +10,7 @@ import { CodeSharp, FormatBoldSharp, FormatClearSharp, FormatItalicSharp, Format
 import FormatButton from "../FormatButton";
 import MathButton from "../MathButton";
 import ToggleLinkButton from "../ToggleLinkButton";
+import BookmarkButton from "../BookmarkButton";
 
 export default function TeXBox(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -26,11 +27,10 @@ export default function TeXBox(props: RenderElementProps): JSX.Element {
             <FormatButton mark="underline" icon={<FormatUnderlinedSharp />}/>
             <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />}/>
             <FormatButton mark="code" icon={<CodeSharp />}/>
-            <BlockButton blockType="quote" icon={<FormatQuoteSharp />}/>
-            <BlockButton blockType="heading" icon={<TitleSharp />}/>
             <ToggleLinkButton />
             <MathButton inline />
             <MathButton />
+            <BookmarkButton />
           </Toolbar>
           <Divider variant="middle"/>
         </section>
