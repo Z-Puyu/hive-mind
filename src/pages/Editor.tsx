@@ -21,10 +21,11 @@ import BlockSelection from "../components/BlockSelection";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import { matchSorter } from "match-sorter";
 import { Params, useParams } from "react-router-dom";
-import { getDoc, doc, updateDoc, query, collection, DocumentReference, DocumentData } from "firebase/firestore";
+import { getDoc, doc, updateDoc, query, collection, DocumentReference, DocumentData, serverTimestamp } from "firebase/firestore";
 import { db } from "../config/Firebase";
 import { Paper } from "@mui/material";
 import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
+import { timeStamp } from "console";
 
 export default function Editor(): JSX.Element | null {
   const params: Readonly<Params<string>> = useParams();
@@ -63,6 +64,11 @@ export default function Editor(): JSX.Element | null {
       name: "dfn",
       blockType: "thm",
       desc: "Definition Box",
+    },
+    {
+      name: "heading",
+      blockType: "heading",
+      desc: "Heading",
     },
     {
       name: "paragraph",
@@ -129,6 +135,7 @@ export default function Editor(): JSX.Element | null {
     "mod+r": "roman",
     "mod+u": "underline",
     "mod+s": "strikethru",
+    "mod+`": "code",
   };
 
   const clearSelection = () => {
@@ -176,11 +183,6 @@ export default function Editor(): JSX.Element | null {
     if (event.key === "$") {
       event.preventDefault();
       TypesetUtil.toggleMath(editor, true);
-    }
-    // Insert inline code when pressing Ctrl + `
-    if (event.ctrlKey && event.key === "`") {
-      event.preventDefault();
-      TypesetUtil.toggleCode(editor, true);
     }
     // Add marks corresponding to the hotkeys.
     for (const hotkey in HOTKEYS) {
@@ -342,7 +344,10 @@ export default function Editor(): JSX.Element | null {
       op => "set_selection" !== op.type
     );
     if (isAtChange) {
-      updateDoc(currDoc!, { slateValue: JSON.stringify(value) });
+      updateDoc(currDoc!, { 
+        slateValue: JSON.stringify(value),
+        timeStamp: serverTimestamp(),
+      });
     }
   }
 

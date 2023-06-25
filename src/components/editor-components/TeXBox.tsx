@@ -10,7 +10,7 @@ import Paragraph from "../../interface/Paragraph";
 import { Editor, Transforms } from "slate";
 import { Box, Divider } from "@mui/material";
 import classes from "./TeXBox.module.css";
-import { FormatBoldSharp, FormatClearSharp, FormatItalicSharp, FormatQuoteSharp, FormatStrikethroughSharp, FormatUnderlinedSharp, TitleSharp } from "@mui/icons-material";
+import { CodeSharp, FormatBoldSharp, FormatClearSharp, FormatItalicSharp, FormatQuoteSharp, FormatStrikethroughSharp, FormatUnderlinedSharp, TitleSharp } from "@mui/icons-material";
 
 export default function TeXBox(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -26,7 +26,7 @@ export default function TeXBox(props: RenderElementProps): JSX.Element {
             <FormatButton mark="roman" icon={<FormatClearSharp />}/>
             <FormatButton mark="underline" icon={<FormatUnderlinedSharp />}/>
             <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />}/>
-            <CodeButton />
+            <FormatButton mark="code" icon={<CodeSharp />}/>
             <BlockButton blockType="quote" icon={<FormatQuoteSharp />}/>
             <BlockButton blockType="heading" icon={<TitleSharp />}/>
             <ToggleLinkButton />

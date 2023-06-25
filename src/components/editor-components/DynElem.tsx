@@ -1,6 +1,5 @@
 import { RenderElementProps } from "slate-react";
 import Math from "../Math";
-import Code from "../Code";
 import Link from "../Link";
 import CodeBlock from "../CodeBlock";
 import Quote from "../Quote";
@@ -19,8 +18,6 @@ export default function DynElem(props: RenderElementProps): JSX.Element {
       return <CodeBlock {...props} />;
     case "math":
       return <Math {...props} />;
-    case "code":
-      return <Code {...props} />;
     case "link":
       return <Link {...props} />;
     case "quote":

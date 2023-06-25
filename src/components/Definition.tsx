@@ -10,7 +10,7 @@ import { css } from "@emotion/css";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import Paragraph from "../interface/Paragraph";
 import TheoremTitle from "./TheoremTitle";
-import { FormatBoldSharp, FormatItalicSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp } from "@mui/icons-material";
+import { FormatBoldSharp, FormatItalicSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp, CodeSharp } from "@mui/icons-material";
 
 export default function Definition(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -25,7 +25,7 @@ export default function Definition(props: RenderElementProps): JSX.Element {
           <FormatButton mark="roman" icon={<FormatClearSharp />} />
           <FormatButton mark="underline" icon={<FormatUnderlinedSharp />} />
           <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />} />
-          <CodeButton />
+          <FormatButton mark="code" icon={<CodeSharp />}/>
           <ToggleLinkButton />
           <MathButton inline />
           <MathButton />

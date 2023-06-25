@@ -9,7 +9,7 @@ import ToggleLinkButton from "./ToggleLinkButton";
 import { css } from "@emotion/css";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import Paragraph from "../interface/Paragraph";
-import { FormatBoldSharp, FormatItalicSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp } from "@mui/icons-material";
+import { FormatBoldSharp, FormatItalicSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp, CodeSharp } from "@mui/icons-material";
 
 export default function Remark(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -23,7 +23,7 @@ export default function Remark(props: RenderElementProps): JSX.Element {
           <FormatButton mark="roman" icon={<FormatClearSharp />} />
           <FormatButton mark="underline" icon={<FormatUnderlinedSharp />} />
           <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />} />
-          <CodeButton />
+          <FormatButton mark="code" icon={<CodeSharp />}/>
           <ToggleLinkButton />
           <MathButton inline />
           <MathButton />

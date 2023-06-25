@@ -38,6 +38,9 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
         <p
           className={css`
             flex-grow: 5;
+            width: 20%;
+            overflow: hidden;
+            text-overflow: ellipsis;
             :hover {
               cursor: pointer;
             }

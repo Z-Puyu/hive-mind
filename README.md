@@ -78,8 +78,8 @@ We conducted a case study on the various mainstream note-taking tools to learn a
      2. Simple syntaxes which allows efficient note-taking.
      3. Considerable amount of support for $\LaTeX$.
    - Cons
-     1. Unable to render complex mathematics with detailed typesetting adjustments. For example, in this very Markdown document, 
-        `$\int\! f(x) \,\mathrm{d}x$` would get incorrectly rendered as $\int\! f(x) \,\mathrm{d}x$.
+     1. Unable to render complex mathematics with detailed typesetting adjustments. For example, in most Markdown editors, 
+        `$\int\! f(x) \,\mathrm{d}x$` would get incorrectly rendered as $\int !f(x) ,\mathrm{d}x$.
      2. Difficult to set up collaborative projects.
 6. Notion
    - Pros

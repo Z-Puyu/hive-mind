@@ -1,7 +1,0 @@
-.inlineCode {
-  font-family: monospace;
-  border-radius: 2.5px;
-  padding: 0 0.2em;
-  background: rgba(192, 192, 192, 0.5);
-  margin: 0.01em; /* Necessary for caret to properly show up along egdes. */
-}
