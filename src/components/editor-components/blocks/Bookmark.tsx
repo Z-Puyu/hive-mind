@@ -1,16 +1,12 @@
-import { Editor, Transforms, Location, Path } from "slate";
-import { ReactEditor, RenderElementProps, useSlate } from "slate-react";
+import { useState, useRef, useEffect } from "react";
+import { Editor, Transforms, Path } from "slate";
+import { RenderElementProps, useSlate, ReactEditor } from "slate-react";
+import Modal from "../../../interface/Modal";
+import { BookmarkElem } from "../../../utils/CustomSlateTypes";
+import InlineChromiumBugfix from "../../../utils/InlineChromBugFix";
+import { Coords } from "../../../utils/UtilityInterfaces";
+import BookmarkConfigMenu from "../BookmarkConfigMenu";
 import classes from "./Bookmark.module.css";
-import { useEffect, useRef, useState } from "react";
-import { Coords } from "../utils/UtilityInterfaces";
-import { css, cx } from "@emotion/css";
-import Modal from "../interface/Modal";
-import ModalOverlay from "../interface/ModalOverlay";
-import InlineChromiumBugfix from "../utils/InlineChromBugFix";
-import BookmarkConfigMenu from "./BookmarkConfigMenu";
-import { BookmarkElem } from "../utils/CustomSlateTypes";
-import { nanoid } from "nanoid";
-import { DOMPoint as SlateDOMNODe } from "slate-react/dist/utils/dom";
 
 interface BookmarkProps {
   pos: Coords;

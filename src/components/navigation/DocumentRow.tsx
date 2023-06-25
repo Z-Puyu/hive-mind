@@ -3,7 +3,7 @@ import { Box, Button, Card, Divider, Modal, TextField } from "@mui/material";
 import { DocumentData, DocumentReference, deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
-import { db } from "../config/Firebase";
+import { db } from "../../config/Firebase";
 
 interface DocumentRowProps {
   docData: DocumentData;

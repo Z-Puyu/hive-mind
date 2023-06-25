@@ -1,6 +1,6 @@
 import { MathJax } from "better-react-mathjax";
 import { RenderElementProps, useSelected } from "slate-react";
-import MathPreview from "./MathPreview";
+import MathPreview from "../MathPreview";
 import { useEffect, useState, useRef } from "react";
 import classes from "./DisplayedMath.module.css"
 import { css } from "@emotion/css";

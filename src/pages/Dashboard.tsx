@@ -14,7 +14,7 @@ import {
   serverTimestamp,
   where
 } from "firebase/firestore";
-import DocumentRow from "../components/DocumentRow";
+import DocumentRow from "../components/navigation/DocumentRow";
 import { nanoid } from "nanoid";
 import Modal from "../components/windows/Modal";
 import classes from "./Dashboard.module.css";

@@ -1,6 +1,5 @@
 import { useSlate } from "slate-react";
-import { TypesetUtil } from "../utils/TypesetUtil";
-import TooltipButton from "../interface/TooltipButton";
+import { TypesetUtil } from "../../utils/TypesetUtil";
 import { Editor, Range } from "slate";
 import { LinkOffSharp, AddLinkSharp, InsertLinkSharp } from "@mui/icons-material";
 import { css } from "@emotion/css";

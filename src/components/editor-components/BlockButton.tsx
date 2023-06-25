@@ -1,17 +1,21 @@
 import { useSlate } from "slate-react";
-import TooltipButton from "../interface/TooltipButton";
-import { TypesetUtil } from "../utils/TypesetUtil";
+import TooltipButton from "../../interface/TooltipButton";
+import { TypesetUtil } from "../../utils/TypesetUtil";
 import { Editor } from "slate";
-import { CodeSharp } from "@mui/icons-material";
 import { css } from "@emotion/css";
 
-export default function CodeButton(): JSX.Element {
+interface BlockButtonProps {
+  blockType: string;
+  icon: JSX.Element;
+}
+
+export default function BlockButton(props: BlockButtonProps): JSX.Element {
   const editor: Editor = useSlate();
-  const isActive: boolean = TypesetUtil.isInlineActive(editor, "code");
+  const isActive: boolean = TypesetUtil.isBlockActive(editor, props.blockType);
 
   const onPointerDownHandler = (event: React.PointerEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    TypesetUtil.toggleCode(editor, true);
+    TypesetUtil.toggleBlock(editor, props.blockType);
   };
 
   return (
@@ -23,7 +27,7 @@ export default function CodeButton(): JSX.Element {
       `}
       onPointerDown={onPointerDownHandler}
     >
-      <CodeSharp />
+      {props.icon}
     </span>
   );
 };

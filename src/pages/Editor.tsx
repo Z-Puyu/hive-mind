@@ -14,10 +14,10 @@ import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, UniqueIdentifier
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { nanoid } from "nanoid";
 import ReactDOM from "react-dom";
-import DraggedContent from "../components/DraggedContent";
+import DraggedContent from "../components/editor-components/DraggedContent";
 import { mathjaxConfig } from "../config/MathJax";
 import { Coords } from "../utils/UtilityInterfaces";
-import BlockSelection from "../components/BlockSelection";
+import BlockSelection from "../components/editor-components/BlockSelection";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import { matchSorter } from "match-sorter";
 import { Params, useParams } from "react-router-dom";

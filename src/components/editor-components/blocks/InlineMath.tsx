@@ -1,9 +1,8 @@
 import { MathJax } from "better-react-mathjax";
 import { RenderElementProps, useSelected, useSlate } from "slate-react";
 import { useEffect, useState, useRef } from "react";
-import MathPreview from "./MathPreview";
+import MathPreview from "../MathPreview";
 import { Editor, Transforms } from "slate";
-import ModalOverlay from "../interface/ModalOverlay";
 import { css } from "@emotion/css";
 
 export default function InlineMath(props: RenderElementProps) {
