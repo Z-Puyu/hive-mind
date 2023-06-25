@@ -1,5 +1,12 @@
 import { RenderElementProps, useSelected } from "slate-react";
-import { FormatBoldSharp, FormatItalicSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp, CodeSharp } from "@mui/icons-material";
+import { 
+  FormatBoldSharp, 
+  FormatItalicSharp, 
+  FormatClearSharp, 
+  FormatUnderlinedSharp, 
+  FormatStrikethroughSharp, 
+  CodeSharp 
+} from "@mui/icons-material";
 import { Toolbar } from "@mui/material";
 import Paragraph from "../../../interface/Paragraph";
 import TextCard from "../../../interface/TextCard";
