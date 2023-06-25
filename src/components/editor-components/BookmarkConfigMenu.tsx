@@ -1,11 +1,11 @@
 import { useState } from "react";
-import PopUp from "../interface/PopUp";
+import PopUp from "../../interface/PopUp";
 import classes from "./BookmarkConfigMenu.module.css"
-import { BookmarkElem } from "../utils/CustomSlateTypes";
+import { BookmarkElem } from "../../utils/CustomSlateTypes";
 import { Editor, Element, Node, Transforms } from "slate";
 import { ReactEditor, useSlate } from "slate-react";
-import SelectMenu from "../interface/SelectMenu";
-import VerticalList from "../interface/VerticalList";
+import SelectMenu from "../../interface/SelectMenu";
+import VerticalList from "../../interface/VerticalList";
 import { Transform } from "stream";
 
 interface BookmarkConfigMenuProps {

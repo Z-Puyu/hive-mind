@@ -1,17 +1,16 @@
+import Bookmark from "./blocks/Bookmark";
 import { RenderElementProps } from "slate-react";
-import Math from "../Math";
-import Code from "../Code";
-import Link from "../Link";
-import CodeBlock from "../CodeBlock";
-import Quote from "../Quote";
-import Heading from "../Heading";
-import Command from "../Command";
-import Theorem from "../Theorem";
 import { ThmElem } from "../../utils/CustomSlateTypes";
-import Definition from "../Definition";
-import Remark from "../Remark";
-import Bookmark from "../Bookmark";
-import TeXBox from "./TeXBox";
+import CodeBlock from "./blocks/CodeBlock";
+import Command from "./blocks/Command";
+import Definition from "./blocks/Definition";
+import Heading from "./blocks/Heading";
+import Quote from "./blocks/Quote";
+import Remark from "./blocks/Remark";
+import TeXBox from "./blocks/TeXBox";
+import Theorem from "./blocks/Theorem";
+import Link from "./blocks/Link";
+import Math from "./blocks/Math";
 
 export default function DynElem(props: RenderElementProps): JSX.Element {
   switch (props.element.type) {
@@ -19,8 +18,6 @@ export default function DynElem(props: RenderElementProps): JSX.Element {
       return <CodeBlock {...props} />;
     case "math":
       return <Math {...props} />;
-    case "code":
-      return <Code {...props} />;
     case "link":
       return <Link {...props} />;
     case "quote":

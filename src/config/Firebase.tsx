@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, getApp, getApps, initializeApp } from "firebase/app";
 import { Analytics, getAnalytics } from "firebase/analytics";
-import { DocumentData, Firestore, Query, QuerySnapshot, addDoc, collection, deleteDoc, doc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore"
+import { DocumentData, Firestore, Query, QuerySnapshot, addDoc, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, serverTimestamp, setDoc, where } from "firebase/firestore"
 import { Auth, createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile, User, UserCredential } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -51,6 +51,15 @@ export const signUp = async (userName: string, email: string, password: string) 
     await updateProfile(user, {
       displayName: userName,
     })
+    await getDoc(doc(db, "exampleProject", "exampleProject")).then(
+      doc => {
+        addDoc(collection(db, "userProjects", user.uid, "projects"), {
+          fileName: "Example",
+          slateValue: doc.data()?.slateValue,
+          timeStamp: serverTimestamp(),
+        })
+      }
+    )
   } catch (e: unknown) {
     if (e instanceof Error) {
       console.error(e);
@@ -93,6 +102,15 @@ export const signInWithGoogle = async () => {
         authProvider: "google",
         email: user.email,
       });
+      await getDoc(doc(db, "exampleProject", "exampleProject")).then(
+        doc => {
+          addDoc(collection(db, "userProjects", user.uid, "projects"), {
+            fileName: "Example",
+            slateValue: doc.data()?.slateValue,
+            timeStamp: serverTimestamp(),
+          })
+        }
+      )
     }
   } catch (e: unknown) {
     if (e instanceof Error) {

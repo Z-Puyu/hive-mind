@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Descendant, Editor, createEditor } from "slate";
 import { Editable, RenderElementProps, Slate, withReact } from "slate-react";
-import { withBetterBreaks, withInline, withNodeUids } from "../plugins/SlatePlugins";
+import { withBetterBreaks, withInline, withNodeUids } from "../../plugins/SlatePlugins";
 import { withHistory } from "slate-history";
 import { css } from "@emotion/css";
 

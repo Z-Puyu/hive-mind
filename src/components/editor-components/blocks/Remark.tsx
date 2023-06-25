@@ -1,15 +1,12 @@
 import { RenderElementProps, useSelected } from "slate-react";
-import TextCard from "../interface/TextCard";
-import Toolbar from "../interface/Toolbar";
-import BlockButton from "./BlockButton";
-import CodeButton from "./CodeButton";
-import FormatButton from "./FormatButton";
-import MathButton from "./MathButton";
-import ToggleLinkButton from "./ToggleLinkButton";
-import { css } from "@emotion/css";
-import { ThmElem } from "../utils/CustomSlateTypes";
-import Paragraph from "../interface/Paragraph";
-import { FormatBoldSharp, FormatItalicSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp } from "@mui/icons-material";
+import { FormatBoldSharp, FormatItalicSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp, CodeSharp } from "@mui/icons-material";
+import { Toolbar } from "@mui/material";
+import Paragraph from "../../../interface/Paragraph";
+import TextCard from "../../../interface/TextCard";
+import FormatButton from "../FormatButton";
+import MathButton from "../MathButton";
+import ToggleLinkButton from "../ToggleLinkButton";
+import BookmarkButton from "../BookmarkButton";
 
 export default function Remark(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -23,17 +20,18 @@ export default function Remark(props: RenderElementProps): JSX.Element {
           <FormatButton mark="roman" icon={<FormatClearSharp />} />
           <FormatButton mark="underline" icon={<FormatUnderlinedSharp />} />
           <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />} />
-          <CodeButton />
+          <FormatButton mark="code" icon={<CodeSharp />}/>
           <ToggleLinkButton />
           <MathButton inline />
           <MathButton />
+          <BookmarkButton />
         </Toolbar> : null}
         <Paragraph attributes={props.attributes}>
           <i
             contentEditable="false"
             suppressContentEditableWarning={true}
           >
-            Remark.
+            {"Remark. "}
           </i>
           {props.children}
         </Paragraph>

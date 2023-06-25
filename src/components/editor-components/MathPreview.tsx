@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import HoveringWindow from "../interface/HoveringWindow";
-import PreviewBox from "../interface/PreviewBox";
+import PreviewBox from "../../interface/PreviewBox";
 import { MathJax } from "better-react-mathjax";
 import { Editor, Range } from "slate";
 import { useSlate, useFocused } from "slate-react";

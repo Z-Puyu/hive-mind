@@ -1,9 +1,7 @@
 import { css, cx } from "@emotion/css"
-import { ThmElem } from "../utils/CustomSlateTypes"
 import classes from "./TheoremTitle.module.css";
 import { MathJax } from "better-react-mathjax";
 import { useRef, useState } from "react";
-import HoveringWindow from "../interface/HoveringWindow";
 
 interface TheoremTitleProps {
   dfnStyle?: true;

@@ -1,6 +1,6 @@
 import { RenderElementProps, useSelected, useSlate } from "slate-react";
 import { Editor } from "slate";
-import { CommandElem } from "../utils/CustomSlateTypes";
+import { CommandElem } from "../../../utils/CustomSlateTypes";
 import { useEffect } from "react";
 
 export default function Command(props: RenderElementProps): JSX.Element {

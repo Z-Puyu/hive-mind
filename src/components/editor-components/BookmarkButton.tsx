@@ -1,21 +1,21 @@
-import { Editor } from "slate";
-import TooltipButton from "../interface/TooltipButton"
-import { TypesetUtil } from "../utils/TypesetUtil"
+import { Editor, Range, Transforms } from "slate";
+import { TypesetUtil } from "../../utils/TypesetUtil"
 import { useSlate } from "slate-react"
 import { css } from "@emotion/css";
-import { CalculateSharp, FunctionsSharp } from "@mui/icons-material";
+import { BookmarkAddSharp } from "@mui/icons-material";
 
-interface ToggleMathButtonProps {
-  inline?: true;
-}
-
-export default function MathButton(props: ToggleMathButtonProps): JSX.Element {
+export default function BookmarkButton(): JSX.Element {
   const editor: Editor = useSlate();
   const isActive: boolean = TypesetUtil.isInlineActive(editor, "math");
 
   const onPointerDownHandler = (event: React.PointerEvent<HTMLButtonElement>) => {
     event.preventDefault()
-    TypesetUtil.toggleMath(editor, props.inline ? true : false);
+    if (editor.selection) {
+      if (!Range.isCollapsed(editor.selection)) {
+        Transforms.collapse(editor, { edge: "end" });
+      }
+      TypesetUtil.insertBookmark(editor);
+    }
   };
 
   return (
@@ -27,7 +27,7 @@ export default function MathButton(props: ToggleMathButtonProps): JSX.Element {
       `}
       onPointerDown={onPointerDownHandler}
     >
-      {props.inline ? <CalculateSharp /> : <FunctionsSharp />}
+      <BookmarkAddSharp />
     </span>
   );
 };

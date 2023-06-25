@@ -78,8 +78,8 @@ We conducted a case study on the various mainstream note-taking tools to learn a
      2. Simple syntaxes which allows efficient note-taking.
      3. Considerable amount of support for $\LaTeX$.
    - Cons
-     1. Unable to render complex mathematics with detailed typesetting adjustments. For example, in this very Markdown document, 
-        `$\int\! f(x) \,\mathrm{d}x$` would get incorrectly rendered as $\int\! f(x) \,\mathrm{d}x$.
+     1. Unable to render complex mathematics with detailed typesetting adjustments. For example, in most Markdown editors, 
+        `$\int\! f(x) \,\mathrm{d}x$` would get incorrectly rendered as $\int !f(x) ,\mathrm{d}x$.
      2. Difficult to set up collaborative projects.
 6. Notion
    - Pros
@@ -214,6 +214,8 @@ All of the above hotkeys have their tooltip button equivalents in the toolbar. T
 
 Regarding the toolbar, we initially appended it to every block in the editor, but this soon led to a problem: most text formats such as boldface and italic texts are not used at all in certain special types of blocks such as a code block, so it is **redundant** to still show the toolbar in those blocks. Therefore, we decided to make the visibility of the toolbar conditional such that it only shows up in a text block (e.g. paragraph and heading) while it is focused. An unexpected benefit this has brought is that the editor now looks cleaner because there can only be at most one visible toolbar concurrently. 
 
+Additionally, since the toolbar is invisible in certain special blocks such as a code block, we placed the block-toggling buttons at a separate toolbar which is always visible.
+
 ##### Slash Commands:
 
 Inspired by Notion, we have found that slash commands are a very useful feature to reduce the frequency of mouse-clicking while using the application, which offers a great boost to efficiency. So we decided to incorporate it into our application as well.
@@ -241,8 +243,6 @@ Therefore, we decided to switch to a UI library instead. We have chosen to use M
 #### [Future Plan]
 
 We will keep updating the hotkey bindings and tooltip buttons to synchronise with new formatting options added. For $\LaTeX$ input, we wish to upgrade it such that toggling math mode with texts selected will wrap the selected texts into $\LaTeX$ environment.
-
-Meanwhile, we are planning to split the toolbar. Currently, both text- and block-level formatting buttons are in the same toolbar. However, since the toolbar is invisible in certain special blocks such as a code block, this makes hotkey the only possible way to switch back from a special block to a text block, which compromises flexibility. Hence, the block-toggling buttons should be placed at a separate toolbar which is always visible as long as the block is focused.
 
 We would also continue to improve the various interactions and hotkeys with regard to webpage navigation. We expect this to be a continuous and long-term process in a sense that new interactions and UI components will be implemented wherever and whenever they are deemed appropriate.
 
@@ -341,6 +341,8 @@ Currently, every entry will display the project name and date of last update, an
 The user can click on the "Create New Project" button to set up a new project, which pops up a window for the user to enter the project name. On pressing "confirm" button, the application will first check the validity of the project name. If the project name is empty or is the same as another existing project, the webpage will alert the user with a message. Otherwise, the new project will be created successfully and its data will be send to the database.
 
 The user can also rename or delete a project by clicking on the corresponding button beside the entry in the manager. When renaming, the same validation process for project name applies.
+
+To help new users quickly learn the various features of our application, their project manager will have a default example project on successful registration.
 
 #### [Future Plan]
 

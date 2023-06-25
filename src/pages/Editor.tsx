@@ -14,17 +14,19 @@ import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, UniqueIdentifier
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { nanoid } from "nanoid";
 import ReactDOM from "react-dom";
-import DraggedContent from "../components/DraggedContent";
+import DraggedContent from "../components/editor-components/DraggedContent";
 import { mathjaxConfig } from "../config/MathJax";
 import { Coords } from "../utils/UtilityInterfaces";
-import BlockSelection from "../components/BlockSelection";
+import BlockSelection from "../components/editor-components/BlockSelection";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import { matchSorter } from "match-sorter";
 import { Params, useParams } from "react-router-dom";
-import { getDoc, doc, updateDoc, query, collection, DocumentReference, DocumentData } from "firebase/firestore";
+import { getDoc, doc, updateDoc, query, collection, DocumentReference, DocumentData, serverTimestamp } from "firebase/firestore";
 import { db } from "../config/Firebase";
 import { Paper } from "@mui/material";
 import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
+import { timeStamp } from "console";
+import BlockToggler from "../components/editor-components/BlockToggler";
 
 export default function Editor(): JSX.Element | null {
   const params: Readonly<Params<string>> = useParams();
@@ -63,6 +65,11 @@ export default function Editor(): JSX.Element | null {
       name: "dfn",
       blockType: "thm",
       desc: "Definition Box",
+    },
+    {
+      name: "heading",
+      blockType: "heading",
+      desc: "Heading",
     },
     {
       name: "paragraph",
@@ -114,11 +121,6 @@ export default function Editor(): JSX.Element | null {
     })
   }, [])
 
-  /* useEffect(() => {
-    
-    Transforms.select(editor, [0])
-  }, []) */
-
   if (!initVal) {
     return null;
   }
@@ -129,6 +131,7 @@ export default function Editor(): JSX.Element | null {
     "mod+r": "roman",
     "mod+u": "underline",
     "mod+s": "strikethru",
+    "mod+`": "code",
   };
 
   const clearSelection = () => {
@@ -176,11 +179,6 @@ export default function Editor(): JSX.Element | null {
     if (event.key === "$") {
       event.preventDefault();
       TypesetUtil.toggleMath(editor, true);
-    }
-    // Insert inline code when pressing Ctrl + `
-    if (event.ctrlKey && event.key === "`") {
-      event.preventDefault();
-      TypesetUtil.toggleCode(editor, true);
     }
     // Add marks corresponding to the hotkeys.
     for (const hotkey in HOTKEYS) {
@@ -262,7 +260,6 @@ export default function Editor(): JSX.Element | null {
           setSelectMenuIsOpen(false);
           break;
         default:
-          console.log(selectMenuItems)
           break;
       }
     }
@@ -342,7 +339,10 @@ export default function Editor(): JSX.Element | null {
       op => "set_selection" !== op.type
     );
     if (isAtChange) {
-      updateDoc(currDoc!, { slateValue: JSON.stringify(value) });
+      updateDoc(currDoc!, { 
+        slateValue: JSON.stringify(value),
+        timeStamp: serverTimestamp(),
+      });
     }
   }
 
@@ -383,6 +383,7 @@ export default function Editor(): JSX.Element | null {
               onKeyUp={onKeyUpHandler}
             />
           </SortableContext>
+          <BlockToggler />
           {ReactDOM.createPortal(
             <DragOverlay adjustScale={false}>
               {!!activeElement ? <DraggedContent
