@@ -49,7 +49,6 @@ export const TypesetUtil = {
           ? thmStyle as "thm" | "dfn" | "remark"
           : undefined,
       };
-      console.log(newProperties)
     }
     Transforms.setNodes(editor, newProperties);
     /* const { selection } = editor;

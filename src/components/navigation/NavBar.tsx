@@ -10,7 +10,6 @@ import classes from "./NavBar.module.css"
 export default function Navbar(): JSX.Element {
   const [user]: AuthStateHook = useAuthState(auth);
   const navigate: NavigateFunction = useNavigate();
-  console.log(user);
 
   const onLogOutHandler = () => {
     signUserOut();

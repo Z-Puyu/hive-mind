@@ -260,7 +260,6 @@ export default function Editor(): JSX.Element | null {
           setSelectMenuIsOpen(false);
           break;
         default:
-          console.log(selectMenuItems)
           break;
       }
     }
