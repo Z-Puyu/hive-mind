@@ -18,16 +18,10 @@ export default function Bookmark(props: RenderElementProps) {
   const bookmarkRef = useRef<HTMLDivElement>(null);
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-    console.log("Now the current bookmark is: ");
-    console.log(props.element)
-  }, [])
-
   const onConfirmConfigHandler = (newTitle: string, newDest?: BookmarkElem, newDesc?: string) => {
     const currId: string = props.element.id;
     const path: Path = ReactEditor.findPath(editor, props.element);
     Transforms.removeNodes(editor, { at: path })
-    console.log(newDesc)
     Transforms.insertNodes(editor, {
       id: currId,
       type: "bookmark",
@@ -52,10 +46,10 @@ export default function Bookmark(props: RenderElementProps) {
       </Modal> : null}
       <span
         className={classes.bookmark}
-        onDoubleClick={() => setModalIsOpen(true)}
-        onClick={() => {
-          // console.log(ReactEditor.toDOMNode(editor, (props.element as BookmarkElem).dest!) as Node);
-          if (!!(props.element as BookmarkElem).dest) {
+        onClick={event => {
+          if (event.ctrlKey) {
+            setModalIsOpen(true);
+          } else if (!!(props.element as BookmarkElem).dest) {
             const destNode: HTMLElement = ReactEditor.toDOMNode(
               editor, Editor.parent(
                 editor, ReactEditor.findPath(

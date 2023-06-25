@@ -49,7 +49,6 @@ export const TypesetUtil = {
           ? thmStyle as "thm" | "dfn" | "remark"
           : undefined,
       };
-      console.log(newProperties)
     }
     Transforms.setNodes(editor, newProperties);
     /* const { selection } = editor;
@@ -172,7 +171,7 @@ export const TypesetUtil = {
   },
 
   insertBookmark: (editor: Editor) => {
-    if (!!editor.selection) {
+    if (editor.selection) {
       Transforms.insertNodes(editor, {
         id: nanoid(),
         type: "bookmark",

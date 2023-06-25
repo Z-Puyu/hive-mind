@@ -8,6 +8,7 @@ import FormatButton from "../FormatButton";
 import MathButton from "../MathButton";
 import TheoremTitle from "../TheoremTitle";
 import ToggleLinkButton from "../ToggleLinkButton";
+import BookmarkButton from "../BookmarkButton";
 
 export default function Definition(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -26,6 +27,7 @@ export default function Definition(props: RenderElementProps): JSX.Element {
           <ToggleLinkButton />
           <MathButton inline />
           <MathButton />
+          <BookmarkButton />
         </Toolbar> : null}
         <Paragraph attributes={props.attributes}>
           {props.children}

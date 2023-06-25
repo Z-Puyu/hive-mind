@@ -10,6 +10,7 @@ import { CodeSharp, FormatBoldSharp, FormatClearSharp, FormatItalicSharp, Format
 import FormatButton from "../FormatButton";
 import MathButton from "../MathButton";
 import ToggleLinkButton from "../ToggleLinkButton";
+import BookmarkButton from "../BookmarkButton";
 
 export default function TeXBox(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -20,24 +21,25 @@ export default function TeXBox(props: RenderElementProps): JSX.Element {
       {isSelected
         ? <section contentEditable="false">
           <Toolbar>
-            <FormatButton mark="bold" icon={<FormatBoldSharp />}/>
-            <FormatButton mark="italic" icon={<FormatItalicSharp />}/>
-            <FormatButton mark="roman" icon={<FormatClearSharp />}/>
-            <FormatButton mark="underline" icon={<FormatUnderlinedSharp />}/>
-            <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />}/>
-            <FormatButton mark="code" icon={<CodeSharp />}/>
-            <BlockButton blockType="quote" icon={<FormatQuoteSharp />}/>
-            <BlockButton blockType="heading" icon={<TitleSharp />}/>
+            <FormatButton mark="bold" icon={<FormatBoldSharp />} />
+            <FormatButton mark="italic" icon={<FormatItalicSharp />} />
+            <FormatButton mark="roman" icon={<FormatClearSharp />} />
+            <FormatButton mark="underline" icon={<FormatUnderlinedSharp />} />
+            <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />} />
+            <FormatButton mark="code" icon={<CodeSharp />} />
             <ToggleLinkButton />
             <MathButton inline />
             <MathButton />
+            <BookmarkButton />
           </Toolbar>
-          <Divider variant="middle"/>
+          <Divider variant="middle" />
         </section>
         : null}
-      <Paragraph attributes={props.attributes}>
-        {props.children}
-      </Paragraph>
+      <section className={isSelected ? classes.focusedParagraph : undefined}>
+        <Paragraph attributes={props.attributes}>
+          {props.children}
+        </Paragraph>
+      </section>
     </TextCard>
   );
 };

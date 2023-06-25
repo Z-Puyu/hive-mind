@@ -1,4 +1,4 @@
-import { Bookmark } from "@mui/icons-material";
+import Bookmark from "./blocks/Bookmark";
 import { RenderElementProps } from "slate-react";
 import { ThmElem } from "../../utils/CustomSlateTypes";
 import CodeBlock from "./blocks/CodeBlock";

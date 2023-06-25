@@ -1,5 +1,6 @@
 .toolbar {
   display: flex;
+  flex-direction: column;
   position: relative;
-  margin: 2% 2% 0;
+  margin: 2%;
 }

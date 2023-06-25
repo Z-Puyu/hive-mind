@@ -8,6 +8,7 @@ import FormatButton from "../FormatButton";
 import MathButton from "../MathButton";
 import TheoremTitle from "../TheoremTitle";
 import ToggleLinkButton from "../ToggleLinkButton";
+import BookmarkButton from "../BookmarkButton";
 
 
 export default function Theorem(props: RenderElementProps): JSX.Element {
@@ -26,6 +27,7 @@ export default function Theorem(props: RenderElementProps): JSX.Element {
           <ToggleLinkButton />
           <MathButton inline />
           <MathButton />
+          <BookmarkButton />
         </Toolbar> : null}
         <i>
           <Paragraph attributes={props.attributes}>
