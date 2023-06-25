@@ -58,8 +58,6 @@ export default function Heading(props: RenderElementProps) {
             <FormatButton mark="underline" icon={<FormatUnderlinedSharp />} />
             <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />} />
             <FormatButton mark="code" icon={<CodeSharp />} />
-            <BlockButton blockType="quote" icon={<FormatQuoteSharp />} />
-            <BlockButton blockType="heading" icon={<TitleSharp />} />
             <ToggleLinkButton />
             <MathButton inline />
             <MathButton />
