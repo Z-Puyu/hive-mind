@@ -1,14 +1,19 @@
-import { FormatBoldSharp, FormatItalicSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp, CodeSharp, FormatQuoteSharp, TitleSharp } from "@mui/icons-material";
+import { 
+  FormatBoldSharp, 
+  FormatItalicSharp, 
+  FormatClearSharp, 
+  FormatUnderlinedSharp, 
+  FormatStrikethroughSharp, 
+  CodeSharp 
+} from "@mui/icons-material";
 import { Toolbar, Divider } from "@mui/material";
 import { RenderElementProps, useSelected } from "slate-react";
 import Paragraph from "../../../interface/Paragraph";
 import TextCard from "../../../interface/TextCard";
 import { HeadingElem } from "../../../utils/CustomSlateTypes";
-import BlockButton from "../BlockButton";
 import FormatButton from "../FormatButton";
 import MathButton from "../MathButton";
 import ToggleLinkButton from "../ToggleLinkButton";
-
 
 export default function Heading(props: RenderElementProps) {
   const isSelected: boolean = useSelected();

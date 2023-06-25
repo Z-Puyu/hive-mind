@@ -1,12 +1,17 @@
-import { RenderElementProps, useSelected, useSlate } from "slate-react";
+import { RenderElementProps, useSelected } from "slate-react";
 import Toolbar from "../../../interface/Toolbar";
-import BlockButton from "../BlockButton";
 import TextCard from "../../../interface/TextCard";
 import Paragraph from "../../../interface/Paragraph";
-import { Editor, Transforms } from "slate";
-import { Box, Divider } from "@mui/material";
+import { Divider } from "@mui/material";
 import classes from "./TeXBox.module.css";
-import { CodeSharp, FormatBoldSharp, FormatClearSharp, FormatItalicSharp, FormatQuoteSharp, FormatStrikethroughSharp, FormatUnderlinedSharp, TitleSharp } from "@mui/icons-material";
+import {
+  CodeSharp,
+  FormatBoldSharp,
+  FormatClearSharp,
+  FormatItalicSharp,
+  FormatStrikethroughSharp,
+  FormatUnderlinedSharp
+} from "@mui/icons-material";
 import FormatButton from "../FormatButton";
 import MathButton from "../MathButton";
 import ToggleLinkButton from "../ToggleLinkButton";
@@ -14,7 +19,6 @@ import BookmarkButton from "../BookmarkButton";
 
 export default function TeXBox(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
-  const editor: Editor = useSlate();
 
   return (
     <TextCard>

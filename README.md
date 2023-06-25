@@ -395,7 +395,7 @@ On the authentication page, use either a registered e-mail account or Google to 
 The production build now includes the following main features:
 
 - Rich-text formatting using toolbar or hotkeys.
-- Press "$" to activate mathematical mode and input inline $\LaTeX$.
+- Press "\$" to activate mathematical mode and input inline $\LaTeX$.
 - Type a backslash to activate the slash command menu to toggle block types.
 - Drag and drop the top-level blocks to re-order paragraphs.
 - Animated styling to enhance user interactions.

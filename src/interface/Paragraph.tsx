@@ -1,4 +1,3 @@
-import { RenderElementProps } from "slate-react";
 import classes from "./Paragraph.module.css";
 
 interface ParagraphProps {

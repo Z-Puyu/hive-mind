@@ -1,31 +1,57 @@
-import { MathJaxContext } from "better-react-mathjax";
 import { KeyboardEvent, useCallback, useMemo, useState, useEffect } from "react";
 import { withInline, withBetterBreaks, withNodeUids } from "../plugins/SlatePlugins";
-import { Editable, ReactEditor, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
+import { 
+  Editable, 
+  ReactEditor, 
+  RenderElementProps, 
+  RenderLeafProps, 
+  Slate, 
+  withReact 
+} from "slate-react";
 import { withHistory } from "slate-history";
-import { createEditor, Descendant, Editor as SlateEditor, Transforms, Range, Text, Element, Node } from "slate";
+import { 
+  createEditor, 
+  Descendant, 
+  Editor as SlateEditor, 
+  Transforms, 
+  Range, 
+  Text, 
+  Element, 
+  Node 
+} from "slate";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import isHotkey, { isKeyHotkey } from "is-hotkey";
 import DynElem from "../components/editor-components/DynElem";
 import Leaf from "../components/editor-components/Leaf";
 import classes from "./Editor.module.css";
 import SortableElement from "../components/editor-components/SortableElement";
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, UniqueIdentifier } from "@dnd-kit/core";
+import { 
+  DndContext, 
+  DragEndEvent, 
+  DragOverlay, 
+  DragStartEvent, 
+  UniqueIdentifier 
+} from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { nanoid } from "nanoid";
 import ReactDOM from "react-dom";
 import DraggedContent from "../components/editor-components/DraggedContent";
-import { mathjaxConfig } from "../config/MathJax";
 import { Coords } from "../utils/UtilityInterfaces";
 import BlockSelection from "../components/editor-components/BlockSelection";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import { matchSorter } from "match-sorter";
 import { Params, useParams } from "react-router-dom";
-import { getDoc, doc, updateDoc, query, collection, DocumentReference, DocumentData, serverTimestamp } from "firebase/firestore";
+import { 
+  getDoc, 
+  doc, 
+  updateDoc, 
+  DocumentReference, 
+  DocumentData, 
+  serverTimestamp 
+} from "firebase/firestore";
 import { db } from "../config/Firebase";
 import { Paper } from "@mui/material";
-import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
-import { timeStamp } from "console";
+import { Auth, getAuth, onAuthStateChanged } from "firebase/auth";
 import BlockToggler from "../components/editor-components/BlockToggler";
 
 export default function Editor(): JSX.Element | null {

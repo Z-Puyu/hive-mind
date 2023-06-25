@@ -6,18 +6,22 @@ import { Editor, Element, Node, Transforms } from "slate";
 import { ReactEditor, useSlate } from "slate-react";
 import SelectMenu from "../../interface/SelectMenu";
 import VerticalList from "../../interface/VerticalList";
-import { Transform } from "stream";
 
 interface BookmarkConfigMenuProps {
   target: BookmarkElem;
-  onConfirm: (title: string, dest?: BookmarkElem, desc?: string) => void;
+  onConfirm: (title: string, dest?: string, destId?: string, desc?: string) => void;
 }
 
 export default function BookmarkConfigMenu(props: BookmarkConfigMenuProps) {
   const editor: Editor = useSlate();
   const [isSelectMenuActive, setIsSelectMenuActive] = useState<boolean>(false);
   const [bookmarkName, setBookmarkName] = useState<string>(props.target.title);
-  const [bookmarkDest, setBookmarkDest] = useState<BookmarkElem | undefined>(props.target.dest);
+  const [bookmarkDest, setBookmarkDest] = useState<string | undefined>(
+    props.target.destTitle ? props.target.destTitle : undefined
+  );
+  const [bookmarkDestId, setBookmarkDestId] = useState<string | undefined>(
+    props.target.dest ? props.target.dest : undefined
+  );
   const [availableBookmarks, setAvailableBookmarks] = useState<BookmarkElem[]>([]);
   const [bookmarkDesc, setBookmarkDesc] = useState<string>(
     !!props.target.customDesc ? props.target.customDesc : ""
@@ -68,7 +72,7 @@ export default function BookmarkConfigMenu(props: BookmarkConfigMenuProps) {
           className={classes.input}
           id="bm-destination"
           type="text"
-          value={!!bookmarkDest ? bookmarkDest.title : ""}
+          value={bookmarkDest ? bookmarkDest : ""}
           onClick={onClickHandler}
         />
       </div>
@@ -83,13 +87,15 @@ export default function BookmarkConfigMenu(props: BookmarkConfigMenuProps) {
             .filter(bm => bm.id !== props.target.id)
             .map(bm => <div
               onClick={() => {
-                setBookmarkDest(bm);
+                setBookmarkDest(bm.title);
+                setBookmarkDestId(bm.id);
                 Transforms.setNodes(editor, {
-                  dest: bm,
+                  dest: bm.id,
                 }, { at: ReactEditor.findPath(editor, props.target) });
                 Transforms.setNodes(editor, {
-                  dest: props.target,
+                  dest: props.target.id,
                 }, { at: ReactEditor.findPath(editor, bm) });
+                setIsSelectMenuActive(!isSelectMenuActive);
               }}
             >
               {bm.title}
@@ -111,7 +117,7 @@ export default function BookmarkConfigMenu(props: BookmarkConfigMenuProps) {
         />
       </div>
       <button
-        onClick={() => props.onConfirm(bookmarkName, bookmarkDest, bookmarkDesc)}
+        onClick={() => props.onConfirm(bookmarkName, bookmarkDest, bookmarkDestId, bookmarkDesc)}
       >
         Confirm
       </button>

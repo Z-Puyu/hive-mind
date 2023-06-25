@@ -3,7 +3,6 @@ import { auth } from "../../config/Firebase";
 import { AuthStateHook, useAuthState } from "react-firebase-hooks/auth";
 import { signUserOut } from "../../config/Firebase";
 import { useNavigate } from "react-router-dom";
-import { css } from "@emotion/css";
 import { Button } from "@mui/material";
 import classes from "./NavBar.module.css"
 
