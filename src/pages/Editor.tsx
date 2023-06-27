@@ -1,16 +1,48 @@
 import { MathJaxContext } from "better-react-mathjax";
 import { KeyboardEvent, useCallback, useMemo, useState, useEffect } from "react";
 import { withInline, withBetterBreaks, withNodeUids } from "../plugins/SlatePlugins";
+<<<<<<< Updated upstream
 import { Editable, ReactEditor, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
 import { withHistory } from "slate-history";
 import { createEditor, Descendant, Editor as SlateEditor, Transforms, Range, Text, Element, Node } from "slate";
+=======
+import {
+  Editable,
+  ReactEditor,
+  RenderElementProps,
+  RenderLeafProps,
+  Slate,
+  withReact
+} from "slate-react";
+import { withHistory } from "slate-history";
+import {
+  createEditor,
+  Descendant,
+  Editor as SlateEditor,
+  Transforms,
+  Range,
+  Text,
+  Element,
+  Node
+} from "slate";
+>>>>>>> Stashed changes
 import { TypesetUtil } from "../utils/TypesetUtil";
 import isHotkey, { isKeyHotkey } from "is-hotkey";
 import DynElem from "../components/editor-components/DynElem";
 import Leaf from "../components/editor-components/Leaf";
 import classes from "./Editor.module.css";
 import SortableElement from "../components/editor-components/SortableElement";
+<<<<<<< Updated upstream
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, UniqueIdentifier } from "@dnd-kit/core";
+=======
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  UniqueIdentifier
+} from "@dnd-kit/core";
+>>>>>>> Stashed changes
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { nanoid } from "nanoid";
 import ReactDOM from "react-dom";
@@ -21,7 +53,18 @@ import BlockSelection from "../components/editor-components/BlockSelection";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import { matchSorter } from "match-sorter";
 import { Params, useParams } from "react-router-dom";
+<<<<<<< Updated upstream
 import { getDoc, doc, updateDoc, query, collection, DocumentReference, DocumentData, serverTimestamp } from "firebase/firestore";
+=======
+import {
+  getDoc,
+  doc,
+  updateDoc,
+  DocumentReference,
+  DocumentData,
+  serverTimestamp
+} from "firebase/firestore";
+>>>>>>> Stashed changes
 import { db } from "../config/Firebase";
 import { Paper } from "@mui/material";
 import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
@@ -34,7 +77,7 @@ export default function Editor(): JSX.Element | null {
   // Import Firestore.
   const auth: Auth = getAuth();
   const [currDoc, setCurrDoc] = useState<DocumentReference<DocumentData> | null>(null);
-  
+
   // Initialise Slate editor.
   const [editor] = useState<SlateEditor>(() => withNodeUids(
     withBetterBreaks(
@@ -107,19 +150,17 @@ export default function Editor(): JSX.Element | null {
   const activeElement: Descendant | undefined = editor.children
     .find(child => (child as Element).id === activeId);
 
-  useEffect(() => {
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        const currDoc: DocumentReference<DocumentData> = doc(db, "userProjects",
-          user.uid, "projects", params.projId!);
-        setCurrDoc(currDoc);
-        getDoc(currDoc).then(doc => {
-          const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
-          setInitVal(slateValue);
-        })
-      }
-    })
-  }, [])
+  useEffect(() => onAuthStateChanged(auth, user => {
+    if (user) {
+      const currDoc: DocumentReference<DocumentData> = doc(db, "userProjects",
+        user.uid, "projects", params.projId!);
+      setCurrDoc(currDoc);
+      getDoc(currDoc).then(doc => {
+        const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
+        setInitVal(slateValue);
+      })
+    }
+  }), [])
 
   if (!initVal) {
     return null;
@@ -339,7 +380,7 @@ export default function Editor(): JSX.Element | null {
       op => "set_selection" !== op.type
     );
     if (isAtChange) {
-      updateDoc(currDoc!, { 
+      updateDoc(currDoc!, {
         slateValue: JSON.stringify(value),
         timeStamp: serverTimestamp(),
       });

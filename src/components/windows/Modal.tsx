@@ -8,12 +8,14 @@ interface ModalProps {
 }
 
 export default function Modal(props: ModalProps): JSX.Element {
-  return <MuiModal
-    open={props.open}
-    onClose={props.onClose}
-  >
-    <Box className={classes.box}>
-      {props.children}
-    </Box>
-  </MuiModal>
+  return (
+    <MuiModal
+      open={props.open}
+      onClose={props.onClose}
+    >
+      <Box className={classes.box}>
+        {props.children}
+      </Box>
+    </MuiModal>
+  );
 }
