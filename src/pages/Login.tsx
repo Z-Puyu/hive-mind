@@ -28,7 +28,7 @@ export default function Login(): JSX.Element {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        navigate("/");
+        navigate("/dashboard");
       }
     }
     // maybe trigger a loading screen

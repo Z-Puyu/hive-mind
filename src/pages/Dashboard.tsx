@@ -19,6 +19,7 @@ import { nanoid } from "nanoid";
 import Modal from "../components/windows/Modal";
 import classes from "./Dashboard.module.css";
 import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
+import TagManager from "../components/navigation/TagManager";
 
 export default function Dashboard(): JSX.Element | null {
   const auth: Auth = getAuth();
@@ -27,42 +28,43 @@ export default function Dashboard(): JSX.Element | null {
   const [docsData, setDocsData] = useState<DocumentData[]>([]);
   const [currUser, setCurrUser] = useState<User | null>(null);
 
-  useEffect(() => {
+  useEffect(() => onAuthStateChanged(auth, user => {
     // We have to check if the user is null before rendering 
     // because the user may not be ready yet when the effect triggers.
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        setCurrUser(user);
-        onSnapshot(
-          query(
-            collection(db, "userProjects", user.uid, "projects"),
-            orderBy("timeStamp"),
-            orderBy("fileName")
-          ),
-          docsSnap => {
-            const currDocs: DocumentData[] = [];
-            docsSnap.forEach(doc => currDocs.push({ ...doc.data(), user: user.uid, id: doc.id }));
-            setDocsData(currDocs);
-          }
-        )
-      }
-    });
-  }, []);
+    if (user) {
+      setCurrUser(user);
+      onSnapshot(
+        query(
+          collection(db, "userProjects", user.uid, "projects"),
+          orderBy("timeStamp"),
+          orderBy("fileName")
+        ),
+        docsSnap => {
+          const currDocs: DocumentData[] = [];
+          docsSnap.forEach(doc => currDocs.push({ ...doc.data(), user: user.uid, id: doc.id }));
+          setDocsData(currDocs);
+        }
+      )
+    }
+  }), []);
 
+  // With early return, we avoid unnecessary initialisation of the functions below.
   if (!currUser) {
     return null;
   }
 
   const onCreateProjectHandler = () => {
     if (newDocName !== "") {
-      const q: Query<DocumentData> = query(
+      // If the project name is non-empty, it is safe to add.
+      const docsWithSameFileName: Query<DocumentData> = query(
         collection(db, "userProjects", currUser.uid, "projects"),
         where("fileName", "==", newDocName)
       );
-      getDocs(q).then(docs => {
+      getDocs(docsWithSameFileName).then(docs => {
         if (docs.docs.length > 0) {
           alert("A project named " + newDocName + " already exists!");
         } else {
+          // There is no documents with the same file name so it's safe to add a new document.
           addDoc(
             collection(db, "userProjects", currUser.uid, "projects"),
             {
@@ -78,6 +80,7 @@ export default function Dashboard(): JSX.Element | null {
               //add Tag
             }
           );
+          // Reset default project name and close the modal.
           setNewDocName("New Project");
           setIsAddingDoc(false);
         }
@@ -88,7 +91,10 @@ export default function Dashboard(): JSX.Element | null {
   }
 
   return (
-    <div>
+    <div
+      className={classes.dashboard}
+    >
+      <TagManager />
       <Paper
         elevation={3}
         className={classes.manager}

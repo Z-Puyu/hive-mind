@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { db } from "../../config/Firebase";
+import classes from "./DocumentRow.module.css";
 
 interface DocumentRowProps {
   docData: DocumentData;
@@ -34,59 +35,27 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
   return (
     <div>
       <Box
-        className={css`
-        display: flex;
-        padding: 0.5em 1em;
-        :hover {
-          background-color: rgba(192, 192, 192, 0.2);
-        }
-      `}
+        className={classes.docRow}
       >
         <p
-          className={css`
-            flex-grow: 5;
-            width: 20%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            :hover {
-              cursor: pointer;
-            }
-          `}
+          className={classes.fileName}
           onClick={() => navigate(`/Editor/${props.docData.id}`)}
         >
           {props.docData.fileName}
         </p>
         <p
-          className={css`
-            flex-grow: 1;
-          `}
+          className={classes.timeStamp}
         >
           {props.docData.timeStamp?.toDate().toLocaleDateString()}
         </p>
         <p
-          className={css`
-            flex-grow: 1;
-            :hover {
-              cursor: pointer;
-            }
-          `}
+          className={classes.button}
         >
           <Modal
             open={isRenaming}
             onClose={() => setIsRenaming(false)}
           >
-            <Box className={css`
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              width: 400px;
-              background-color: white;
-              box-shadow: 0px 0px 5em rgb(64, 64, 64);
-              padding: 2em;
-              border-radius: 1em;
-              text-align: center;
-            `}>
+            <Box className={classes.card}>
               <TextField
                 variant="outlined"
                 label="Project Title"
@@ -99,7 +68,7 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
                 variant="text"
                 onClick={() => setIsRenaming(false)}
                 sx={{
-                  margin: "0 0.75em"
+                  margin: "0 0.75em",
                 }}
               >
                 Cancel
@@ -108,30 +77,21 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
                 variant="contained"
                 onClick={onRenameProjectHandler}
                 sx={{
-                  margin: "0 0.75em"
+                  margin: "0 0.75em",
                 }}
               >
                 Rename Project
               </Button>
             </Box>
           </Modal>
-          <u
-            onClick={() => setIsRenaming(true)}
-          >
+          <u onClick={() => setIsRenaming(true)}>
             Rename
           </u>
         </p>
         <p
-          className={css`
-            flex-grow: 1;
-            :hover {
-              cursor: pointer;
-            }
-          `}
+          className={classes.button}
         >
-          <u
-            onClick={() => deleteDoc(currProject)}
-          >
+          <u onClick={() => deleteDoc(currProject)}>
             Delete
           </u>
         </p>

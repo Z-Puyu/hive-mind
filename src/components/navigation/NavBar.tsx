@@ -4,10 +4,12 @@ import { AuthStateHook, useAuthState } from "react-firebase-hooks/auth";
 import { signUserOut } from "../../config/Firebase";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
-import classes from "./NavBar.module.css"
+import classes from "./NavBar.module.css";
+import { useState, useEffect } from "react";
+import { User, onAuthStateChanged } from "firebase/auth";
 
 export default function Navbar(): JSX.Element {
-  const [user]: AuthStateHook = useAuthState(auth);
+  const [currUser, setCurrUser] = useState<User | null>(null)
   const navigate: NavigateFunction = useNavigate();
 
   const onLogOutHandler = () => {
@@ -15,20 +17,26 @@ export default function Navbar(): JSX.Element {
     navigate("/authentication");
   }
 
+  useEffect(() => onAuthStateChanged(auth, user => {
+    if (user) {
+      setCurrUser(user);
+    }
+  }), []);
+
   return (
     <div
+      id="nav-bar"
       className={classes.navBar}
     >
       <div className={classes.links}>
-        <Link to="/">Dashboard</Link>
-        {user ? null : <Link to="/authentication">Login</Link>}
+        {currUser ? <Link to="/dashboard">Dashboard</Link> : <Link to="/authentication">Login</Link>}
       </div>
       <div className={classes.user}
       >
-        {user ? (
+        {currUser ? (
           <>
-            <p>{user.displayName}</p>
-            <img src={user.photoURL || ""} alt="" />
+            <p>{currUser.displayName}</p>
+            <img src={currUser.photoURL || ""} alt="" />
             <Button 
             sx={{
               backgroundColor: "rgb(128, 128, 128)",

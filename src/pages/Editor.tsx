@@ -45,6 +45,8 @@ import {
   getDoc, 
   doc, 
   updateDoc, 
+  query, 
+  collection, 
   DocumentReference, 
   DocumentData, 
   serverTimestamp 
@@ -53,6 +55,25 @@ import { db } from "../config/Firebase";
 import { Paper } from "@mui/material";
 import { Auth, getAuth, onAuthStateChanged } from "firebase/auth";
 import BlockToggler from "../components/editor-components/BlockToggler";
+import { 
+  UniqueIdentifier, 
+  DragStartEvent, 
+  DragEndEvent, 
+  DndContext, 
+  DragOverlay 
+} from "@dnd-kit/core";
+import { 
+  createEditor, 
+  Descendant, 
+  Transforms, 
+  Editor as SlateEditor, 
+  Element, 
+  Range, 
+  Text, 
+  Node 
+} from "slate";
+import { withHistory } from "slate-history";
+import { withReact, RenderElementProps, ReactEditor, RenderLeafProps, Slate, Editable } from "slate-react";
 
 export default function Editor(): JSX.Element | null {
   const params: Readonly<Params<string>> = useParams();
@@ -60,7 +81,7 @@ export default function Editor(): JSX.Element | null {
   // Import Firestore.
   const auth: Auth = getAuth();
   const [currDoc, setCurrDoc] = useState<DocumentReference<DocumentData> | null>(null);
-  
+
   // Initialise Slate editor.
   const [editor] = useState<SlateEditor>(() => withNodeUids(
     withBetterBreaks(
@@ -134,23 +155,17 @@ export default function Editor(): JSX.Element | null {
   const activeElement: Descendant | undefined = editor.children
     .find(child => (child as Element).id === activeId);
 
-  useEffect(() => {
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        const currDoc: DocumentReference<DocumentData> = doc(db, "userProjects",
-          user.uid, "projects", params.projId!);
-        setCurrDoc(currDoc);
-        getDoc(currDoc).then(doc => {
-          const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
-          setInitVal(slateValue);
-        })
-        // getDoc(currDoc).then(doc => {
-        //   (doc.data()?.tag);
-        //   setTag(doc);
-        // })
-      }
-    })
-  }, [])
+  useEffect(() => onAuthStateChanged(auth, user => {
+    if (user) {
+      const currDoc: DocumentReference<DocumentData> = doc(db, "userProjects",
+        user.uid, "projects", params.projId!);
+      setCurrDoc(currDoc);
+      getDoc(currDoc).then(doc => {
+        const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
+        setInitVal(slateValue);
+      })
+    }
+  }), [])
 
   if (!initVal) {
     return null;
@@ -370,7 +385,7 @@ export default function Editor(): JSX.Element | null {
       op => "set_selection" !== op.type
     );
     if (isAtChange) {
-      updateDoc(currDoc!, { 
+      updateDoc(currDoc!, {
         slateValue: JSON.stringify(value),
         timeStamp: serverTimestamp(),
       });

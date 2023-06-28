@@ -384,9 +384,96 @@ Thus, we propose to incorporate collaborative editing into HiveMind. Users may c
 6. MathJax
 7. $\LaTeX$
 
-## Proof-of-concept
+## Problems Encountered and How We Fixed Them
 
-The [project poster](https://drive.google.com/file/d/1iGHT04W8h5N5H2RU6KsVlVeNxAIIhOCD/view?usp=share_link) and [project video](https://drive.google.com/file/d/11urJgv1n9FsqEqYKHdD4jG00sjB7-DRh/view?usp=share_link) can be accessed from here.
+With both members as complete novices in software development, our team has had a hard time during the initial stages of our project. Though we had to spend much extra time tackling all kinds of issues we have encountered, these have later turned into invaluable learning experiences for us. Here we document several notable and major problems that appeared in the process of our project development.
+
+### The Pain of Re-building the Wheels
+
+Our project aims to tackle a relatively niche issue: **increasing the modularity of digital note-editing with comprehensive** $\LaTeX$ **support.** The one immediate problem we had to face was: there is little resource online that is directly relevant to our development. Most people who need large amount of $\LaTeX$ typesetting will just use a $\LaTeX$ editor or choose to write in Markdown anyways. Therefore, there are very few examples for such a note editor from which we can take reference. As such, we had no choice but to learn from and emulate other types of applications like a regular rich-text editor, which proved to be of great pain.
+
+Our inexperience also led us to being *overly (or naïvely) confident* to the extent that we believed we could achieve our targeted outcome by building everything using plain React alone. We simplistically thought that one contentEditable `<div>` would suffice for building an editor, but the mechanism behind a simple editor appeared far more complicated than it seemsed. We then resolved to using the content-editable Node package, but later realised that a simple and light-weight package like this could not cover our needs at all. As a result, by Milestone 1, only a very small fraction of our plan has been implemented, which was barely kept from breaking apart. It was by then that we realised that we urgently need to seek for a **comprehensive framework** which specifically targets editor development, and we finally found *Slate.js*.
+
+The advantages of Slate.js have been discussed in earlier sections so we shall skip them here. Nevertheless, what happened afterwards proved one important thing to us: *it is always better to adopt a ready-to-use tool than to build the wheels from scratch.* Even if the library does not fit your needs 100%, it would still be way more efficient to improvise using existing tools than to construct everything on our own. 
+
+We managed to rebuild our application from the previous mini-demo within only half a day. Since then, we finally have had a stable foundation for our application that can be easily extended with new functionalities.
+
+### Dilemmas in Design Decisions
+
+We had wished that we could always find the "best" or the "ideal" way to implement every single functionality for our application, but we have been proven wrong. There are times where every possible implementation brings along some seemingly "unacceptable" pitfalls.
+
+The most prominent instance is when we were implementing rendering logic for displayed mathematics. As a jargon for mathematical typesetting, "displayed mathematics" refers to mathematics which occupies its own lines which are disjoint from regular text flow. Examples of displayed mathematics include
+
+$$
+\lim_{n \to \infty}\left(1 + \frac{1}{n}\right)^n = \sum_{n = 0}^\infty \frac{1}{n!} = \mathrm{e}
+$$
+
+and other kinds of often complex mathematical expressions.
+
+You will notice that although displayed mathematics seem to occupy separate "paragraphs", they in reality carry semantic meanings and act as some part of speech in a full sentence. Thus, it is justified to implement displayed mathematics as **nested blocks** within a paragraph. 
+
+However, an issue soon emerged. We noticed that if a paragraph ends with displayed mathematics, an empty line will appear after the mathematics, which makes the gap after that paragraph inconsistently wider. What was worse was that we soon realised that there was practically no solution for it because it was caused by an inherent constraint of Slate.js. Slate.js uses an **empty string** to indicate the end of a top-level block, and since our displayed mathematics took away the full width of the block, Slate.js had to insert that empty string to the next line, leading to the empty line problem.
+
+We then considered re-building the displayed mathematics as its own top-level blocks. However, because the mathematics serves as a part of a complete sentence, this would cause one sentence to be fragmented into three different blocks, which was aesthetically weird. Moreover, as our editor needed to include blocks for theorems, definitions, remarks, solutions and proofs, it would not make sense if those blocks have to split up whenever displayed mathematics needs to be inserted.
+
+Eventually, we decided to compromise. We judged that issues due to empty lines would occur much less frequently as compared to potential broken blocks would do if we make displayed mathematics into top-level blocks. The encounter with such a dilemma has taught us that we often have to weigh the pitfalls between several non-ideal implementations and choose one, rather than to seek a "perfect" solution that is impractical.
+
+### Bugs with the Bookmark Feature
+
+In the features section, we mentioned that we wish to hyperlink important sections with bookmarks such that clicking on them allows the user to jump instantly back and forth between these sections. We planned to achieve this by associating each bookmark with a **destination**, represented by an optional property in the type declaration for the bookmark object.
+
+Initially, we thought that it was the most straight-forward if we just implement the destination as another bookmark object. For example, when marking Bookmark B as the destination for Bookmark A, we simply assign Bookmark B to the destination property of Bookmark A, like this:
+
+```typescript
+// Type declaration
+type Bookmark = {
+    // Other properties
+    dest: Bookmark;
+};
+
+// Bookmark A
+a: Bookmark = {
+    // Other properties
+    dest: b,
+};
+```
+
+If it worked as intended, we could then use the built-in methods of Slate.js to convert the bookmark node in the editor to a DOMNode (or an HTMLElement) and use the `scrollTo` method to perform the jump between sections.
+
+However, we soon noticed a bug: after configuring Bookmarks A and B as such, the linkage between them could not be saved! When we closed the editor and opened it again, the hyperlink between them disappeared and clicking did not work as expected. Moreover, when we tried to re-configure them, we received error messages from time to time.
+
+With some testing, we quickly located the problem. It was because our bookmark hyperlinks represent a **symmetric relation**, meaning that the code above would actually be:
+
+```typescript
+// Type declaration
+type Bookmark = {
+    // Other properties
+    dest: Bookmark;
+};
+
+// Bookmark A
+a: Bookmark = {
+    // Other properties
+    dest: b,
+};
+
+b: Bookmark = {
+    // Other properties
+    dest: a,
+};
+```
+
+Looking at `a`, since the value `b` of its `dest` property is also a Bookmark object, `b` would contain a `dest` property whose value is `a`. This essentially reduced to an infinite loop and cyclic dependency which broke our code.
+
+Hence, we needed another way to store the destination data. We though of using the *paths* of the corresponding bookmark nodes, which are structures provided by Slate.js representing the relative position of a node in an editor with respect to some root node. However, this idea was aborted before it was implemented, as we realised that the path of a node is mutable in our application due to the drag-and-drop mechanism.
+
+This pointed us a direction: we require an *immutable* value to represent and record a bookmark node! We happened to have already such a value associated with every node in the editor: previously when we implement the drag-and-drop logic, the library we used requires that every draggable element should have a unique ID. Therefore, we could just use that unique ID to manage the bookmark hyperlinks. 
+
+Through solving this bug, we have learnt the important lesson that we should always avoid cyclic references in our code, and re-use pre-existing structures to solve problems as much as possible.
+
+## Proof-of-concept and Demonstration Project
+
+The [project poster](https://drive.google.com/file/d/1nrOBtsAm5hrHAS1ok_Vsw5_PstDqHmvf/view?usp=drive_link) and [project video](https://drive.google.com/file/d/1e7t9K8qMJnjLR59IZqi6TdiP0apbOAkV/view?usp=drive_link) can be accessed from here.
 
 We have also deployed our application [here](https://hive-mind-inky.vercel.app/).
 
