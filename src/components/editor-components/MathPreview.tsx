@@ -3,48 +3,34 @@ import PreviewBox from "../../interface/PreviewBox";
 import { MathJax } from "better-react-mathjax";
 import { Editor, Range } from "slate";
 import { useSlate, useFocused } from "slate-react";
+import { Card, Portal } from "@mui/material";
+import { css } from "@emotion/css";
 
 interface MathPreviewProps {
   value: string;
-  owner: React.RefObject<HTMLElement>;
-  displayStyle?: true;
+  rect?: DOMRect;
+  displayStyle?: string;
+  owner?: React.RefObject<HTMLSpanElement>;
 }
 
 export default function MathPreview(props: MathPreviewProps): JSX.Element {
-  const ref = useRef<HTMLDivElement | null>(null)
-  /* const editor = useSlate()
-  const inFocus = useFocused()
-  useEffect(() => {
-    const el = ref.current
-    const { selection } = editor
+  const cardRef = useRef<HTMLDivElement | null>(null)
 
-    if (!el) {
-      return
-    }
-
-    if (
-      !selection ||
-      !inFocus ||
-      Range.isCollapsed(selection) ||
-      Editor.string(editor, selection) === ''
-    ) {
-      el.removeAttribute('style')
-      return
-    }
-
-    const domSelection = window.getSelection()
-    const domRange = domSelection?.getRangeAt(0)
-    const rect = domRange?.getBoundingClientRect()
-    el.style.opacity = '1'
-    el.style.top = `${rect?.top! + window.pageYOffset - el.offsetHeight}px`
-    el.style.left = `${rect?.left! +
-      window.pageXOffset -
-      el.offsetWidth / 2 +
-      rect?.width! / 2}px`
-  }) */
   return (
-    // <HoveringWindow>
-      <PreviewBox owner={props.owner} displayStyle={props.displayStyle}>
+    <Portal container={document.getElementById("hivemind-editable")}>
+      <Card
+        ref={cardRef}
+        className={css`
+          width: fit-content;
+          max-width: 75%;
+          padding: ${props.displayStyle ? "0 0.5em" : "0.5em"};
+          position: absolute;
+          top: ${props.rect?.top! + window.scrollY - 1.25 * cardRef.current?.offsetHeight!}px;
+          left: ${props.rect?.left! + window.scrollX -
+          (cardRef.current?.offsetWidth! - props.rect?.width!) / 2}px;
+        `}
+        raised={true}
+      >
         <MathJax
           dynamic
           contentEditable={false}
@@ -54,10 +40,12 @@ export default function MathPreview(props: MathPreviewProps): JSX.Element {
           }}
         >
           {props.displayStyle
-            ? "\\begin{displaymath}" + props.value + "\\end{displaymath}"
+            ? "\\[\n\\begin{" + props.displayStyle + "}" +
+              props.value +
+              "\\end{" + props.displayStyle + "}\n\\]"
             : props.value}
         </MathJax>
-      </PreviewBox>
-    // </HoveringWindow>
+      </Card>
+    </Portal>
   );
 };

@@ -227,6 +227,12 @@ export default function Editor(): JSX.Element | null {
         event.preventDefault();
       }
     }
+    if (event.key === "Backspace") {
+      if (editor.selection?.anchor.offset === 0 && TypesetUtil.isEmptyInline(editor)) {
+        event.preventDefault();
+        TypesetUtil.removeEmptyInlines(editor);
+      }
+    }
     if (selectMenuIsOpen) {
       const selectedItemIndex: number = selectMenuItems.indexOf(selectedItem);
       switch (event.key) {
@@ -396,6 +402,7 @@ export default function Editor(): JSX.Element | null {
             : null}
           <SortableContext items={itemlist} strategy={verticalListSortingStrategy}>
             <Editable
+              id="hivemind-editable"
               className={classes.notes}
               disableDefaultStyles
               autoFocus

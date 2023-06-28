@@ -41,6 +41,7 @@ export type MathElem = {
   id: string;
   type: "math" | null | string;
   inline: boolean;
+  environment?: string;
   children: any[];
 };
 
