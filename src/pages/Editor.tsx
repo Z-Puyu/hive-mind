@@ -123,6 +123,7 @@ export default function Editor(): JSX.Element | null {
   const [selectedItem, setSelectedItem] = useState<{ [key: string]: string }>(selectMenuItems[0]);
   const [selectMenuIsOpen, setSelectMenuIsOpen] = useState<boolean>(false);
   const [selectMenuPos, setSelectMenuPos] = useState<Coords>({ x: 0, y: 0 });
+  //const [initTag, setInitTag] = useState<string> 
 
   // Initialise drag-and-drop.
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
@@ -143,6 +144,10 @@ export default function Editor(): JSX.Element | null {
           const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
           setInitVal(slateValue);
         })
+        // getDoc(currDoc).then(doc => {
+        //   (doc.data()?.tag);
+        //   setTag(doc);
+        // })
       }
     })
   }, [])
@@ -373,54 +378,57 @@ export default function Editor(): JSX.Element | null {
   }
 
   return (
-    <Paper
-      elevation={3}
-      square
-      className={classes.paper}
-      suppressContentEditableWarning={true}
-    >
-      <Slate
-        editor={editor}
-        value={initVal}
-        onChange={value => autoSave(value)}
+    <>
+      <Paper
+        elevation={3}
+        square
+        className={classes.paper}
+        suppressContentEditableWarning={true}
       >
-        <DndContext
-          onDragStart={onDragStartHandler}
-          onDragEnd={onDragEndHandler}
-          onDragCancel={() => setActiveId(null)}
+        <Slate
+          editor={editor}
+          value={initVal}
+          onChange={value => autoSave(value)}
         >
-          {selectMenuIsOpen
-            ? <BlockSelection
-              pos={selectMenuPos}
-              items={selectMenuItems}
-              currSelection={selectedItem}
-              onSelect={onSelectHandler}
-              onClose={onCloseSelectMenuHandler}
-            />
-            : null}
-          <SortableContext items={itemlist} strategy={verticalListSortingStrategy}>
-            <Editable
-              className={classes.notes}
-              disableDefaultStyles
-              autoFocus
-              renderElement={renderElementHandler}
-              renderLeaf={renderLeafHandler}
-              onKeyDown={onKeyDownHandler}
-              onKeyUp={onKeyUpHandler}
-            />
-          </SortableContext>
-          <BlockToggler />
-          {ReactDOM.createPortal(
-            <DragOverlay adjustScale={false}>
-              {!!activeElement ? <DraggedContent
-                element={activeElement}
+          <DndContext
+            onDragStart={onDragStartHandler}
+            onDragEnd={onDragEndHandler}
+            onDragCancel={() => setActiveId(null)}
+          >
+            {selectMenuIsOpen
+              ? <BlockSelection
+                pos={selectMenuPos}
+                items={selectMenuItems}
+                currSelection={selectedItem}
+                onSelect={onSelectHandler}
+                onClose={onCloseSelectMenuHandler}
+              />
+              : null}
+            <SortableContext items={itemlist} strategy={verticalListSortingStrategy}>
+              <Editable
+                className={classes.notes}
+                disableDefaultStyles
+                autoFocus
                 renderElement={renderElementHandler}
-              /> : null}
-            </DragOverlay>,
-            document.body
-          )}
-        </DndContext>
-      </Slate>
-    </Paper>
+                renderLeaf={renderLeafHandler}
+                onKeyDown={onKeyDownHandler}
+                onKeyUp={onKeyUpHandler}
+              />
+            </SortableContext>
+            <BlockToggler />
+            {ReactDOM.createPortal(
+              <DragOverlay adjustScale={false}>
+                {!!activeElement ? <DraggedContent
+                  element={activeElement}
+                  renderElement={renderElementHandler}
+                /> : null}
+              </DragOverlay>,
+              document.body
+            )}
+          </DndContext>
+        </Slate>
+      </Paper>
+      <h1></h1>
+    </>
   );
 };

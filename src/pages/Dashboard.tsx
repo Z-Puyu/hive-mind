@@ -75,6 +75,7 @@ export default function Dashboard(): JSX.Element | null {
                   children: [{ text: "" }]
                 }
               ]),
+              //add Tag
             }
           );
           setNewDocName("New Project");
