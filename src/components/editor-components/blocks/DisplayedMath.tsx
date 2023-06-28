@@ -1,11 +1,12 @@
 import { MathJax } from "better-react-mathjax";
-import { RenderElementProps, useSelected } from "slate-react";
+import { ReactEditor, RenderElementProps, useSelected, useSlate } from "slate-react";
 import MathPreview from "../MathPreview";
 import { useEffect, useState, useRef } from "react";
 import classes from "./DisplayedMath.module.css"
 import { css } from "@emotion/css";
 import { MathElem } from "../../../utils/CustomSlateTypes";
 import { Menu, MenuItem } from "@mui/material";
+import { Editor, Transforms } from "slate";
 
 const ALLOWED_ENVIRONMENTS: string[] = [
   "equation*",
@@ -20,6 +21,7 @@ const ALLOWED_ENVIRONMENTS: string[] = [
 ];
 
 export default function DisplayedMath(props: RenderElementProps): JSX.Element {
+  const editor: Editor = useSlate();
   const isSelected: boolean = useSelected();
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const mathRef = useRef<HTMLDivElement>(null);
@@ -32,6 +34,11 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
   const onChangeEnvironemtHandler = (env: string) => {
     setEnvironment(env);
     setAnchor(null);
+  }
+
+  const onPointerDownHandler = (event: React.PointerEvent<HTMLSpanElement>) => {
+    event.preventDefault();
+    setIsVisible(true);
   }
 
   return isVisible || isSelected ? (
@@ -47,7 +54,9 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
           text-align: left;
           margin: auto;
           width: fit-content;
-      ` }
+        `}
+        onPointerUp={() => Transforms.select(editor, 
+          ReactEditor.findPath(editor, props.element.children[0]))}
       >
         <code contentEditable="false" className={css`font-size: 10pt`}>
           {"\\begin{"}
@@ -96,9 +105,6 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
         <code contentEditable="false" className={css`font-size: 10pt`}>
           {"\\end{"}
           <Menu
-            className={css`
-             
-            `}
             open={!!anchor}
             onClose={() => setAnchor(null)}
             anchorEl={anchor}
@@ -135,7 +141,7 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
         margin: auto;
         width: fit-content;
         font-family: "Times New Roman";
-        cursor: pointer;
+        cursor: default;
         border-radius: 0.5em;
         padding: 0 0.5em;
         &:hover {
@@ -144,20 +150,18 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
           transition: 0.2s;
         }
       `}
+      onPointerDown={onPointerDownHandler}
     >
       <MathJax
         dynamic
         contentEditable="false"
         suppressContentEditableWarning={true}
-        style={{
-          fontFamily: "times",
-          fontWeight: "normal",
-          fontStyle: "normal",
-        }}
-        onClick={(event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-          event.preventDefault();
-          setIsVisible(true);
-        }}
+        className={css`
+          font-family: "times";
+          font-weight: normal;
+          font-style: normal;
+          cursor: pointer;
+        `}
       >
         {"\\begin{displaymath}"}
         {"\\begin{" + environment + "}"}
