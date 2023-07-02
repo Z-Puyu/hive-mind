@@ -51,6 +51,7 @@ import {
 } from "slate";
 import { withHistory } from "slate-history";
 import { withReact, RenderElementProps, ReactEditor, RenderLeafProps, Slate, Editable } from "slate-react";
+import IllustrationMaker from "../components/windows/IllustrationMaker";
 
 const INIT_BLOCK_TYPES: { [key: string]: string }[] = [
   {
@@ -439,6 +440,7 @@ export default function Editor(): JSX.Element | null {
               onClose={onCloseSelectMenuHandler}
             />
             : null}
+          {/* <IllustrationMaker /> */}
           <SortableContext items={itemlist} strategy={verticalListSortingStrategy}>
             <Editable
               id="hivemind-editable"

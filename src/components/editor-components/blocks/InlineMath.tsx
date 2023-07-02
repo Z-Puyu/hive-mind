@@ -19,11 +19,33 @@ export default function InlineMath(props: RenderElementProps) {
     setIsVisible(true);
   }
 
-  return isVisible || isSelected ? (
+  return isSelected ? (
     <span
       className={css`
         position: relative;
       `}
+    >
+      <MathPreview
+        value={props.children[0].props.text.text}
+        rect={mathRef.current?.getBoundingClientRect()}
+      />
+      <span
+        {...props.attributes}
+        ref={mathRef}
+        style={{
+          color: "gray",
+        }}
+        suppressContentEditableWarning={true}
+      >
+        {props.children}
+      </span>
+    </span>
+  ) : isVisible ? (
+    <span
+      className={css`
+          position: relative;
+        `}
+      contentEditable="false"
     >
       <MathPreview
         value={props.children[0].props.text.text}

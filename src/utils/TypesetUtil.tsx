@@ -1,4 +1,4 @@
-import { Editor, Text, Element, Transforms, Range, isEmpty, Node } from "slate";
+import { Editor, Text, Element, Transforms, Range, Node } from "slate";
 import { MathElem } from "./CustomSlateTypes";
 import { nanoid } from "nanoid";
 
