@@ -4,7 +4,7 @@ import { MathJax } from "better-react-mathjax";
 import { useRef, useState } from "react";
 
 interface TheoremTitleProps {
-  dfnStyle?: true;
+  style?: "dfn" | "eg" | "problem"
   title?: string;
 }
 
@@ -12,9 +12,26 @@ export default function TheoremTitle(props: TheoremTitleProps) {
   const [title, setTitle] = useState<string | undefined>(props.title);
   const [inputIsVisible, setInputIsVisible] = useState<boolean>(true);
   const inputRef = useRef<HTMLDivElement>(null);
-  const bgColor: string = props.dfnStyle
-    ? css`background-color: rgb(22, 97, 171)`
-    : css`background-color: rgb(130, 17, 31)`;
+  let bgColor: string;
+  let type: string;
+  switch (props.style) {
+    case "dfn":
+      bgColor = css`background-color: rgb(22, 97, 171)`;
+      type = "Definition";
+      break;
+    case "eg":
+      bgColor = css`background-color: rgb(139, 38, 113)`;
+      type = "Example";
+      break;
+    case "problem":
+      bgColor = css`background-color: rgb(93, 101, 95)`;
+      type = "Problem";
+      break;
+    default:
+      bgColor = css`background-color: rgb(130, 17, 31)`;
+      type = "Theorem";
+      break;
+  }
 
   return (
     <>
@@ -35,7 +52,7 @@ export default function TheoremTitle(props: TheoremTitleProps) {
         onClick={() => setInputIsVisible(!inputIsVisible)}
       >
         <MathJax inline dynamic>
-          {(props.dfnStyle ? "Definition " : "Theorem") + (!!title ? "(" + title + ")" : "")}
+          {type + (title ? "(" + title + ")" : "")}
         </MathJax>
       </div>
     </>

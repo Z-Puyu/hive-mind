@@ -36,6 +36,7 @@ export default function InlineMath(props: RenderElementProps) {
           color: "gray",
         }}
         onPointerUp={() => Transforms.select(editor, ReactEditor.findPath(editor, props.element))}
+        suppressContentEditableWarning={true}
       >
         {props.children}
       </span>
@@ -58,6 +59,7 @@ export default function InlineMath(props: RenderElementProps) {
         }
       `}
       onPointerDown={onPointerDownHandler}
+      suppressContentEditableWarning={true}
     >
       {props.children[0].props.text.text}
     </MathJax>

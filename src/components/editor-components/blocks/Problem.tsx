@@ -9,13 +9,15 @@ import MathButton from "../MathButton";
 import TheoremTitle from "../TheoremTitle";
 import ToggleLinkButton from "../ToggleLinkButton";
 import BookmarkButton from "../BookmarkButton";
+import { MathJax } from "better-react-mathjax";
+import { css } from "@emotion/css";
 
-export default function Definition(props: RenderElementProps): JSX.Element {
+export default function Problem(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
 
   return (
     <TextCard>
-      <TheoremTitle style="dfn" title={(props.element as ThmElem).title} />
+      <TheoremTitle style="problem" title={(props.element as ThmElem).title} />
       {isSelected ? <Toolbar>
         <FormatButton mark="bold" icon={<FormatBoldSharp />} />
         <FormatButton mark="italic" icon={<FormatItalicSharp />} />

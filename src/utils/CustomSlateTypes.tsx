@@ -69,8 +69,16 @@ export type CommandElem = {
 export type ThmElem = {
   id: string;
   type: "thm" | null | string;
-  style: "dfn" | "thm" | "remark";
+  style: "dfn" | "thm" | "remark" | "eg" | "problem";
   title?: string; 
+  withProof?: true;
+  children: any[];
+};
+
+export type SolnElem = {
+  id: string;
+  type: "soln" | null | string;
+  proof?: true;
   children: any[];
 };
 
@@ -96,6 +104,7 @@ export type CustomElement =
   | HeadingElem
   | CommandElem
   | ThmElem
+  | SolnElem
   | BookmarkElem;
 
 export type CustomText = FormattedPlainText;

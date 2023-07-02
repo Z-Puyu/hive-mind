@@ -45,8 +45,8 @@ export const TypesetUtil = {
     } else {
       newProperties = {
         type: blockType,
-        style: !!thmStyle && ["thm", "dfn", "remark"].includes(thmStyle)
-          ? thmStyle as "thm" | "dfn" | "remark"
+        style: thmStyle && ["thm", "dfn", "remark", "eg", "problem"].includes(thmStyle)
+          ? thmStyle as "thm" | "dfn" | "remark" | "eg" | "problem"
           : undefined,
       };
     }

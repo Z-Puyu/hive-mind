@@ -19,7 +19,7 @@ export default function TeXBox(props: RenderElementProps): JSX.Element {
   return (
     <TextCard>
       {isSelected
-        ? <section contentEditable="false">
+        ? <section contentEditable="false" suppressContentEditableWarning={true}>
           <Toolbar>
             <FormatButton mark="bold" icon={<FormatBoldSharp />} />
             <FormatButton mark="italic" icon={<FormatItalicSharp />} />
@@ -35,7 +35,10 @@ export default function TeXBox(props: RenderElementProps): JSX.Element {
           <Divider variant="middle" />
         </section>
         : null}
-      <section className={isSelected ? classes.focusedParagraph : undefined}>
+      <section
+        className={isSelected ? classes.focusedParagraph : undefined}
+        suppressContentEditableWarning={true}
+      >
         <Paragraph attributes={props.attributes}>
           {props.children}
         </Paragraph>

@@ -25,7 +25,6 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const mathRef = useRef<HTMLDivElement>(null);
-  const envRef = useRef<HTMLSpanElement>(null);
   const [environment, setEnvironment] = useState<string>((props.element as MathElem).environment!);
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
 
@@ -42,7 +41,11 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
   }
 
   return isVisible || isSelected ? (
-    <div {...props.attributes} className={classes.displayedMath}>
+    <div
+      {...props.attributes}
+      className={classes.displayedMath}
+      suppressContentEditableWarning={true}
+    >
       <MathPreview
         value={props.children[0].props.text.text}
         rect={mathRef.current?.getBoundingClientRect()}
@@ -55,15 +58,17 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
           margin: auto;
           width: fit-content;
         `}
-        onPointerUp={() => Transforms.select(editor, 
+        onPointerUp={() => Transforms.select(editor,
           ReactEditor.findPath(editor, props.element.children[0]))}
+        suppressContentEditableWarning={true}
       >
-        <code contentEditable="false" className={css`font-size: 10pt`}>
+        <code
+          contentEditable="false"
+          className={css`font-size: 10pt`}
+          suppressContentEditableWarning={true}
+        >
           {"\\begin{"}
           <Menu
-            className={css`
-             
-            `}
             open={!!anchor}
             onClose={() => setAnchor(null)}
             anchorEl={anchor}
@@ -76,7 +81,8 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
                 {env}
               </MenuItem>)}
           </Menu>
-          <span 
+          <span
+            contentEditable="false"
             className={css`
               border-radius: 0.25em;
               padding: 0 0.25em;
@@ -86,6 +92,7 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
               }
             `}
             onClick={event => setAnchor(event.currentTarget)}
+            suppressContentEditableWarning={true}
           >
             {environment}
           </span>
@@ -99,10 +106,15 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
             margin: 0.25em 0;
             font-family: monospace;
           `}
+          suppressContentEditableWarning={true}
         >
           {props.children}
         </div>
-        <code contentEditable="false" className={css`font-size: 10pt`}>
+        <code
+          contentEditable="false"
+          className={css`font-size: 10pt`}
+          suppressContentEditableWarning={true}
+        >
           {"\\end{"}
           <Menu
             open={!!anchor}
@@ -117,7 +129,8 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
                 {env}
               </MenuItem>)}
           </Menu>
-          <span 
+          <span
+            contentEditable="false"
             className={css`
               border-radius: 0.25em;
               padding: 0 0.25em;
@@ -127,6 +140,7 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
               }
             `}
             onClick={event => setAnchor(event.currentTarget)}
+            suppressContentEditableWarning={true}
           >
             {environment}
           </span>
@@ -137,8 +151,10 @@ export default function DisplayedMath(props: RenderElementProps): JSX.Element {
   ) : (
     <div
       className={css`
+        display: inline-block;
         text-align: center;
-        margin: auto;
+        margin-left: 50%;
+        transform: translateX(-50%);
         width: fit-content;
         font-family: "Times New Roman";
         cursor: default;

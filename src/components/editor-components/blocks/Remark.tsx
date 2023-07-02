@@ -13,29 +13,27 @@ export default function Remark(props: RenderElementProps): JSX.Element {
 
   return (
     <TextCard>
-      <>
-        {isSelected ? <Toolbar>
-          <FormatButton mark="bold" icon={<FormatBoldSharp />} />
-          <FormatButton mark="italic" icon={<FormatItalicSharp />} />
-          <FormatButton mark="roman" icon={<FormatClearSharp />} />
-          <FormatButton mark="underline" icon={<FormatUnderlinedSharp />} />
-          <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />} />
-          <FormatButton mark="code" icon={<CodeSharp />}/>
-          <ToggleLinkButton />
-          <MathButton inline />
-          <MathButton />
-          <BookmarkButton />
-        </Toolbar> : null}
-        <Paragraph attributes={props.attributes}>
-          <i
-            contentEditable="false"
-            suppressContentEditableWarning={true}
-          >
-            {"Remark. "}
-          </i>
-          {props.children}
-        </Paragraph>
-      </>
+      {isSelected ? <Toolbar>
+        <FormatButton mark="bold" icon={<FormatBoldSharp />} />
+        <FormatButton mark="italic" icon={<FormatItalicSharp />} />
+        <FormatButton mark="roman" icon={<FormatClearSharp />} />
+        <FormatButton mark="underline" icon={<FormatUnderlinedSharp />} />
+        <FormatButton mark="strikethru" icon={<FormatStrikethroughSharp />} />
+        <FormatButton mark="code" icon={<CodeSharp />} />
+        <ToggleLinkButton />
+        <MathButton inline />
+        <MathButton />
+        <BookmarkButton />
+      </Toolbar> : null}
+      <Paragraph attributes={props.attributes}>
+        <i
+          contentEditable="false"
+          suppressContentEditableWarning={true}
+        >
+          {"Remark. "}
+        </i>
+        {props.children}
+      </Paragraph>
     </TextCard>
   );
 };

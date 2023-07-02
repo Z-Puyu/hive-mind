@@ -3,7 +3,7 @@ import classes from "./Paragraph.module.css";
 
 interface ParagraphProps {
   attributes: any;
-  children: JSX.Element | JSX.Element[];
+  children: JSX.Element | (JSX.Element | null)[];
 }
 
 export default function Paragraph(props: ParagraphProps): JSX.Element {
