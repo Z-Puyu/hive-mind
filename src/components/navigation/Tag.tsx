@@ -2,11 +2,12 @@ import { Box } from "@mui/material";
 import classes from "./Tag.module.css";
 import { css, cx } from "@emotion/css";
 import { DeleteSharp, DriveFileRenameOutlineSharp } from "@mui/icons-material";
+import { DocumentData } from "firebase/firestore";
 
 interface TagProps {
   colour: string;
   name: string;
-  onEdit: () => void;
+  onEdit: (tag:DocumentData) => void;
   onDelete: () => void;
 }
 

@@ -9,7 +9,7 @@ interface BlockSelectionProps {
   pos: Coords;
   items: { [key: string]: string }[];
   currSelection: { [key: string]: string };
-  onSelect: (blockType: string) => void;
+  onSelect: (item: { [key: string]: string }) => void;
   onClose: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
@@ -28,7 +28,7 @@ export default function BlockSelection(props: BlockSelectionProps): JSX.Element 
                   key={key}
                   role="button"
                   tabIndex={0}
-                  onClick={() => props.onSelect(item.blockType)}
+                  onClick={() => props.onSelect(item)}
                 >
                   {item.name}
                 </div>

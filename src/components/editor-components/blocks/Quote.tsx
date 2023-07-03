@@ -4,9 +4,9 @@ import classes from "./Quote.module.css"
 export default function Quote(props: RenderElementProps): JSX.Element {
   return (
     <div {...props.attributes} className={classes.quote}>
-    <blockquote className={classes.quoteContents}>
-      {props.children}
-    </blockquote>
+      <blockquote className={classes.quoteContents} suppressContentEditableWarning={true}>
+        {props.children}
+      </blockquote>
     </div>
   );
 };

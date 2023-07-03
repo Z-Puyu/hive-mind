@@ -24,9 +24,11 @@ import TagManager from "../components/navigation/TagManager";
 export default function Dashboard(): JSX.Element | null {
   const auth: Auth = getAuth();
   const [isAddingDoc, setIsAddingDoc] = useState<boolean>(false);
+  const [isAddingTag, setIsAddingTag] = useState<boolean>(false);
   const [newDocName, setNewDocName] = useState<string>("New Project");
   const [docsData, setDocsData] = useState<DocumentData[]>([]);
   const [currUser, setCurrUser] = useState<User | null>(null);
+  const [selectedDoc, setSelectedDoc] = useState<string[]>([]);
 
   useEffect(() => onAuthStateChanged(auth, user => {
     // We have to check if the user is null before rendering 
@@ -77,7 +79,6 @@ export default function Dashboard(): JSX.Element | null {
                   children: [{ text: "" }]
                 }
               ]),
-              //add Tag
             }
           );
           // Reset default project name and close the modal.
@@ -101,6 +102,15 @@ export default function Dashboard(): JSX.Element | null {
       >
         <section>
           <Box className={classes.topBar}>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "1em",
+              }}
+              onClick={() => setIsAddingTag(true)}
+            >
+              Add tag
+            </Button>
             <Button
               variant="contained"
               sx={{
@@ -160,7 +170,7 @@ export default function Dashboard(): JSX.Element | null {
           </Modal>
         </section>
         <section>
-          {docsData.map(data => <DocumentRow key={data.id} docData={data} />)}
+          {docsData.map(data => <DocumentRow key={data.id} docData={data} selected={selectedDoc} updateSelectedDoc={setSelectedDoc} />)}
         </section>
       </Paper>
     </div>

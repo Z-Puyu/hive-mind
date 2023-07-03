@@ -13,18 +13,19 @@ import ResetPassword from "./pages/ResetPassword";
 
 export default function App(): JSX.Element {
   return (
-    <MathJaxContext
-      version={3}
-      config={mathjaxConfig}
+    <div
+      className="webpage"
+      suppressContentEditableWarning={true}
     >
-      <div
-        className="webpage"
-        suppressContentEditableWarning={true}
+      <MathJaxContext
+        version={3}
+        config={mathjaxConfig}
       >
         <Router>
           <Navbar />
           <div
             className="remainingPage"
+            suppressContentEditableWarning={true}
           >
             <Routes>
               <Route path="/" element={<Home />} />
@@ -37,7 +38,7 @@ export default function App(): JSX.Element {
             </Routes>
           </div>
         </Router>
-      </div>
-    </MathJaxContext>
+      </MathJaxContext>
+    </div>
   );
 };
