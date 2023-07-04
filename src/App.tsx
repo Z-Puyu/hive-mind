@@ -13,26 +13,32 @@ import ResetPassword from "./pages/ResetPassword";
 
 export default function App(): JSX.Element {
   return (
-    <MathJaxContext
-      version={3}
-      config={mathjaxConfig}
+    <div
+      className="webpage"
+      suppressContentEditableWarning={true}
     >
-      <div
-        suppressContentEditableWarning={true}
+      <MathJaxContext
+        version={3}
+        config={mathjaxConfig}
       >
         <Router>
           <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/authentication" element={<Login />} />
-            <Route path="/register" element={<Registration />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/editor/:projId" element={<Editor />} />
-            <Route path="*" element={<h1>PAGE NOT FOUND</h1>} />
-          </Routes>
+          <div
+            className="remainingPage"
+            suppressContentEditableWarning={true}
+          >
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/authentication" element={<Login />} />
+              <Route path="/register" element={<Registration />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/editor/:projId" element={<Editor />} />
+              <Route path="*" element={<h1>PAGE NOT FOUND</h1>} />
+            </Routes>
+          </div>
         </Router>
-      </div>
-    </MathJaxContext>
+      </MathJaxContext>
+    </div>
   );
 };

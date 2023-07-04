@@ -10,12 +10,12 @@ import TheoremTitle from "../TheoremTitle";
 import ToggleLinkButton from "../ToggleLinkButton";
 import BookmarkButton from "../BookmarkButton";
 
-export default function Definition(props: RenderElementProps): JSX.Element {
+export default function Example(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
 
   return (
     <TextCard>
-      <TheoremTitle style="dfn" title={(props.element as ThmElem).title} />
+      <TheoremTitle style="eg" title={(props.element as ThmElem).title} />
       {isSelected ? <Toolbar>
         <FormatButton mark="bold" icon={<FormatBoldSharp />} />
         <FormatButton mark="italic" icon={<FormatItalicSharp />} />

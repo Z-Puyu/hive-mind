@@ -1,37 +1,11 @@
 import { KeyboardEvent, useCallback, useMemo, useState, useEffect } from "react";
 import { withInline, withBetterBreaks, withNodeUids } from "../plugins/SlatePlugins";
-import { 
-  Editable, 
-  ReactEditor, 
-  RenderElementProps, 
-  RenderLeafProps, 
-  Slate, 
-  withReact 
-} from "slate-react";
-import { withHistory } from "slate-history";
-import { 
-  createEditor, 
-  Descendant, 
-  Editor as SlateEditor, 
-  Transforms, 
-  Range, 
-  Text, 
-  Element, 
-  Node 
-} from "slate";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import isHotkey, { isKeyHotkey } from "is-hotkey";
 import DynElem from "../components/editor-components/DynElem";
 import Leaf from "../components/editor-components/Leaf";
 import classes from "./Editor.module.css";
 import SortableElement from "../components/editor-components/SortableElement";
-import { 
-  DndContext, 
-  DragEndEvent, 
-  DragOverlay, 
-  DragStartEvent, 
-  UniqueIdentifier 
-} from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { nanoid } from "nanoid";
 import ReactDOM from "react-dom";
@@ -41,18 +15,108 @@ import BlockSelection from "../components/editor-components/BlockSelection";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import { matchSorter } from "match-sorter";
 import { Params, useParams } from "react-router-dom";
-import { 
-  getDoc, 
-  doc, 
-  updateDoc, 
-  DocumentReference, 
-  DocumentData, 
-  serverTimestamp 
+import {
+  getDoc,
+  doc,
+  updateDoc,
+  query,
+  collection,
+  DocumentReference,
+  DocumentData,
+  serverTimestamp
 } from "firebase/firestore";
 import { db } from "../config/Firebase";
-import { Paper } from "@mui/material";
-import { Auth, getAuth, onAuthStateChanged } from "firebase/auth";
+import { Paper, Portal } from "@mui/material";
+import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
+import { timeStamp } from "console";
 import BlockToggler from "../components/editor-components/BlockToggler";
+import {
+  UniqueIdentifier,
+  DragStartEvent,
+  DragEndEvent,
+  DndContext,
+  DragOverlay
+} from "@dnd-kit/core";
+import {
+  createEditor,
+  Descendant,
+  Transforms,
+  Editor as SlateEditor,
+  Element,
+  Range,
+  Text,
+  Node
+} from "slate";
+import { withHistory } from "slate-history";
+import { withReact, RenderElementProps, ReactEditor, RenderLeafProps, Slate, Editable } from "slate-react";
+import IllustrationMaker from "../components/windows/IllustrationMaker";
+
+const INIT_BLOCK_TYPES: { [key: string]: string }[] = [
+  {
+    name: "code",
+    blockType: "code-block",
+    desc: "Code Block",
+  },
+  {
+    name: "dfn",
+    blockType: "thm",
+    desc: "Definition Box",
+  },
+  {
+    name: "eg",
+    blockType: "thm",
+    desc: "Example Box",
+  },
+  {
+    name: "heading",
+    blockType: "heading",
+    desc: "Heading",
+  },
+  {
+    name: "paragraph",
+    blockType: "paragraph",
+    desc: "Paragraph",
+  },
+  {
+    name: "problem",
+    blockType: "thm",
+    desc: "Problem Box",
+  },
+  {
+    name: "proof",
+    blockType: "soln",
+    desc: "Proof",
+  },
+  {
+    name: "quote",
+    blockType: "quote",
+    desc: "Block Quote",
+  },
+  {
+    name: "remark",
+    blockType: "thm",
+    desc: "Remark Box",
+  },
+  {
+    name: "solution",
+    blockType: "soln",
+    desc: "Solution",
+  },
+  {
+    name: "thm",
+    blockType: "thm",
+    desc: "Theorem Box",
+  },
+];
+
+const HOTKEYS: { [key: string]: string } = {
+  "mod+b": "bold",
+  "mod+i": "italic",
+  "mod+r": "roman",
+  "mod+u": "underline",
+  "mod+s": "strikethru",
+  "mod+`": "code",
+};
 
 export default function Editor(): JSX.Element | null {
   const params: Readonly<Params<string>> = useParams();
@@ -60,7 +124,7 @@ export default function Editor(): JSX.Element | null {
   // Import Firestore.
   const auth: Auth = getAuth();
   const [currDoc, setCurrDoc] = useState<DocumentReference<DocumentData> | null>(null);
-  
+
   // Initialise Slate editor.
   const [editor] = useState<SlateEditor>(() => withNodeUids(
     withBetterBreaks(
@@ -81,45 +145,7 @@ export default function Editor(): JSX.Element | null {
   const renderLeafHandler = useCallback((props: RenderLeafProps) => <Leaf {...props} />, []);
 
   // Initialise block type select menu.
-  const initItems: { [key: string]: string }[] = [
-    {
-      name: "code",
-      blockType: "code-block",
-      desc: "Code Block",
-    },
-    {
-      name: "dfn",
-      blockType: "thm",
-      desc: "Definition Box",
-    },
-    {
-      name: "heading",
-      blockType: "heading",
-      desc: "Heading",
-    },
-    {
-      name: "paragraph",
-      blockType: "paragraph",
-      desc: "Paragraph",
-    },
-    {
-      name: "quote",
-      blockType: "quote",
-      desc: "Block Quote",
-    },
-    {
-      name: "remark",
-      blockType: "thm",
-      desc: "Remark Box",
-    },
-    {
-      name: "thm",
-      blockType: "thm",
-      desc: "Theorem Box",
-    },
-  ];
-
-  const [selectMenuItems, setSelectMenuItems] = useState<{ [key: string]: string }[]>(initItems);
+  const [selectMenuItems, setSelectMenuItems] = useState<{ [key: string]: string }[]>(INIT_BLOCK_TYPES);
   const [selectedItem, setSelectedItem] = useState<{ [key: string]: string }>(selectMenuItems[0]);
   const [selectMenuIsOpen, setSelectMenuIsOpen] = useState<boolean>(false);
   const [selectMenuPos, setSelectMenuPos] = useState<Coords>({ x: 0, y: 0 });
@@ -133,32 +159,22 @@ export default function Editor(): JSX.Element | null {
   const activeElement: Descendant | undefined = editor.children
     .find(child => (child as Element).id === activeId);
 
-  useEffect(() => {
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        const currDoc: DocumentReference<DocumentData> = doc(db, "userProjects",
-          user.uid, "projects", params.projId!);
-        setCurrDoc(currDoc);
-        getDoc(currDoc).then(doc => {
-          const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
-          setInitVal(slateValue);
-        })
-      }
-    })
-  }, [])
+  useEffect(() => onAuthStateChanged(auth, user => {
+    if (user) {
+      const currDoc: DocumentReference<DocumentData> = doc(db, "userProjects",
+        user.uid, "projects", params.projId!);
+      setCurrDoc(currDoc);
+      getDoc(currDoc).then(doc => {
+        const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
+        console.log(slateValue)
+        setInitVal(slateValue);
+      })
+    }
+  }), [])
 
   if (!initVal) {
     return null;
   }
-
-  const HOTKEYS: { [key: string]: string } = {
-    "mod+b": "bold",
-    "mod+i": "italic",
-    "mod+r": "roman",
-    "mod+u": "underline",
-    "mod+s": "strikethru",
-    "mod+`": "code",
-  };
 
   const clearSelection = () => {
     ReactEditor.blur(editor);
@@ -189,48 +205,6 @@ export default function Editor(): JSX.Element | null {
   };
 
   const onKeyDownHandler = (event: KeyboardEvent<HTMLDivElement>) => {
-    // Override cursor movement with offset as the unit.
-    const { selection } = editor;
-    if (selection && Range.isCollapsed(selection)) {
-      const { nativeEvent } = event;
-      if (isKeyHotkey("left", nativeEvent)) {
-        event.preventDefault();
-        Transforms.move(editor, { unit: "offset", reverse: true });
-      } else if (isKeyHotkey("right", nativeEvent)) {
-        event.preventDefault();
-        Transforms.move(editor, { unit: "offset" });
-      }
-    }
-    // Insert inline mathematics when pressing "$".
-    if (event.key === "$") {
-      event.preventDefault();
-      TypesetUtil.toggleMath(editor, true);
-    }
-    // Add marks corresponding to the hotkeys.
-    for (const hotkey in HOTKEYS) {
-      if (isHotkey(hotkey, event)) {
-        event.preventDefault();
-        const mark = HOTKEYS[hotkey];
-        TypesetUtil.toggleMark(editor, mark as keyof Omit<Text, "text">);
-      }
-    }
-    // Alternate Soft-break.
-    if (event.ctrlKey && event.key === "Enter") {
-      SlateEditor.insertSoftBreak(editor);
-    }
-    // Add bookmark.
-    if (event.ctrlKey && event.key === "m") {
-      event.preventDefault();
-      TypesetUtil.insertBookmark(editor);
-    }
-    // Handle selection menu interactions.
-    if (event.key === "\\") {
-      const isInMathMode: boolean = (SlateEditor.parent(editor,
-        editor.selection?.anchor!)[0] as Element).type === "math";
-      if (!isInMathMode) {
-        event.preventDefault();
-      }
-    }
     if (selectMenuIsOpen) {
       const selectedItemIndex: number = selectMenuItems.indexOf(selectedItem);
       switch (event.key) {
@@ -249,24 +223,7 @@ export default function Editor(): JSX.Element | null {
         case "Enter":
         case "Tab":
           event.preventDefault();
-          const currBlock: Element = SlateEditor.parent(editor, SlateEditor.parent(editor,
-            editor.selection?.anchor!)[1])[0] as Element;
-          const isDifferentBlock: boolean = selectedItem.blockType !== currBlock.type
-            || (selectedItem.blockType === "thm"
-              && currBlock.type === "thm"
-              && selectedItem.name !== (currBlock as ThmElem).style);
-          if (isDifferentBlock) {
-            const optionalArgs = [
-              selectedItem.blockType === "thm" ? selectedItem.name : undefined
-            ]
-            TypesetUtil.toggleBlock(editor, selectedItem.blockType, ...optionalArgs);
-            Transforms.removeNodes(
-              editor,
-              { at: SlateEditor.parent(editor, editor.selection?.anchor!)[1] },
-            );
-            setSelectMenuItems(initItems);
-            setSelectMenuIsOpen(false);
-          }
+          onSelectHandler(selectedItem);
           break;
         case "Backspace":
           if (editor.selection?.anchor.offset === 1) {
@@ -274,7 +231,7 @@ export default function Editor(): JSX.Element | null {
               editor,
               { at: SlateEditor.parent(editor, editor.selection.anchor)[1] },
             );
-            setSelectMenuItems(initItems);
+            setSelectMenuItems(INIT_BLOCK_TYPES);
             setSelectMenuIsOpen(false);
           }
           break;
@@ -282,10 +239,62 @@ export default function Editor(): JSX.Element | null {
           event.preventDefault();
           Transforms.move(editor, { unit: "offset" });
           Transforms.insertText(editor, " ");
-          setSelectMenuItems(initItems);
+          setSelectMenuItems(INIT_BLOCK_TYPES);
           setSelectMenuIsOpen(false);
           break;
         default:
+          break;
+      }
+    } else {
+      // Override cursor movement with offset as the unit.
+      const { selection } = editor;
+      if (selection && Range.isCollapsed(selection)) {
+        const { nativeEvent } = event;
+        if (isKeyHotkey("left", nativeEvent)) {
+          event.preventDefault();
+          Transforms.move(editor, { unit: "offset", reverse: true });
+        } else if (isKeyHotkey("right", nativeEvent)) {
+          event.preventDefault();
+          Transforms.move(editor, { unit: "offset" });
+        }
+      }
+      switch (event.key) {
+        case "$":
+          event.preventDefault();
+          TypesetUtil.toggleMath(editor, true);
+          break;
+        case "Enter":
+          if (event.ctrlKey) {
+            SlateEditor.insertSoftBreak(editor);
+          }
+          break;
+        case "m":
+          if (event.ctrlKey) {
+            event.preventDefault();
+            TypesetUtil.insertBookmark(editor);
+          }
+          break;
+        case "\\":
+          const isInMathMode: boolean = (SlateEditor.parent(editor,
+            editor.selection?.anchor!)[0] as Element).type === "math";
+          if (!isInMathMode) {
+            event.preventDefault();
+          }
+          break;
+        case "Backspace":
+          if (editor.selection?.anchor.offset === 0 && TypesetUtil.isEmptyInline(editor)) {
+            event.preventDefault();
+            TypesetUtil.removeEmptyInlines(editor);
+          }
+          break;
+        default:
+          for (const hotkey in HOTKEYS) {
+            if (isHotkey(hotkey, event)) {
+              event.preventDefault();
+              const mark = HOTKEYS[hotkey];
+              TypesetUtil.toggleMark(editor, mark as keyof Omit<Text, "text">);
+            }
+          }
           break;
       }
     }
@@ -299,7 +308,7 @@ export default function Editor(): JSX.Element | null {
         .text
         .substring(1);
       const updatedItems: { [key: string]: string }[] = matchSorter(
-        initItems,
+        INIT_BLOCK_TYPES,
         command,
         {
           keys: ["name"],
@@ -348,11 +357,35 @@ export default function Editor(): JSX.Element | null {
     }
   };
 
-  const onSelectHandler = (blockType: string) => {
-    Transforms.setNodes(editor, {
-      type: blockType,
-      children: [],
-    });
+  const onSelectHandler = (item: { [key: string]: string }) => {
+    Transforms.removeNodes(
+      editor,
+      { at: SlateEditor.parent(editor, editor.selection?.anchor!)[1] },
+    );
+    if (item.blockType === "soln") {
+      Transforms.insertNodes(editor, {
+        id: nanoid(),
+        type: "soln",
+        proof: item.name === "proof" ? true : undefined,
+        children: [{ text: "" }],
+      });
+      Transforms.setNodes(editor, { withProof: true });
+    } else {
+      const currBlock: Element = SlateEditor.parent(editor, SlateEditor.parent(editor,
+        editor.selection?.anchor!)[1])[0] as Element;
+      const isDifferentBlock: boolean = item.blockType !== currBlock.type
+        || (item.blockType === "thm"
+          && currBlock.type === "thm"
+          && item.name !== (currBlock as ThmElem).style);
+      if (isDifferentBlock) {
+        const optionalArgs = [
+          item.blockType === "thm" ? item.name : undefined
+        ]
+        TypesetUtil.toggleBlock(editor, item.blockType, ...optionalArgs);
+      }
+    }
+    setSelectMenuItems(INIT_BLOCK_TYPES);
+    setSelectMenuIsOpen(false);
   };
 
   const onCloseSelectMenuHandler = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -360,13 +393,20 @@ export default function Editor(): JSX.Element | null {
     setSelectMenuIsOpen(false);
   };
 
+  // This can be a very expensive operation... Need to find ways to optimise.
   const autoSave = (value: Descendant[]) => {
     const isAtChange = editor.operations.some(
       op => "set_selection" !== op.type
     );
     if (isAtChange) {
-      updateDoc(currDoc!, { 
-        slateValue: JSON.stringify(value),
+      updateDoc(currDoc!, {
+        slateValue: JSON.stringify(value.map(node => {
+          const newNode: Descendant = {
+            ...node,
+            children: (node as Element).children.filter(child => child.type !== "cmd")
+          }
+          return newNode;
+        })),
         timeStamp: serverTimestamp(),
       });
     }
@@ -400,6 +440,7 @@ export default function Editor(): JSX.Element | null {
             : null}
           <SortableContext items={itemlist} strategy={verticalListSortingStrategy}>
             <Editable
+              id="hivemind-editable"
               className={classes.notes}
               disableDefaultStyles
               autoFocus
@@ -407,18 +448,18 @@ export default function Editor(): JSX.Element | null {
               renderLeaf={renderLeafHandler}
               onKeyDown={onKeyDownHandler}
               onKeyUp={onKeyUpHandler}
+              suppressContentEditableWarning={true}
             />
           </SortableContext>
           <BlockToggler />
-          {ReactDOM.createPortal(
+          <Portal>
             <DragOverlay adjustScale={false}>
-              {!!activeElement ? <DraggedContent
+              {activeElement ? <DraggedContent
                 element={activeElement}
                 renderElement={renderElementHandler}
               /> : null}
-            </DragOverlay>,
-            document.body
-          )}
+            </DragOverlay>
+          </Portal>
         </DndContext>
       </Slate>
     </Paper>

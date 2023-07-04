@@ -1,7 +1,9 @@
-export const mathjaxConfig = {
-  loader: { load: ["[tex]/html"] },
+import { MathJax3Config } from "better-react-mathjax";
+
+export const mathjaxConfig: MathJax3Config = {
+  loader: { load: ["[tex]/autoload"] },
   tex: {
-    packages: { "[+]": ["html"] },
+    packages: { "[+]": ["autoload"] },
     inlineMath: [["$", "$"]],
     displayMath: [["\\[", "\\]"], ["\\begin{displaymath}", "\\end{displaymath}"]],
   },

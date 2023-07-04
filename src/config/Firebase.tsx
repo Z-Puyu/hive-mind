@@ -27,17 +27,32 @@ export const googleProvider: GoogleAuthProvider = new GoogleAuthProvider();
 export const db: Firestore = getFirestore(app);
 
 // Authentication functions
+/**
+ * Checks whether a user already exists by searching in the database for either
+ * users with the same ID or users with the same registration e-mail address.
+ * 
+ * @param user The user to be checked.
+ * @param email The user's registration e-mail address.
+ * @returns Returns true if there is another user with the same credential, and false otherwise.
+ */
 export const isExistingUser = async (user?: User, email?: string) => {
-  let q: Query<DocumentData>;
+  let usersWithSameCredential: Query<DocumentData>;
   if (user) {
-    q = query(collection(db, "users"), where("uid", "==", user.uid));
+    usersWithSameCredential = query(collection(db, "users"), where("uid", "==", user.uid));
   } else {
-    q = query(collection(db, "users"), where("email", "==", email));
+    usersWithSameCredential = query(collection(db, "users"), where("email", "==", email));
   }
-  const docs: QuerySnapshot<DocumentData> = await getDocs(q);
+  const docs: QuerySnapshot<DocumentData> = await getDocs(usersWithSameCredential);
   return docs.docs.length !== 0;
 }
 
+/**
+ * Register a new user.
+ * 
+ * @param userName The new user's display name.
+ * @param email The new user's e-mail address.
+ * @param password The new user's password.
+ */
 export const signUp = async (userName: string, email: string, password: string) => {
   try {
     const credential: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -48,9 +63,11 @@ export const signUp = async (userName: string, email: string, password: string) 
       authProvider: "local",
       email: email,
     });
+    // We have to also update the profile for the new user to get the user's info displayed.
     await updateProfile(user, {
       displayName: userName,
     })
+    // Retrieve the example project and load it to the new user's project manager.
     await getDoc(doc(db, "exampleProject", "exampleProject")).then(
       doc => {
         addDoc(collection(db, "userProjects", user.uid, "projects"), {
@@ -91,11 +108,16 @@ export const resetPassword = async (email: string) => {
   }
 };
 
+/**
+ * Log in with a Google account.
+ */
 export const signInWithGoogle = async () => {
   try {
     const credential: UserCredential = await signInWithPopup(auth, googleProvider);
     const user: User = credential.user;
     if (!isExistingUser(user)) {
+      // First time using this account for log-in. 
+      // We have to initialise the user's info as what we do for new user registration.
       await addDoc(collection(db, "users"), {
         uid: user.uid,
         name: user.displayName,

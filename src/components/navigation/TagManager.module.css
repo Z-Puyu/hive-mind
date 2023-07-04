@@ -1,0 +1,17 @@
+.manager {
+  text-align: center;
+  background-color: rgb(71, 81, 100);
+  flex-grow: 0.15;
+  box-shadow: 10px 12px 25px rgb(0, 0, 0, 0.25);
+  z-index: 1;
+}
+
+.textTooltip {
+  text-align: left;
+  color: gray;
+}
+
+.listOfTags {
+  display: flex;
+  margin: 0.5em auto;
+}

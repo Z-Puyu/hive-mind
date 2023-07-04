@@ -11,6 +11,9 @@ import TeXBox from "./blocks/TeXBox";
 import Theorem from "./blocks/Theorem";
 import Link from "./blocks/Link";
 import Math from "./blocks/Math";
+import Example from "./blocks/Example";
+import Problem from "./blocks/Problem";
+import Solution from "./blocks/Solution";
 
 export default function DynElem(props: RenderElementProps): JSX.Element {
   switch (props.element.type) {
@@ -34,10 +37,16 @@ export default function DynElem(props: RenderElementProps): JSX.Element {
           return <Definition {...props} />;
         case "remark":
           return <Remark {...props} />;
+        case "eg":
+          return <Example {...props} />;
+        case "problem":
+          return <Problem {...props} />;
         case "thm":
         default:
           return <Theorem {...props} />;
       }
+    case "soln":
+      return <Solution {...props} />;
     default: // Paragraph
       return <TeXBox {...props} />;
   }

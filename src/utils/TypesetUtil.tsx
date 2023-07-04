@@ -1,4 +1,4 @@
-import { Editor, Text, Element, Transforms, Range } from "slate";
+import { Editor, Text, Element, Transforms, Range, Node } from "slate";
 import { MathElem } from "./CustomSlateTypes";
 import { nanoid } from "nanoid";
 
@@ -45,8 +45,8 @@ export const TypesetUtil = {
     } else {
       newProperties = {
         type: blockType,
-        style: !!thmStyle && ["thm", "dfn", "remark"].includes(thmStyle)
-          ? thmStyle as "thm" | "dfn" | "remark"
+        style: thmStyle && ["thm", "dfn", "remark", "eg", "problem"].includes(thmStyle)
+          ? thmStyle as "thm" | "dfn" | "remark" | "eg" | "problem"
           : undefined,
       };
     }
@@ -177,8 +177,8 @@ export const TypesetUtil = {
         type: "bookmark",
         title: "bookmark",
         customDesc: "",
-        children: [{ 
-          text: "bookmark" 
+        children: [{
+          text: "bookmark"
         }],
       });
     }
@@ -193,6 +193,7 @@ export const TypesetUtil = {
             id: nanoid(),
             type: "math",
             inline: isInline,
+            environment: isInline ? undefined : "equation*",
             children: [{
               text: isInline ? "$$" : "",
             }],
@@ -215,6 +216,24 @@ export const TypesetUtil = {
       Transforms.unwrapNodes(editor, {
         match: n =>
           !Editor.isEditor(n) && Element.isElement(n) && n.type === "math",
+      });
+    }
+  },
+
+  isEmptyInline: (editor: Editor, node?: Node) => {
+    const n: Node = node ? node : Editor.parent(editor, editor.selection?.anchor!)[0];
+    return !Editor.isEditor(n)
+      && Element.isElement(n)
+      && editor.isInline(n)
+      && n.children.length === 1
+      && n.children[0].text === "";
+  },
+
+  removeEmptyInlines: (editor: Editor) => {
+    const { selection } = editor;
+    if (selection && Range.isCollapsed(selection)) {
+      Transforms.unwrapNodes(editor, {
+        match: n => TypesetUtil.isEmptyInline(editor, n),
       });
     }
   },

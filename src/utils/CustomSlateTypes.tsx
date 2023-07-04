@@ -40,6 +40,7 @@ export type MathElem = {
   id: string;
   type: "math" | null | string;
   inline: boolean;
+  environment?: string;
   children: any[];
 };
 
@@ -67,8 +68,16 @@ export type CommandElem = {
 export type ThmElem = {
   id: string;
   type: "thm" | null | string;
-  style: "dfn" | "thm" | "remark";
+  style: "dfn" | "thm" | "remark" | "eg" | "problem";
   title?: string; 
+  withProof?: true;
+  children: any[];
+};
+
+export type SolnElem = {
+  id: string;
+  type: "soln" | null | string;
+  proof?: true;
   children: any[];
 };
 
@@ -83,6 +92,13 @@ export type BookmarkElem = {
   children: any[];
 };
 
+export type IllustrationElem = {
+  id: string;
+  type: "illustration" | null | string;
+  variant?: "matrix";
+  children: any[];
+}
+
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 
 export type CustomElement =
@@ -95,6 +111,8 @@ export type CustomElement =
   | HeadingElem
   | CommandElem
   | ThmElem
+  | SolnElem
+  | IllustrationElem
   | BookmarkElem;
 
 export type CustomText = FormattedPlainText;
