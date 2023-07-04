@@ -16,6 +16,7 @@ import FormatButton from "../FormatButton";
 import MathButton from "../MathButton";
 import ToggleLinkButton from "../ToggleLinkButton";
 import BookmarkButton from "../BookmarkButton";
+import IllustrationButton from "../IllustrationButton";
 
 export default function TeXBox(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();
@@ -35,6 +36,7 @@ export default function TeXBox(props: RenderElementProps): JSX.Element {
             <MathButton inline />
             <MathButton />
             <BookmarkButton />
+            <IllustrationButton />
           </Toolbar>
           <Divider variant="middle" />
         </section>

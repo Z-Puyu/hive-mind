@@ -92,6 +92,13 @@ export type BookmarkElem = {
   children: any[];
 };
 
+export type IllustrationElem = {
+  id: string;
+  type: "illustration" | null | string;
+  variant?: "matrix";
+  children: any[];
+}
+
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 
 export type CustomElement =
@@ -105,6 +112,7 @@ export type CustomElement =
   | CommandElem
   | ThmElem
   | SolnElem
+  | IllustrationElem
   | BookmarkElem;
 
 export type CustomText = FormattedPlainText;
