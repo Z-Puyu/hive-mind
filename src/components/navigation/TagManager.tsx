@@ -83,6 +83,7 @@ export default function TagManager() {
           {
             tagName: newTagName,
             tagColour: newTagColour,
+            isTobeAddedToDocs: false,
           }
         );
         setNewTagName("New Tag");
