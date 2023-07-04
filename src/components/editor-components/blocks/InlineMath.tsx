@@ -11,6 +11,7 @@ export default function InlineMath(props: RenderElementProps) {
   const isSelected: boolean = useSelected();
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const mathRef = useRef<HTMLSpanElement>(null);
+
   useEffect(() => setIsVisible(false), [isSelected === true]);
 
   const onPointerDownHandler = (event: React.PointerEvent<HTMLSpanElement>) => {
