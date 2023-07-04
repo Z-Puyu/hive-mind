@@ -151,6 +151,7 @@ export default function Editor(): JSX.Element | null {
   const [selectedItem, setSelectedItem] = useState<{ [key: string]: string }>(selectMenuItems[0]);
   const [selectMenuIsOpen, setSelectMenuIsOpen] = useState<boolean>(false);
   const [selectMenuPos, setSelectMenuPos] = useState<Coords>({ x: 0, y: 0 });
+  //const [initTag, setInitTag] = useState<string> 
 
   // Initialise drag-and-drop.
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);

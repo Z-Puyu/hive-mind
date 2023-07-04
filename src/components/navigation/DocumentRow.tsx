@@ -1,18 +1,30 @@
 import { css } from "@emotion/css";
-import { Box, Button, Card, Divider, Modal, TextField } from "@mui/material";
-import { DocumentData, DocumentReference, deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { Box, Button, Divider, Modal, TextField } from "@mui/material";
+import { 
+  DocumentData, 
+  DocumentReference, 
+  deleteDoc, 
+  doc, 
+  serverTimestamp, 
+  updateDoc 
+} from "firebase/firestore";
 import { useState } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { db } from "../../config/Firebase";
 import classes from "./DocumentRow.module.css";
+import { on } from "events";
+import { Check, LensTwoTone } from "@mui/icons-material";
 
 interface DocumentRowProps {
   docData: DocumentData;
+  selected: string[]; 
+  updateSelectedDoc: (id: string[]) => void;
 }
 
 export default function DocumentRow(props: DocumentRowProps): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const [isRenaming, setIsRenaming] = useState<boolean>(false);
+  const [isChecked, setIsChecked] = useState<boolean>(false);
   const currProject: DocumentReference<DocumentData> = doc(db, "userProjects", 
     props.docData.user, "projects", props.docData.id);
   const [docName, setDocName] = useState<string>("");
@@ -25,11 +37,36 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
     setIsRenaming(false);
   }
 
+  const onCheck = (selectedDocId:string) => {
+    setIsChecked(!isChecked);
+    if (!isChecked){
+      console.log(`${selectedDocId} is selected`);
+       let tmp = [...props.selected, selectedDocId];
+       props.updateSelectedDoc(tmp);
+       tmp = props.selected;
+       console.log(tmp);
+    }
+    else{
+      console.log(`${selectedDocId} is removed`);
+      let tmp = props.selected.splice(props.selected.indexOf(selectedDocId), 1);
+      props.updateSelectedDoc(tmp);
+      tmp = props.selected;
+      console.log(tmp);
+    }
+  }
+
   return (
     <div>
       <Box
         className={classes.docRow}
       >
+        <input 
+        type="checkbox" 
+        name="mycheckbox"
+        value={props.docData.id}
+        checked={isChecked}
+        onChange={event => onCheck(event.target.value)}
+        />
         <p
           className={classes.fileName}
           onClick={() => navigate(`/Editor/${props.docData.id}`)}

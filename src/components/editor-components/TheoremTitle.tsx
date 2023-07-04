@@ -1,7 +1,7 @@
 import { css, cx } from "@emotion/css"
 import classes from "./TheoremTitle.module.css";
 import { MathJax } from "better-react-mathjax";
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 
 interface TheoremTitleProps {
   style?: "dfn" | "eg" | "problem"

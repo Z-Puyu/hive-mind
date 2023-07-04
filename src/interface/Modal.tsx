@@ -1,5 +1,4 @@
 import { css } from "@emotion/css";
-import { ChildrenProps } from "../utils/UtilityInterfaces";
 import HoveringWindow from "./HoveringWindow";
 import ModalOverlay from "./ModalOverlay";
 import { useState } from "react";

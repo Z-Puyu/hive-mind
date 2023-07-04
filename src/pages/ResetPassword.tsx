@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, isExistingUser, resetPassword, signIn, signInWithGoogle, signUp } from "../config/Firebase";
+import { auth, resetPassword, signInWithGoogle } from "../config/Firebase";
 import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import { css } from "@emotion/css";
 import { Box, TextField, Button, Divider } from "@mui/material";
-import { sendPasswordResetEmail } from "firebase/auth";
 import classes from "./AuthenticationPages.module.css";
 
 export default function ResetPassword() {
