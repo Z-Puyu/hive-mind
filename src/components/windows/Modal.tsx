@@ -4,7 +4,7 @@ import { MathJaxContext } from "better-react-mathjax";
 import { mathjaxConfig } from "../../config/MathJax";
 
 interface ModalProps {
-  children: JSX.Element | JSX.Element[];
+  children: JSX.Element | (JSX.Element | null)[];
   open: boolean;
   onClose: () => void;
 }

@@ -440,7 +440,6 @@ export default function Editor(): JSX.Element | null {
               onClose={onCloseSelectMenuHandler}
             />
             : null}
-          {/* <IllustrationMaker /> */}
           <SortableContext items={itemlist} strategy={verticalListSortingStrategy}>
             <Editable
               id="hivemind-editable"
