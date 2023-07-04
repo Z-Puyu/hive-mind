@@ -1,6 +1,12 @@
 import { RenderElementProps, useSelected } from "slate-react";
 import TextCard from "../../../interface/TextCard";
-import { FormatBoldSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp, CodeSharp } from "@mui/icons-material";
+import { 
+  FormatBoldSharp, 
+  FormatClearSharp, 
+  FormatUnderlinedSharp, 
+  FormatStrikethroughSharp, 
+  CodeSharp 
+} from "@mui/icons-material";
 import { Toolbar } from "@mui/material";
 import Paragraph from "../../../interface/Paragraph";
 import { ThmElem } from "../../../utils/CustomSlateTypes";
@@ -11,7 +17,6 @@ import ToggleLinkButton from "../ToggleLinkButton";
 import BookmarkButton from "../BookmarkButton";
 import { css } from "@emotion/css";
 import { MathJax } from "better-react-mathjax";
-
 
 export default function Theorem(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();

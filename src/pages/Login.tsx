@@ -1,10 +1,20 @@
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, isExistingUser, signIn, signInWithGoogle } from "../config/Firebase"
-import { Link, NavigateFunction, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { css } from "@emotion/css";
-import { Box, Button, Divider, FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField } from "@mui/material";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { 
+  Box, 
+  Button, 
+  Divider, 
+  FormControl, 
+  FormHelperText, 
+  IconButton, 
+  InputAdornment, 
+  InputLabel, 
+  OutlinedInput, 
+  TextField 
+} from "@mui/material";
 import classes from "./AuthenticationPages.module.css";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 

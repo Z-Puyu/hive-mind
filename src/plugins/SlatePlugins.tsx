@@ -1,4 +1,4 @@
-import { Editor, Transforms, Element, elementReadOnly, NodeEntry, Ancestor, Point } from "slate";
+import { Editor, Transforms, Element, NodeEntry, Ancestor, Point } from "slate";
 import isUrl from "is-url";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import { nanoid } from "nanoid";

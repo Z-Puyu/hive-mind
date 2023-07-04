@@ -1,7 +1,6 @@
 import { BaseEditor, Descendant } from "slate";
 import { ReactEditor } from "slate-react";
 import { HistoryEditor } from "slate-history";
-import { Dispatch, SetStateAction } from "react";
 
 export type FormattedPlainText = {
   text: string;
@@ -87,7 +86,8 @@ export type BookmarkElem = {
   id: string;
   type: "bookmark" | null | string;
   title: string;
-  dest?: BookmarkElem;
+  dest?: string;
+  destTitle?: string;
   customDesc: string;
   children: any[];
 };

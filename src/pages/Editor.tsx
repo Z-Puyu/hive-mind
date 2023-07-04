@@ -1,4 +1,3 @@
-import { MathJaxContext } from "better-react-mathjax";
 import { KeyboardEvent, useCallback, useMemo, useState, useEffect } from "react";
 import { withInline, withBetterBreaks, withNodeUids } from "../plugins/SlatePlugins";
 import { TypesetUtil } from "../utils/TypesetUtil";
@@ -11,7 +10,6 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { nanoid } from "nanoid";
 import ReactDOM from "react-dom";
 import DraggedContent from "../components/editor-components/DraggedContent";
-import { mathjaxConfig } from "../config/MathJax";
 import { Coords } from "../utils/UtilityInterfaces";
 import BlockSelection from "../components/editor-components/BlockSelection";
 import { ThmElem } from "../utils/CustomSlateTypes";

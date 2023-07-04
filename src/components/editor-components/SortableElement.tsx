@@ -1,9 +1,8 @@
 import { useSortable } from "@dnd-kit/sortable";
-import { RenderElementProps, useSelected } from "slate-react";
+import { RenderElementProps } from "slate-react";
 import DynElem from "./DynElem";
 import { css } from "@emotion/css";
 import classes from "./SortableElement.module.css";
-import BlockContainer from "../../interface/BlockContainer";
 
 export default function SortableElement(props: RenderElementProps): JSX.Element {
   const sortableObj = useSortable({
