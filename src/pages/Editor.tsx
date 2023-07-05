@@ -169,7 +169,6 @@ export default function Editor(): JSX.Element | null {
       setCurrDoc(currDoc);
       getDoc(currDoc).then(doc => {
         const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
-        console.log(slateValue)
         setInitVal(slateValue);
       })
     }

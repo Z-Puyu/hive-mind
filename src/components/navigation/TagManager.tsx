@@ -83,7 +83,6 @@ export default function TagManager() {
           {
             tagName: newTagName,
             tagColour: newTagColour,
-            isTobeAddedToDocs: false,
           }
         );
         setNewTagName("New Tag");
@@ -187,6 +186,10 @@ export default function TagManager() {
               colour={rgb.value}
               isSelected={rgb.isSelected}
               onCheck={() => onCheckColourHandler(rgb.id)}
+              size={css`
+                width: 30px; 
+                height: 30px;
+              `}
             />)}
           </Box>
         </Box>
@@ -234,6 +237,10 @@ export default function TagManager() {
               colour={rgb.value}
               isSelected={rgb.isSelected}
               onCheck={() => onCheckColourHandler(rgb.id)}
+              size={css`
+                width: 30px; 
+                height: 30px;
+              `}
             />)}
           </Box>
         </Box>

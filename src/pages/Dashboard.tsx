@@ -1,5 +1,18 @@
 import { css } from "@emotion/css";
-import { Box, Button, Divider, Paper, TextField } from "@mui/material";
+import { 
+  Box, 
+  Button, 
+  Checkbox, 
+  Divider, 
+  List, 
+  ListItem, 
+  ListItemButton, 
+  ListItemIcon, 
+  ListItemText, 
+  Menu, 
+  Paper, 
+  TextField 
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { db } from "../config/Firebase";
 import {
@@ -7,7 +20,6 @@ import {
   Query,
   addDoc,
   collection,
-  deleteDoc,
   doc,
   getDocs,
   onSnapshot,
@@ -23,19 +35,17 @@ import Modal from "../components/windows/Modal";
 import classes from "./Dashboard.module.css";
 import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
 import TagManager from "../components/navigation/TagManager";
-import  Tag  from "../components/navigation/Tag";
+import Colour from "../components/Colour";
 
 export default function Dashboard(): JSX.Element | null {
   const auth: Auth = getAuth();
   const [isAddingDoc, setIsAddingDoc] = useState<boolean>(false);
-  const [isAddingToTag, setIsAddingToTag] = useState<boolean>(false);
   const [newDocName, setNewDocName] = useState<string>("New Project");
   const [docsData, setDocsData] = useState<DocumentData[]>([]);
   const [tagsData, setTagsData] = useState<DocumentData[]>([]);
   const [currUser, setCurrUser] = useState<User | null>(null);
-  const [selectedDoc, setSelectedDoc] = useState<string[]>([]);
-  const [selectedTag, setSelectedTag] = useState<string[]>([]);
-  const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [selectedDocs, setSelectedDocs] = useState<DocumentData[]>([]);
+  const [tagMenuAnchor, setTagMenuAnchor] = useState<HTMLElement | null>(null);
 
   useEffect(() => onAuthStateChanged(auth, user => {
     // We have to check if the user is null before rendering 
@@ -62,15 +72,15 @@ export default function Dashboard(): JSX.Element | null {
           const currTags: DocumentData[] = [];
           docsSnap.forEach(doc => currTags.push({ ...doc.data(), user: user.uid, id: doc.id }));
           setTagsData(currTags);
-        //   let n = currTags.length;
-        //   let tmp = [];
-        //   for (let i = 0; i < n; i += 1)
-        //   {
-        //     tmp.push(false);
-        //     setIsChecked(tmp);
-        //   }
-        //   //console.log(n);
-        //   //console.log(tmp);
+          //   let n = currTags.length;
+          //   let tmp = [];
+          //   for (let i = 0; i < n; i += 1)
+          //   {
+          //     tmp.push(false);
+          //     setIsChecked(tmp);
+          //   }
+          //   //console.log(n);
+          //   //console.log(tmp);
         }
       )
     }
@@ -117,25 +127,49 @@ export default function Dashboard(): JSX.Element | null {
     }
   }
 
-  const onAddtoTagHandler = (tags: DocumentData[]) => {
-    for (let tag of tags) {
-      if (tag.isTobeAddedToDocs = true){
-        updateDoc(doc(db, "userProjects",
-        tag.user, "tags", tag.id), {
-        projects: selectedDoc,
-        });
+  const onToggleTagHandler = (tag: DocumentData) => {
+    const updatedDocs: DocumentData[] = [...selectedDocs];
+    for (let i: number = 0; i < updatedDocs.length; i += 1) {
+      if (!Array.isArray(updatedDocs[i].tags)) {
+        updatedDocs[i] = { ...updatedDocs[i], tags: [] };
       }
-      tag.isTobeAddedToDocs = false;
+      const updatedTags: DocumentData[] = [...updatedDocs[i].tags];
+      if (updatedTags.some(assignedTag => assignedTag.id === tag.id)) {
+        updatedDocs[i] = {
+          ...updatedDocs[i],
+          tags: isTagActive(tag)
+            ? updatedTags.filter(assignedTag => assignedTag.id !== tag.id)
+            : updatedTags
+        }
+      } else {
+        updatedDocs[i] = {
+          ...updatedDocs[i],
+          tags: updatedTags.concat([tag])
+        }
+      }
     }
-    console.log(tagsData);
+    updatedDocs.forEach(updatedDoc => updateDoc(
+      doc(db, "userProjects", currUser.uid, "projects", updatedDoc.id), updatedDoc
+    ));
+    setSelectedDocs(updatedDocs);
   }
 
-  const onCheckHandler = (tag: DocumentData) => {
-    updateDoc(doc(db, "userProjects",
-      tag.user, "tags", tag.id), {
-        isTobeAddedToDocs: !tag.isTobeAddedToDocs,
-    });
-  }
+  const isTagActive = (tag: DocumentData) => {
+    if (selectedDocs.length === 0) {
+      return false;
+    }
+    for (let i: number = 0; i < selectedDocs.length; i += 1) {
+      if (Array.isArray(selectedDocs[i].tags) 
+        && !selectedDocs[i].tags.some((assignedTag: DocumentData) => assignedTag.id === tag.id)) {
+        return false;
+      }
+    }
+    // Either all projects have no tags, or the tag is assigned to every project.
+    if (!Array.isArray(selectedDocs[0].tags) || selectedDocs[0].tags.length === 0) {
+      return false;
+    }
+    return true;
+  };
 
   return (
     <div
@@ -148,15 +182,52 @@ export default function Dashboard(): JSX.Element | null {
       >
         <section>
           <Box className={classes.topBar}>
-            <Button
+            {selectedDocs.length > 0 ? <Button
               variant="contained"
               sx={{
                 margin: "1em",
               }}
-              onClick={() => setIsAddingToTag(true)}
+              onClick={event => setTagMenuAnchor(event.currentTarget)}
             >
-              Add tag
-            </Button>
+              Manage Tags
+            </Button> : null}
+            <Menu
+              open={!!tagMenuAnchor}
+              onClose={() => setTagMenuAnchor(null)}
+              anchorEl={tagMenuAnchor}
+            >
+              <List>
+                {tagsData.map(tag => <ListItem>
+                  <ListItemButton
+                    onClick={() => onToggleTagHandler(tag)}
+                    dense
+                  >
+                    <ListItemIcon>
+                      <Checkbox
+                        edge="start"
+                        checked={isTagActive(tag)}
+                        tabIndex={-1}
+                        disableRipple
+                      />
+                      <span className={css`
+                        display: inline-flex;
+                        align-items: center;
+                      `}>
+                        <Colour
+                          colour={tag.tagColour.value}
+                          size={css`
+                          width: 12.5px;
+                          height: 12.5px;
+                        `}
+                          static
+                        />
+                      </span>
+                    </ListItemIcon>
+                    <ListItemText primary={tag.tagName} />
+                  </ListItemButton>
+                </ListItem>)}
+              </List>
+            </Menu>
             <Button
               variant="contained"
               sx={{
@@ -214,57 +285,17 @@ export default function Dashboard(): JSX.Element | null {
               Create Project
             </Button>
           </Modal>
-          <Modal
-            open={isAddingToTag}
-            onClose={() => setIsAddingToTag(false)}
-          >
-            <div>
-              {tagsData.map(tag => 
-                <div className="tag-popup">
-                  <input 
-                  type="checkbox"
-                  name="mycheckbox"
-                  value={tag.id}
-                  //checked={isChecked}
-                  onChange={event => onCheckHandler(tag)}
-                  />
-                  <Tag
-                  key={tag.id}
-                  colour={tag.tagColour ? tag.tagColour.value : ""}
-                  name={tag.tagName}
-                  onDelete={() => deleteDoc(doc(db, "userProjects",
-                    tag.user, "tags", tag.id))}
-                  />
-                </div>)}
-            </div>
-            <Button
-              variant="text"
-              onClick={() => {
-                setIsAddingToTag(false);
-                for (let tagData of tagsData)
-                {
-                  tagData.isTobeAddedToDocs = false;
-                }
-              }}
-              sx={{
-                margin: "0 0.75em"
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => onAddtoTagHandler(tagsData)}
-              sx={{
-                margin: "0 0.75em"
-              }}
-            >
-              Confirm
-            </Button>
-          </Modal>
         </section>
         <section>
-          {docsData.map(data => <DocumentRow key={data.id} docData={data} selected={selectedDoc} updateSelectedDoc={setSelectedDoc} />)}
+          <List>
+            {docsData.map(data => <DocumentRow
+              key={data.id}
+              docData={data}
+              onSelect={() => setSelectedDocs(selectedDocs.concat([data]))}
+              onRemove={() => setSelectedDocs(selectedDocs.filter(doc => doc.id !== data.id))}
+              isChecked={false}
+            />)}
+          </List>
         </section>
       </Paper>
     </div>

@@ -3,6 +3,7 @@ import classes from "./Tag.module.css";
 import { css, cx } from "@emotion/css";
 import { DeleteSharp, DriveFileRenameOutlineSharp } from "@mui/icons-material";
 import { DocumentData } from "firebase/firestore";
+import Colour from "../Colour";
 
 interface TagProps {
   colour: string;
@@ -16,7 +17,14 @@ export default function Tag(props: TagProps) {
     <Box
       className={classes.tag}
     >
-      <span className={cx(classes.pin, css`background-color: ${props.colour}`)}/>
+      <Colour 
+        colour={props.colour}
+        size={css`
+          width: 15px;
+          height: 15px;
+        `}
+        static
+      />
       <p className={classes.text}>{props.name}</p>
       <DriveFileRenameOutlineSharp onClick={props.onEdit}/>
       <DeleteSharp onClick={props.onDelete}/>
