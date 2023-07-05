@@ -7,8 +7,8 @@ import { DocumentData } from "firebase/firestore";
 interface TagProps {
   colour: string;
   name: string;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export default function Tag(props: TagProps) {

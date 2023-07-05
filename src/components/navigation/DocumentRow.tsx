@@ -14,6 +14,7 @@ import { db } from "../../config/Firebase";
 import classes from "./DocumentRow.module.css";
 import { on } from "events";
 import { Check, LensTwoTone } from "@mui/icons-material";
+import { indexOf } from "lodash";
 
 interface DocumentRowProps {
   docData: DocumentData;
@@ -40,18 +41,18 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
   const onCheck = (selectedDocId:string) => {
     setIsChecked(!isChecked);
     if (!isChecked){
-      console.log(`${selectedDocId} is selected`);
-       let tmp = [...props.selected, selectedDocId];
-       props.updateSelectedDoc(tmp);
-       tmp = props.selected;
-       console.log(tmp);
+      //console.log(`${selectedDocId} is selected`);
+      let tmp = props.selected;
+      tmp = [...props.selected, selectedDocId];
+      //console.log(tmp);
+      props.updateSelectedDoc(tmp);
     }
     else{
-      console.log(`${selectedDocId} is removed`);
-      let tmp = props.selected.splice(props.selected.indexOf(selectedDocId), 1);
+      //console.log(`${selectedDocId} is removed`);
+      let tmp = props.selected;
+      tmp.splice(props.selected.indexOf(selectedDocId), 1);
+      //console.log(tmp);
       props.updateSelectedDoc(tmp);
-      tmp = props.selected;
-      console.log(tmp);
     }
   }
 
