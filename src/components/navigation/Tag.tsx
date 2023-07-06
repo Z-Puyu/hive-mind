@@ -10,6 +10,7 @@ interface TagProps {
   name: string;
   onEdit?: () => void;
   onDelete?: () => void;
+  onClick?: () => void;
 }
 
 export default function Tag(props: TagProps) {
@@ -25,7 +26,10 @@ export default function Tag(props: TagProps) {
         `}
         static
       />
-      <p className={classes.text}>{props.name}</p>
+      <p 
+        className={classes.text}
+        onClick={props.onClick}
+      >{props.name}</p>
       <DriveFileRenameOutlineSharp onClick={props.onEdit}/>
       <DeleteSharp onClick={props.onDelete}/>
     </Box>

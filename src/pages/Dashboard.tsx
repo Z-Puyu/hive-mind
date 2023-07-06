@@ -171,6 +171,30 @@ export default function Dashboard(): JSX.Element | null {
     return true;
   };
 
+  const isDisplayed = (doc: DocumentData) => {
+    if (doc.tags) 
+    {
+      for (const tag of doc.tags)
+      {
+        for (const tagData of tagsData)
+        {
+          if (tag.id === tagData.id && tagData.isDisplayed)
+          {
+            return true;
+          }
+        }
+      }
+    }
+    for (const tagData of tagsData)
+    {
+      if (!tagData.isDisplayed)
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
   return (
     <div
       className={classes.dashboard}
@@ -288,7 +312,7 @@ export default function Dashboard(): JSX.Element | null {
         </section>
         <section>
           <List>
-            {docsData.map(data => <DocumentRow
+            { docsData.map(data => isDisplayed(data) && <DocumentRow
               key={data.id}
               docData={data}
               onSelect={() => setSelectedDocs(selectedDocs.concat([data]))}
