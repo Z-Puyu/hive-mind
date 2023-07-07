@@ -83,7 +83,6 @@ export default function TagManager() {
           {
             tagName: newTagName,
             tagColour: newTagColour,
-            isTobeAddedToDocs: false,
           }
         );
         setNewTagName("New Tag");
@@ -110,6 +109,33 @@ export default function TagManager() {
     setCurrTag(tag);
   }
 
+  //Once a tag is clicked, it is set to be the filter tag.
+  const onFilterHandler = (tag: DocumentData) => {
+    for (let tag of tags)
+    {
+      updateDoc(doc(db, "userProjects",
+      tag.user, "tags", tag.id), {
+        isDisplayed: false,  
+      });
+    } 
+    updateDoc(doc(db, "userProjects",
+    tag.user, "tags", tag.id), {
+      isDisplayed: true,
+  });
+  }
+
+  // Once Show All button is clicked, all projects are shown.
+  const onShowAllHandler = () => {
+    for (let tag of tags)
+    {
+      {
+        updateDoc(doc(db, "userProjects",
+        tag.user, "tags", tag.id), {
+          isDisplayed: true,  
+        });
+      } 
+    }
+  }
   /**
    * Toggle the selection of colours. If the target colour is currently unselected,
    * set it as selected and record its RGB value into the state. Otherwise, 
@@ -187,6 +213,10 @@ export default function TagManager() {
               colour={rgb.value}
               isSelected={rgb.isSelected}
               onCheck={() => onCheckColourHandler(rgb.id)}
+              size={css`
+                width: 30px; 
+                height: 30px;
+              `}
             />)}
           </Box>
         </Box>
@@ -234,6 +264,10 @@ export default function TagManager() {
               colour={rgb.value}
               isSelected={rgb.isSelected}
               onCheck={() => onCheckColourHandler(rgb.id)}
+              size={css`
+                width: 30px; 
+                height: 30px;
+              `}
             />)}
           </Box>
         </Box>
@@ -263,7 +297,9 @@ export default function TagManager() {
         onEdit={() => onEditTagHandler(tag)}
         onDelete={() => deleteDoc(doc(db, "userProjects",
           tag.user, "tags", tag.id))}
+        onClick={() => onFilterHandler(tag)}
       />)}
+      <button onClick={onShowAllHandler}>Show All</button>
     </Box>
   );
 }

@@ -237,10 +237,6 @@ export default function MatrixMaker(props: MatrixMakerProps) {
     props.onClose();
   }
 
-  /* const onInsertMatrixHandler = () => {
-
-  } */
-
   return (
     <Box>
       <Box
