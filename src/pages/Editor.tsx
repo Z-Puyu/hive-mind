@@ -1,3 +1,4 @@
+import { MathJaxContext } from "better-react-mathjax";
 import { KeyboardEvent, useCallback, useMemo, useState, useEffect } from "react";
 import { withInline, withBetterBreaks, withNodeUids } from "../plugins/SlatePlugins";
 import { TypesetUtil } from "../utils/TypesetUtil";
@@ -10,6 +11,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { nanoid } from "nanoid";
 import ReactDOM from "react-dom";
 import DraggedContent from "../components/editor-components/DraggedContent";
+import { mathjaxConfig } from "../config/MathJax";
 import { Coords } from "../utils/UtilityInterfaces";
 import BlockSelection from "../components/editor-components/BlockSelection";
 import { ThmElem } from "../utils/CustomSlateTypes";
@@ -149,6 +151,7 @@ export default function Editor(): JSX.Element | null {
   const [selectedItem, setSelectedItem] = useState<{ [key: string]: string }>(selectMenuItems[0]);
   const [selectMenuIsOpen, setSelectMenuIsOpen] = useState<boolean>(false);
   const [selectMenuPos, setSelectMenuPos] = useState<Coords>({ x: 0, y: 0 });
+  //const [initTag, setInitTag] = useState<string> 
 
   // Initialise drag-and-drop.
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
@@ -166,7 +169,6 @@ export default function Editor(): JSX.Element | null {
       setCurrDoc(currDoc);
       getDoc(currDoc).then(doc => {
         const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
-        console.log(slateValue)
         setInitVal(slateValue);
       })
     }

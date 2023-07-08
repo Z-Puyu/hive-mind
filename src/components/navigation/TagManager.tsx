@@ -1,13 +1,24 @@
 import { css } from "@emotion/css";
 import { AddSharp } from "@mui/icons-material";
 import { Box, Button, TextField } from "@mui/material";
-import { useState } from "react";
-import { Tag as TagObj } from "../../utils/UtilityInterfaces";
+import { useEffect, useState } from "react";
 import Modal from "../windows/Modal";
 import Colour from "../Colour";
 import { nanoid } from "nanoid";
 import Tag from "./Tag";
 import classes from "./TagManager.module.css"
+import { 
+  DocumentData, 
+  addDoc, 
+  collection, 
+  deleteDoc, 
+  doc, 
+  onSnapshot, 
+  query, 
+  updateDoc 
+} from "firebase/firestore";
+import { auth, db } from "../../config/Firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 interface ColourObj {
   id: string;
@@ -27,12 +38,42 @@ const DEFAULT_COLOURS: ColourObj[] = [
   { id: nanoid(), isSelected: false, value: "rgb(128, 118, 163)" },
 ];
 
-export default function TagManager() {
-  const [tags, setTags] = useState<TagObj[]>([]);
+interface TagManagerProps {
+  onFilter: (tag: DocumentData) => void;
+  onClearFilters: () => void;
+}
+
+export default function TagManager(props: TagManagerProps) {
+  const [tags, setTags] = useState<DocumentData[]>([]);
   const [newTagName, setNewTagName] = useState<string>("New Tag");
-  const [newTagColour, setNewTagColour] = useState<string | null>(null)
+  const [newTagColour, setNewTagColour] = useState<ColourObj | null>(null)
   const [isAddingTag, setIsAddingTag] = useState<boolean>(false);
+  const [isEditingTag, setIsEditingTag] = useState<boolean>(false);
+  const [currTag, setCurrTag] = useState<DocumentData | null>(null);
   const [colours, setColours] = useState<ColourObj[]>(DEFAULT_COLOURS);
+  const [currUser, setCurrUser] = useState<User | null>(null);
+  const [isShowingAll, setIsShowingAll] = useState<boolean>(true);
+
+  useEffect(() => onAuthStateChanged(auth, user => {
+    if (user) {
+      setCurrUser(user);
+      onSnapshot(
+        query(
+          collection(db, "userProjects", user.uid, "tags"),
+        ),
+        docsSnap => {
+          const currtags: DocumentData[] = [];
+          docsSnap.forEach(doc => currtags.push({ ...doc.data(), user: user.uid, id: doc.id }));
+          setTags(currtags);
+        }
+      )
+    }
+  }), []);
+
+  // With early return, we avoid unnecessary initialisation of the functions below.
+  if (!currUser) {
+    return null;
+  }
 
   const onAddTagHandler = () => {
     if (!newTagColour) {
@@ -41,16 +82,23 @@ export default function TagManager() {
       alert("Tag name cannot be empty!");
     } else {
       // The tag has a name and a colour so it's safe to add.
-      const updatedTags: TagObj[] = tags;
-      if (updatedTags.filter(tag => tag.name === newTagName).length !== 0) {
+      const updatedTags: DocumentData[] = tags;
+      if (updatedTags.filter(tag => tag.tagName === newTagName).length !== 0) {
         alert("A tag with this name already exists!");
       } else {
-        updatedTags.push({ id: nanoid(), colour: newTagColour!, name: newTagName });
+        updatedTags.push({ id: nanoid(), tagColour: newTagColour!, tagName: newTagName });
         setTags(updatedTags);
         // After adding the new tag, we must restore relevant states to their default values.
         const availableColours: ColourObj[] = colours;
         setColours(availableColours
           .map(colour => colour.isSelected ? { ...colour, isSelected: false } : colour));
+        addDoc(
+          collection(db, "userProjects", currUser.uid, "tags"),
+          {
+            tagName: newTagName,
+            tagColour: newTagColour,
+          }
+        );
         setNewTagName("New Tag");
         setNewTagColour(null);
         setIsAddingTag(false); // Closes the modal
@@ -58,15 +106,21 @@ export default function TagManager() {
     }
   }
 
-  const onEditTagHandler = (tag: TagObj) => {
-    setNewTagName(tag.name);
-    setNewTagColour(tag.colour);
-    setIsAddingTag(true);
+  const onUpdateTagHandler = (tag: DocumentData) => {
+    updateDoc(doc(db, "userProjects",
+      tag.user, "tags", tag.id), {
+      tagName: newTagName,
+      tagColour: newTagColour,
+    });
+    setIsEditingTag(false);
   }
 
-  const onDeleteTagHandler = (id: string) => {
-    const updatedTags: TagObj[] = tags;
-    setTags(updatedTags.filter(tag => tag.id !== id));
+  const onEditTagHandler = (tag: DocumentData) => {
+    setColours(colours.map(colour => colour.id === tag.tagColour.id
+      ? { ...colour, isSelected: true } : colour));
+    setNewTagColour(tag.tagColour);
+    setIsEditingTag(true);
+    setCurrTag(tag);
   }
 
   /**
@@ -77,14 +131,49 @@ export default function TagManager() {
    * @param id The ID of the colour.
    */
   const onCheckColourHandler = (id: string) => {
-    const availableColours: ColourObj[] = colours;
-    // There as to exist a colour with the matching ID 
+    let availableColours: ColourObj[] = [...colours];
+    // There has to exist a colour with the matching ID 
     // as this ID was itself retrieved from the array.
     const target: ColourObj = availableColours.find(colour => colour.id === id)!;
+    if (!target.isSelected) {
+      availableColours = availableColours.map(colour => colour.isSelected
+        ? { ...colour, isSelected: false } : colour);
+    }
     availableColours.splice(availableColours.indexOf(target), 1,
       { ...target, isSelected: !target.isSelected });
-    setNewTagColour(newTagColour ? null : target.value);
+    setNewTagColour(newTagColour?.id === target.id ? null : target);
     setColours(availableColours);
+  }
+
+  const onConfigureNewTagHandler = () => {
+    setIsAddingTag(true);
+    if (newTagColour) {
+      const defaultColours: ColourObj[] = [...colours];
+      const index: number = defaultColours.indexOf(newTagColour);
+      defaultColours[index] = { ...defaultColours[index], isSelected: false };
+      setColours(defaultColours);
+      setNewTagColour(null);
+    }
+  }
+
+  const onToggleTagFilterHandler = (tag: DocumentData) => {
+    props.onFilter(tag);
+    const updatedTags: DocumentData[] = [...tags];
+    const index: number = updatedTags.findIndex(updatedTag => tag.id === updatedTag.id);
+    updatedTags[index] = {
+      ...updatedTags[index],
+      isSelected: updatedTags[index].isSelected ? false : true
+    }
+    setTags(updatedTags);
+    if (updatedTags.some(tag => tag.isSelected)) {
+      setIsShowingAll(false);
+    }
+  }
+
+  const onClearFiltersHandler = () => {
+    props.onClearFilters();
+    setTags(tags.map(tag => { return { ...tag, isSelected: false } }));
+    setIsShowingAll(true);
   }
 
   return (
@@ -101,7 +190,7 @@ export default function TagManager() {
             backgroundColor: "rgb(34, 148, 83)",
           },
         }}
-        onClick={() => setIsAddingTag(true)}
+        onClick={onConfigureNewTagHandler}
       >
         <AddSharp />
         Add New Tag
@@ -131,6 +220,10 @@ export default function TagManager() {
               colour={rgb.value}
               isSelected={rgb.isSelected}
               onCheck={() => onCheckColourHandler(rgb.id)}
+              size={css`
+                width: 30px; 
+                height: 30px;
+              `}
             />)}
           </Box>
         </Box>
@@ -153,12 +246,73 @@ export default function TagManager() {
           Add
         </Button>
       </Modal>
+      <Modal
+        open={isEditingTag}
+        onClose={() => setIsEditingTag(false)}
+      >
+        <TextField
+          variant="outlined"
+          label="Tag Name"
+          defaultValue={currTag?.tagName}
+          fullWidth
+          margin="normal"
+          onChange={event => setNewTagName(event.target.value)}
+        />
+        <Box
+          className={classes.textTooltip}
+        >
+          <strong>Tag Colour:</strong>
+          <br />
+          <Box
+            className={classes.listOfTags}
+          >
+            {colours.map(rgb => <Colour
+              key={rgb.id}
+              colour={rgb.value}
+              isSelected={rgb.isSelected}
+              onCheck={() => onCheckColourHandler(rgb.id)}
+              size={css`
+                width: 30px; 
+                height: 30px;
+              `}
+            />)}
+          </Box>
+        </Box>
+        <Button
+          variant="text"
+          onClick={() => setIsEditingTag(false)}
+          sx={{
+            margin: "0 0.75em",
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => onUpdateTagHandler(currTag!)}
+          sx={{
+            margin: "0 0.75em",
+          }}
+        >
+          Update
+        </Button>
+      </Modal>
+      <br />
+      <Tag
+        colour={""}
+        name={"All Projects"}
+        isSelected={isShowingAll}
+        onClick={onClearFiltersHandler}
+      />
       {tags.map(tag => <Tag
         key={tag.id}
-        colour={tag.colour}
-        name={tag.name}
+        colour={tag.tagColour ? tag.tagColour.value : ""}
+        name={tag.tagName}
+        isSelected={tag.isSelected}
         onEdit={() => onEditTagHandler(tag)}
-        onDelete={() => onDeleteTagHandler(tag.id)}
+        onDelete={() => deleteDoc(doc(db, "userProjects",
+          tag.user, "tags", tag.id))}
+        onClick={() => onToggleTagFilterHandler(tag)}
       />)}
     </Box>
   );

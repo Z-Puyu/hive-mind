@@ -4,8 +4,10 @@ import { useEffect, useState, useRef } from "react";
 import MathPreview from "../MathPreview";
 import { css } from "@emotion/css";
 import { findDOMNode } from "react-dom";
+import { Editor, Transforms } from "slate";
 
 export default function InlineMath(props: RenderElementProps) {
+  const editor: Editor = useSlate();
   const isSelected: boolean = useSelected();
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const mathRef = useRef<HTMLSpanElement>(null);
