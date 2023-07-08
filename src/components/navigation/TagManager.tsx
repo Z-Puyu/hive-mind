@@ -2,13 +2,21 @@ import { css } from "@emotion/css";
 import { AddSharp } from "@mui/icons-material";
 import { Box, Button, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Tag as TagObj } from "../../utils/UtilityInterfaces";
 import Modal from "../windows/Modal";
 import Colour from "../Colour";
 import { nanoid } from "nanoid";
 import Tag from "./Tag";
 import classes from "./TagManager.module.css"
-import { DocumentData, addDoc, collection, deleteDoc, doc, onSnapshot, query, serverTimestamp, updateDoc } from "firebase/firestore";
+import { 
+  DocumentData, 
+  addDoc, 
+  collection, 
+  deleteDoc, 
+  doc, 
+  onSnapshot, 
+  query, 
+  updateDoc 
+} from "firebase/firestore";
 import { auth, db } from "../../config/Firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
 
@@ -115,15 +123,6 @@ export default function TagManager(props: TagManagerProps) {
     setCurrTag(tag);
   }
 
-  // Once "Show All" button is clicked, all projects are shown.
-  const onShowAllHandler = () => {
-    for (let tag of tags) {
-      updateDoc(doc(db, "userProjects",
-        tag.user, "tags", tag.id), {
-        isDisplayed: true,
-      });
-    }
-  }
   /**
    * Toggle the selection of colours. If the target colour is currently unselected,
    * set it as selected and record its RGB value into the state. Otherwise, 
