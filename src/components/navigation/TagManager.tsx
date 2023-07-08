@@ -30,7 +30,12 @@ const DEFAULT_COLOURS: ColourObj[] = [
   { id: nanoid(), isSelected: false, value: "rgb(128, 118, 163)" },
 ];
 
-export default function TagManager() {
+interface TagManagerProps {
+  onFilter: (tag: DocumentData) => void;
+  onClearFilters: () => void;
+}
+
+export default function TagManager(props: TagManagerProps) {
   const [tags, setTags] = useState<DocumentData[]>([]);
   const [newTagName, setNewTagName] = useState<string>("New Tag");
   const [newTagColour, setNewTagColour] = useState<ColourObj | null>(null)
@@ -39,6 +44,7 @@ export default function TagManager() {
   const [currTag, setCurrTag] = useState<DocumentData | null>(null);
   const [colours, setColours] = useState<ColourObj[]>(DEFAULT_COLOURS);
   const [currUser, setCurrUser] = useState<User | null>(null);
+  const [isShowingAll, setIsShowingAll] = useState<boolean>(true);
 
   useEffect(() => onAuthStateChanged(auth, user => {
     if (user) {
@@ -109,31 +115,13 @@ export default function TagManager() {
     setCurrTag(tag);
   }
 
-  //Once a tag is clicked, it is set to be the filter tag.
-  const onFilterHandler = (tag: DocumentData) => {
-    for (let tag of tags)
-    {
-      updateDoc(doc(db, "userProjects",
-      tag.user, "tags", tag.id), {
-        isDisplayed: false,  
-      });
-    } 
-    updateDoc(doc(db, "userProjects",
-    tag.user, "tags", tag.id), {
-      isDisplayed: true,
-  });
-  }
-
-  // Once Show All button is clicked, all projects are shown.
+  // Once "Show All" button is clicked, all projects are shown.
   const onShowAllHandler = () => {
-    for (let tag of tags)
-    {
-      {
-        updateDoc(doc(db, "userProjects",
+    for (let tag of tags) {
+      updateDoc(doc(db, "userProjects",
         tag.user, "tags", tag.id), {
-          isDisplayed: true,  
-        });
-      } 
+        isDisplayed: true,
+      });
     }
   }
   /**
@@ -163,10 +151,30 @@ export default function TagManager() {
     if (newTagColour) {
       const defaultColours: ColourObj[] = [...colours];
       const index: number = defaultColours.indexOf(newTagColour);
-      defaultColours[index] = {...defaultColours[index], isSelected: false};
+      defaultColours[index] = { ...defaultColours[index], isSelected: false };
       setColours(defaultColours);
       setNewTagColour(null);
     }
+  }
+
+  const onToggleTagFilterHandler = (tag: DocumentData) => {
+    props.onFilter(tag);
+    const updatedTags: DocumentData[] = [...tags];
+    const index: number = updatedTags.findIndex(updatedTag => tag.id === updatedTag.id);
+    updatedTags[index] = {
+      ...updatedTags[index],
+      isSelected: updatedTags[index].isSelected ? false : true
+    }
+    setTags(updatedTags);
+    if (updatedTags.some(tag => tag.isSelected)) {
+      setIsShowingAll(false);
+    }
+  }
+
+  const onClearFiltersHandler = () => {
+    props.onClearFilters();
+    setTags(tags.map(tag => { return { ...tag, isSelected: false } }));
+    setIsShowingAll(true);
   }
 
   return (
@@ -290,16 +298,23 @@ export default function TagManager() {
           Update
         </Button>
       </Modal>
+      <br />
+      <Tag
+        colour={""}
+        name={"All Projects"}
+        isSelected={isShowingAll}
+        onClick={onClearFiltersHandler}
+      />
       {tags.map(tag => <Tag
         key={tag.id}
         colour={tag.tagColour ? tag.tagColour.value : ""}
         name={tag.tagName}
+        isSelected={tag.isSelected}
         onEdit={() => onEditTagHandler(tag)}
         onDelete={() => deleteDoc(doc(db, "userProjects",
           tag.user, "tags", tag.id))}
-        onClick={() => onFilterHandler(tag)}
+        onClick={() => onToggleTagFilterHandler(tag)}
       />)}
-      <button onClick={onShowAllHandler}>Show All</button>
     </Box>
   );
 }
