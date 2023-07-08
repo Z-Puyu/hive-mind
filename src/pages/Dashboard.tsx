@@ -1,17 +1,17 @@
 import { css } from "@emotion/css";
-import { 
-  Box, 
-  Button, 
-  Checkbox, 
-  Divider, 
-  List, 
-  ListItem, 
-  ListItemButton, 
-  ListItemIcon, 
-  ListItemText, 
-  Menu, 
-  Paper, 
-  TextField 
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  Paper,
+  TextField
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { db } from "../config/Firebase";
@@ -43,6 +43,7 @@ export default function Dashboard(): JSX.Element | null {
   const [newDocName, setNewDocName] = useState<string>("New Project");
   const [docsData, setDocsData] = useState<DocumentData[]>([]);
   const [tagsData, setTagsData] = useState<DocumentData[]>([]);
+  const [activeTags, setActiveTags] = useState<DocumentData[]>([]);
   const [currUser, setCurrUser] = useState<User | null>(null);
   const [selectedDocs, setSelectedDocs] = useState<DocumentData[]>([]);
   const [tagMenuAnchor, setTagMenuAnchor] = useState<HTMLElement | null>(null);
@@ -159,7 +160,7 @@ export default function Dashboard(): JSX.Element | null {
       return false;
     }
     for (let i: number = 0; i < selectedDocs.length; i += 1) {
-      if (Array.isArray(selectedDocs[i].tags) 
+      if (Array.isArray(selectedDocs[i].tags)
         && !selectedDocs[i].tags.some((assignedTag: DocumentData) => assignedTag.id === tag.id)) {
         return false;
       }
@@ -172,34 +173,42 @@ export default function Dashboard(): JSX.Element | null {
   };
 
   const isDisplayed = (doc: DocumentData) => {
-    if (doc.tags) 
-    {
-      for (const tag of doc.tags)
-      {
-        for (const tagData of tagsData)
-        {
-          if (tag.id === tagData.id && tagData.isDisplayed)
-          {
+    if (doc.tags) {
+      for (const tag of doc.tags) {
+        for (const tagData of tagsData) {
+          if (tag.id === tagData.id && tagData.isDisplayed) {
             return true;
           }
         }
       }
     }
-    for (const tagData of tagsData)
-    {
-      if (!tagData.isDisplayed)
-      {
+    for (const tagData of tagsData) {
+      if (!tagData.isDisplayed) {
         return false;
       }
     }
     return true;
   }
 
+  const onFilterHandler = (tag: DocumentData) => {
+    if (activeTags.some(activeTag => activeTag.id === tag.id)) {
+      const updatedTags: DocumentData[] = [...activeTags];
+      const index: number = activeTags.findIndex(activeTag => activeTag.id === tag.id);
+      updatedTags.splice(index, 1);
+      setActiveTags(updatedTags);
+    } else {
+      setActiveTags(activeTags.concat([{ ...tag }]));
+    }
+  }
+
   return (
     <div
       className={classes.dashboard}
     >
-      <TagManager />
+      <TagManager
+        onFilter={onFilterHandler}
+        onClearFilters={() => setActiveTags([])}
+      />
       <Paper
         elevation={3}
         className={classes.manager}
@@ -240,9 +249,9 @@ export default function Dashboard(): JSX.Element | null {
                         <Colour
                           colour={tag.tagColour.value}
                           size={css`
-                            width: 12.5px;
-                            height: 12.5px;
-                          `}
+                          width: 12.5px;
+                          height: 12.5px;
+                        `}
                           static
                         />
                       </span>
@@ -312,13 +321,16 @@ export default function Dashboard(): JSX.Element | null {
         </section>
         <section>
           <List>
-            { docsData.map(data => isDisplayed(data) && <DocumentRow
-              key={data.id}
-              docData={data}
-              onSelect={() => setSelectedDocs(selectedDocs.concat([data]))}
-              onRemove={() => setSelectedDocs(selectedDocs.filter(doc => doc.id !== data.id))}
-              isChecked={false}
-            />)}
+            {docsData.map(data => activeTags.length === 0 || (Array.isArray(data.tags)
+              && activeTags.every(activeTag => data.tags
+                .some((tag: DocumentData) => activeTag.id === tag.id)))
+              ? <DocumentRow
+                key={data.id}
+                docData={data}
+                onSelect={() => setSelectedDocs(selectedDocs.concat([data]))}
+                onRemove={() => setSelectedDocs(selectedDocs.filter(doc => doc.id !== data.id))}
+                isChecked={false}
+              /> : null)}
           </List>
         </section>
       </Paper>

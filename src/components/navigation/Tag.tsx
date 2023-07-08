@@ -4,19 +4,22 @@ import { css, cx } from "@emotion/css";
 import { DeleteSharp, DriveFileRenameOutlineSharp } from "@mui/icons-material";
 import { DocumentData } from "firebase/firestore";
 import Colour from "../Colour";
+import { useState } from "react";
 
 interface TagProps {
   colour: string;
   name: string;
+  isSelected: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
-  onClick?: () => void;
+  onClick: () => void;
 }
 
 export default function Tag(props: TagProps) {
   return (
     <Box
-      className={classes.tag}
+      className={props.isSelected ? classes.selectedTag : classes.tag}
+      onClick={() => props.onClick()}
     >
       <Colour 
         colour={props.colour}
@@ -26,12 +29,11 @@ export default function Tag(props: TagProps) {
         `}
         static
       />
-      <p 
-        className={classes.text}
-        onClick={props.onClick}
-      >{props.name}</p>
-      <DriveFileRenameOutlineSharp onClick={props.onEdit}/>
-      <DeleteSharp onClick={props.onDelete}/>
+      <p className={classes.text}>
+        {props.name}
+      </p>
+      {props.onEdit ? <DriveFileRenameOutlineSharp onClick={props.onEdit}/> : null}
+      {props.onDelete ? <DeleteSharp onClick={props.onDelete}/> : null}
     </Box>
   )
 }
