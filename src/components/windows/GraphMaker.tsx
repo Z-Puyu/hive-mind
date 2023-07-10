@@ -12,8 +12,10 @@ import { Utilities } from "../../utils/Utilities";
 import { AddSharp } from "@mui/icons-material";
 import { MathJax } from "better-react-mathjax";
 import "katex/dist/katex.min.css";
+import { Editor, Transforms } from "slate";
+import { useSlate } from "slate-react";
 
-interface FuncObj {
+export interface FuncObj {
   id: string;
   def: string;
   fx: boolean;
@@ -23,19 +25,20 @@ interface GraphMakerProps {
   onClose: () => void;
 }
 
-const PLOT_COLOURS: string[] = [
-  Theme.foreground, 
-  Theme.blue, 
-  Theme.green, 
-  Theme.indigo, 
-  Theme.orange, 
-  Theme.pink, 
-  Theme.red, 
-  Theme.violet, 
+export const PLOT_COLOURS: string[] = [
+  Theme.foreground,
+  Theme.blue,
+  Theme.green,
+  Theme.indigo,
+  Theme.orange,
+  Theme.pink,
+  Theme.red,
+  Theme.violet,
   Theme.yellow
 ]
 
 export default function GraphMaker(props: GraphMakerProps) {
+  const editor: Editor = useSlate();
   const [funcObjects, setFuncObjects] = useState<FuncObj[]>([{ id: nanoid(), def: "", fx: true }]);
 
   const onChangeFuncHandler = (index: number, value: string) => {
@@ -54,6 +57,16 @@ export default function GraphMaker(props: GraphMakerProps) {
       fx: !updatedFuncObjects[index].fx
     };
     setFuncObjects(updatedFuncObjects);
+  }
+
+  const onInsertPlotHandler = () => {
+    Transforms.insertNodes(editor, {
+      id: nanoid(),
+      type: "func-plot",
+      functions: funcObjects,
+      children: [{ text: "" }]
+    });
+    props.onClose();
   }
 
   return (
@@ -97,29 +110,8 @@ export default function GraphMaker(props: GraphMakerProps) {
             color={PLOT_COLOURS[index]}
           />
         )}
-        {funcObjects.map((func, index) => func.fx
-          ? <Text
-            key={func.id}
-            x={2}
-            y={Utilities.evaluate(func.def, 2, "y")}
-            attach="e"
-            attachDistance={15}
-          >
-            {/* <MathJax inline dynamic> */}
-            {`$y = ${func.def}$`}
-            {/* </MathJax> */}
-          </Text>
-          : <Text
-            key={func.id}
-            x={Utilities.evaluate(func.def, 2, "x")}
-            y={Utilities.evaluate(func.def, 2, "y")}
-            attach="e"
-            attachDistance={15}
-          >
-            {`$x = ${func.def}$`}
-          </Text>
-        )}
       </Mafs>
+      <Button onClick={onInsertPlotHandler}>Insert Plot</Button>
     </Box>
   )
 }

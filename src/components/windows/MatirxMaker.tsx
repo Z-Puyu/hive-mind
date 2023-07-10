@@ -459,7 +459,6 @@ export default function MatrixMaker(props: MatrixMakerProps) {
         </MathJax>
       </Box>
       <Button onClick={onInsertLaTeXHandler}>Insert as LaTeX</Button>
-      {/* <Button onClick={onInsertMatrixHandler}>Insert as Illustration</Button> */}
     </Box>
   )
 }

@@ -1,6 +1,7 @@
 import { BaseEditor, Descendant } from "slate";
 import { ReactEditor } from "slate-react";
 import { HistoryEditor } from "slate-history";
+import { FuncObj } from "../components/windows/GraphMaker";
 
 export type FormattedPlainText = {
   text: string;
@@ -92,10 +93,10 @@ export type BookmarkElem = {
   children: any[];
 };
 
-export type IllustrationElem = {
+export type FuncPlotElem = {
   id: string;
-  type: "illustration" | null | string;
-  variant?: "matrix";
+  type: "func-plot" | null | string;
+  functions: FuncObj[];
   children: any[];
 }
 
@@ -112,7 +113,7 @@ export type CustomElement =
   | CommandElem
   | ThmElem
   | SolnElem
-  | IllustrationElem
+  | FuncPlotElem
   | BookmarkElem;
 
 export type CustomText = FormattedPlainText;

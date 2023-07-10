@@ -7,3 +7,7 @@
   /* Margin is necessary to clearly show the cursor */
   margin: 0 0.001em;
 }
+
+.funcPlot {
+  cursor: grab;
+}

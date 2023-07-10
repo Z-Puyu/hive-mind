@@ -1,6 +1,6 @@
 import { MathJaxContext } from "better-react-mathjax";
 import { KeyboardEvent, useCallback, useMemo, useState, useEffect } from "react";
-import { withInline, withBetterBreaks, withNodeUids } from "../plugins/SlatePlugins";
+import { withInline, withBetterBreaks, withNodeUids, withVoids } from "../plugins/SlatePlugins";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import isHotkey, { isKeyHotkey } from "is-hotkey";
 import DynElem from "../components/editor-components/DynElem";
@@ -131,8 +131,10 @@ export default function Editor(): JSX.Element | null {
   const [editor] = useState<SlateEditor>(() => withNodeUids(
     withBetterBreaks(
       withInline(
-        withHistory(
-          withReact(createEditor())
+        withVoids(
+          withHistory(
+            withReact(createEditor())
+          )
         )
       )
     )

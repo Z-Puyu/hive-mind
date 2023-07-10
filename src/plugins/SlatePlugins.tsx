@@ -1,4 +1,4 @@
-import { Editor, Transforms, Element, NodeEntry, Ancestor, Point } from "slate";
+import { Editor, Transforms, Element, NodeEntry, Ancestor, Point, Operation, BaseOperation } from "slate";
 import isUrl from "is-url";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import { nanoid } from "nanoid";
@@ -21,13 +21,13 @@ export const withInline = (editor: Editor) => {
     "soln"
   ];
 
-  editor.isInline = element =>
+  editor.isInline = (element: Element) =>
     inlineTypes.includes(element.type) || isInline(element);
 
-  editor.isSelectable = element =>
+  editor.isSelectable = (element: Element) =>
     element.type !== "bookmark" && isSelectable(element);
 
-  editor.isElementReadOnly = element =>
+  editor.isElementReadOnly = (element: Element) =>
     element.type === "bookmark" || isElementReadOnly(element);
 
   editor.insertText = (text: string) => {
@@ -87,7 +87,7 @@ export const withNodeUids = (editor: Editor) => {
       node.children.forEach(child => assignId(child as Node));
     }
   } */
-  editor.apply = (operation) => {
+  editor.apply = (operation: BaseOperation) => {
     /* if (operation.type === "insert_node") {
       if (Element.isElement(operation.node)) {
         operation.node.id = nanoid();
@@ -102,3 +102,11 @@ export const withNodeUids = (editor: Editor) => {
   };
   return editor;
 };
+
+export const withVoids = (editor: Editor) => {
+  const { isVoid } = editor;
+
+  editor.isVoid = (element: Element) => element.type === "func-plot" || isVoid(element);
+
+  return editor;
+}

@@ -315,7 +315,6 @@ export default function TagManager(props: TagManagerProps) {
           tag.user, "tags", tag.id))}
         onClick={() => onToggleTagFilterHandler(tag)}
       />)}
-      <button onClick={onShowAllHandler}>Show All</button>
     </Box>
   );
 }
