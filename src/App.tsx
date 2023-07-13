@@ -12,9 +12,9 @@ import Registration from "./pages/Registration";
 import ResetPassword from "./pages/ResetPassword";
 import { ComputeEngine } from "@cortex-js/compute-engine";
 import { Utilities } from "./utils/Utilities";
+import UserProfile from "./pages/UserProfile";
 
 export default function App(): JSX.Element {
-  console.log(Utilities.evaluate("\\sin{1/x}", 1, "x"))
   return (
     <div
       className="webpage"
@@ -36,6 +36,7 @@ export default function App(): JSX.Element {
               <Route path="/authentication" element={<Login />} />
               <Route path="/register" element={<Registration />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/user-profile" element={<UserProfile />} />
               <Route path="/editor/:projId" element={<Editor />} />
               <Route path="*" element={<h1>PAGE NOT FOUND</h1>} />
             </Routes>

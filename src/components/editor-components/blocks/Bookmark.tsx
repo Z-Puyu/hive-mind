@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Editor, Transforms, Path, Node, Element } from "slate";
 import { RenderElementProps, useSlate, ReactEditor } from "slate-react";
-import Modal from "../../../interface/Modal";
 import { BookmarkElem } from "../../../utils/CustomSlateTypes";
 import InlineChromiumBugfix from "../../../utils/InlineChromBugFix";
 import BookmarkConfigMenu from "../BookmarkConfigMenu";
 import classes from "./Bookmark.module.css";
+import Modal from "../../windows/Modal";
 
 export default function Bookmark(props: RenderElementProps) {
   const editor: Editor = useSlate();
@@ -62,12 +62,12 @@ export default function Bookmark(props: RenderElementProps) {
 
   return (
     <>
-      {modalIsOpen ? <Modal onClose={() => setModalIsOpen(false)}>
+      <Modal open={modalIsOpen} onClose={() => setModalIsOpen(false)}>
         <BookmarkConfigMenu
           target={props.element as BookmarkElem}
           onConfirm={onConfirmConfigHandler}
         />
-      </Modal> : null}
+      </Modal>
       <span
         id={props.element.id}
         className={classes.bookmark}

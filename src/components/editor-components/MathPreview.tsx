@@ -1,8 +1,5 @@
-import { useEffect, useRef } from "react";
-import PreviewBox from "../../interface/PreviewBox";
+import { useRef } from "react";
 import { MathJax } from "better-react-mathjax";
-import { Editor, Range } from "slate";
-import { useSlate, useFocused } from "slate-react";
 import { Card, Portal } from "@mui/material";
 import { css } from "@emotion/css";
 

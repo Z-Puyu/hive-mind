@@ -1,15 +1,17 @@
 import { css } from "@emotion/css";
-import { 
-  Box, 
-  Button, 
-  Checkbox, 
-  Divider, 
-  ListItem, 
-  ListItemButton, 
-  ListItemIcon, 
-  ListItemText, 
-  Modal, 
-  TextField 
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Modal,
+  TableCell,
+  TableRow,
+  TextField
 } from "@mui/material";
 import {
   DocumentData,
@@ -23,7 +25,7 @@ import { useRef, useState } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { db } from "../../config/Firebase";
 import classes from "./DocumentRow.module.css";
-import { MoreHorizSharp } from "@mui/icons-material";
+import { DeleteSharp, DriveFileRenameOutlineSharp, MoreHorizSharp } from "@mui/icons-material";
 import MiniTag from "./MiniTag";
 import MoreTags from "./MoreTags";
 
@@ -40,7 +42,7 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
   const ellipsisRef = useRef<HTMLSpanElement>(null);
 
   const [isRenaming, setIsRenaming] = useState<boolean>(false);
-  const [isChecked, setIsChecked] = useState<boolean>(props.isChecked);
+  /* const [isChecked, setIsChecked] = useState<boolean>(props.isChecked); */
   const currProject: DocumentReference<DocumentData> = doc(db, "userProjects",
     props.docData.user, "projects", props.docData.id);
   const [docName, setDocName] = useState<string>("");
@@ -55,127 +57,130 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
   }
 
   const onCheckHandler = () => {
-    if (!isChecked) {
+    if (!props.isChecked) {
       props.onSelect();
     } else {
       props.onRemove();
     }
-    setIsChecked(!isChecked);
+    /* setIsChecked(!isChecked); */
   }
 
   return (
-    <>
-      <ListItem disablePadding>
-        <ListItemButton
-          className={classes.docRow}
-        /* onClick={onCheck} */
+    <TableRow
+      hover
+      role="checkbox"
+      aria-checked={props.isChecked}
+      tabIndex={-1}
+      key={props.docData.id}
+      selected={props.isChecked}
+    >
+      <TableCell
+        padding="checkbox"
+        onClick={onCheckHandler}
+        sx={{ cursor: "pointer" }}
+      >
+        <Checkbox
+          color="primary"
+          checked={props.isChecked}
+        />
+      </TableCell>
+      <TableCell
+        component="th"
+        scope="row"
+        padding="none"
+        onClick={() => navigate(`/Editor/${props.docData.id}`)}
+        sx={{ 
+          cursor: "pointer" 
+        }}
+      >
+        <span
+          className={css`
+            display: inline-block;
+            width: 25em;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          `}
         >
-          <ListItemIcon>
-            <Checkbox
-              edge="start"
-              checked={isChecked}
-              tabIndex={-1}
-              disableRipple
-              onClick={onCheckHandler}
+        {props.docData.fileName}
+        </span>
+      </TableCell>
+      {isShowingAllTags ? <MoreTags
+        anchor={ellipsisRef.current}
+        tagList={props.docData.tags?.slice(3)}
+      /> : null}
+      <TableCell align="left" sx={{width: "fit-content"}} padding="none">
+        <span
+          className={css`
+            display: flex;
+            align-items: center;
+            width: fit-content;
+          `}
+        >
+          {props.docData.tags?.length > 3
+            ? (props.docData.tags?.slice(0, 4)
+              .map((tag: DocumentData, index: number) => index < 3
+                ? <MiniTag colour={tag.tagColour.value} name={tag.tagName} />
+                : <span
+                  ref={ellipsisRef}
+                  className={classes.moreTags}
+                  onClick={() => setIsShowingAllTags(!isShowingAllTags)}
+                >
+                  <MoreHorizSharp />
+                </span>))
+            : props.docData.tags?.map((tag: DocumentData) => <MiniTag
+              colour={tag.tagColour.value}
+              name={tag.tagName}
+            />)}
+        </span>
+      </TableCell>
+      <TableCell align="left" padding="none">
+        {props.docData.owner + ""}
+      </TableCell>
+      <TableCell align="left" padding="none">
+        {props.docData.timeStamp?.toDate().toLocaleDateString()}
+      </TableCell>
+      <TableCell align="left" padding="none">
+        <Modal
+          open={isRenaming}
+          onClose={() => setIsRenaming(false)}
+        >
+          <Box className={classes.card}>
+            <TextField
+              variant="outlined"
+              label="Project Title"
+              defaultValue={props.docData.fileName}
+              fullWidth
+              margin="normal"
+              onChange={event => setDocName(event.target.value)}
             />
-          </ListItemIcon>
-          <span className={classes.fileName}>
-            <ListItemText
+            <Button
+              variant="text"
+              onClick={() => setIsRenaming(false)}
               sx={{
-                flex: "unset",
-                WebkitFlex: "unset"
+                margin: "0 0.75em",
               }}
-              className={css`
-                display: inline;
-                max-width: 50%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              `}
-              primary={props.docData.fileName}
-              onClick={() => navigate(`/Editor/${props.docData.id}`)}
-            />
-            {isShowingAllTags ? <MoreTags 
-              anchor={ellipsisRef.current}
-              tagList={props.docData.tags?.slice(3)}
-            /> : null}
-            <span
-              className={css`
-                display: inline-flex;
-                flex: 1;
-              `}
             >
-              {props.docData.tags?.length > 3
-                ? props.docData.tags?.slice(0, 4)
-                  .map((tag: DocumentData, index: number) => index < 3
-                    ? <MiniTag colour={tag.tagColour.value} name={tag.tagName} />
-                    : <span
-                      ref={ellipsisRef}
-                      className={classes.moreTags}
-                      onClick={() => setIsShowingAllTags(!isShowingAllTags)}
-                    >
-                      <MoreHorizSharp />
-                    </span>)
-                : props.docData.tags?.map((tag: DocumentData) => <MiniTag
-                  colour={tag.tagColour.value}
-                  name={tag.tagName}
-                />)}
-            </span>
-          </span>
-          <p
-            className={classes.timeStamp}
-          >
-            {props.docData.timeStamp?.toDate().toLocaleDateString()}
-          </p>
-          <p
-            className={classes.button}
-          >
-            <Modal
-              open={isRenaming}
-              onClose={() => setIsRenaming(false)}
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={onRenameProjectHandler}
+              sx={{
+                margin: "0 0.75em",
+              }}
             >
-              <Box className={classes.card}>
-                <TextField
-                  variant="outlined"
-                  label="Project Title"
-                  defaultValue={props.docData.fileName}
-                  fullWidth
-                  margin="normal"
-                  onChange={event => setDocName(event.target.value)}
-                />
-                <Button
-                  variant="text"
-                  onClick={() => setIsRenaming(false)}
-                  sx={{
-                    margin: "0 0.75em",
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={onRenameProjectHandler}
-                  sx={{
-                    margin: "0 0.75em",
-                  }}
-                >
-                  Rename Project
-                </Button>
-              </Box>
-            </Modal>
-            <u onClick={() => setIsRenaming(true)}>
-              Rename
-            </u>
-          </p>
-          <p
-            className={classes.button}
-          >
-            <u onClick={() => deleteDoc(currProject)}>
-              Delete
-            </u>
-          </p>
-        </ListItemButton>
-      </ListItem>
-      <Divider component="li" />
-    </>
-  )
+              Rename Project
+            </Button>
+          </Box>
+        </Modal>
+        <span className={classes.button} onClick={() => setIsRenaming(true)}>
+          <DriveFileRenameOutlineSharp />
+        </span>
+        <span className={classes.button} onClick={() => deleteDoc(currProject)}>
+          <DeleteSharp />
+        </span>
+      </TableCell>
+    </TableRow>
+  );
 }

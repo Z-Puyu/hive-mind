@@ -19,8 +19,8 @@ export default function SelectMenu(props: SelectMenuProps): JSX.Element {
       /* className={classes.menu} */
       className={cx(
         css`
-          left: ${props.position.x}px,
-          top: ${props.position.y}px,
+          left: ${props.position.x}px;
+          top: ${props.position.y}px;
         `, classes.menu
       )}
     >

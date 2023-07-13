@@ -36,16 +36,6 @@ export default function TheoremTitle(props: TheoremTitleProps) {
 
   return (
     <>
-      {/* {inputIsVisible ? <HoveringWindow>
-        <div
-          ref={inputRef}
-          onChange={() => setTitle(inputRef.current?.innerHTML)}
-          autoFocus
-          contentEditable
-        >
-          Title
-        </div>
-      </HoveringWindow> : null} */}
       <div
         contentEditable="false"
         suppressContentEditableWarning={true}

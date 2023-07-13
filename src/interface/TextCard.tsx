@@ -1,6 +1,4 @@
 import { Box } from "@mui/material";
-import { ChildrenProps } from "../utils/UtilityInterfaces";
-import BlockContainer from "./BlockContainer";
 import { PropsWithChildren } from "react";
 import classes from "./TextCard.module.css";
 import { useSelected } from "slate-react";

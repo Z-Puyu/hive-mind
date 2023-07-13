@@ -1,4 +1,3 @@
-import { MathJaxContext } from "better-react-mathjax";
 import { KeyboardEvent, useCallback, useMemo, useState, useEffect } from "react";
 import { withInline, withBetterBreaks, withNodeUids, withVoids } from "../plugins/SlatePlugins";
 import { TypesetUtil } from "../utils/TypesetUtil";
@@ -9,10 +8,7 @@ import classes from "./Editor.module.css";
 import SortableElement from "../components/editor-components/SortableElement";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { nanoid } from "nanoid";
-import ReactDOM from "react-dom";
 import DraggedContent from "../components/editor-components/DraggedContent";
-import { mathjaxConfig } from "../config/MathJax";
-import { Coords } from "../utils/UtilityInterfaces";
 import BlockSelection from "../components/editor-components/BlockSelection";
 import { ThmElem } from "../utils/CustomSlateTypes";
 import { matchSorter } from "match-sorter";
@@ -21,16 +17,13 @@ import {
   getDoc,
   doc,
   updateDoc,
-  query,
-  collection,
   DocumentReference,
   DocumentData,
   serverTimestamp
 } from "firebase/firestore";
 import { db } from "../config/Firebase";
 import { Paper, Portal } from "@mui/material";
-import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
-import { timeStamp } from "console";
+import { Auth, getAuth, onAuthStateChanged } from "firebase/auth";
 import BlockToggler from "../components/editor-components/BlockToggler";
 import {
   UniqueIdentifier,
@@ -47,11 +40,9 @@ import {
   Element,
   Range,
   Text,
-  Node
 } from "slate";
 import { withHistory } from "slate-history";
 import { withReact, RenderElementProps, ReactEditor, RenderLeafProps, Slate, Editable } from "slate-react";
-import IllustrationMaker from "../components/windows/IllustrationMaker";
 
 const INIT_BLOCK_TYPES: { [key: string]: string }[] = [
   {
@@ -152,7 +143,7 @@ export default function Editor(): JSX.Element | null {
   const [selectMenuItems, setSelectMenuItems] = useState<{ [key: string]: string }[]>(INIT_BLOCK_TYPES);
   const [selectedItem, setSelectedItem] = useState<{ [key: string]: string }>(selectMenuItems[0]);
   const [selectMenuIsOpen, setSelectMenuIsOpen] = useState<boolean>(false);
-  const [selectMenuPos, setSelectMenuPos] = useState<Coords>({ x: 0, y: 0 });
+  const [anchorId, setAnchorId] = useState<string>("");
   //const [initTag, setInitTag] = useState<string> 
 
   // Initialise drag-and-drop.
@@ -334,29 +325,16 @@ export default function Editor(): JSX.Element | null {
             match: n => !SlateEditor.isEditor(n) && Element.isElement(n) && n.type === "cmd",
           },
         );
+        const cmdId: string = nanoid();
+        setAnchorId(cmdId);
         Transforms.insertNodes(editor, {
-          id: nanoid(),
+          id: cmdId,
           type: "cmd",
           onSelect: (bool: boolean) => setSelectMenuIsOpen(bool),
           children: [{ text: "\\" }],
         })
-        const prevNeighbour: Node = SlateEditor.node(
-          editor,
-          SlateEditor.before(
-            editor,
-            SlateEditor.before(
-              editor,
-              editor.selection?.anchor!
-            )!
-          )!
-        )[0];
-        const prevElem: HTMLElement = ReactEditor.toDOMNode(editor, prevNeighbour as Element);
         setSelectedItem(selectMenuItems[0]);
         setSelectMenuIsOpen(true);
-        setSelectMenuPos({
-          x: prevElem.offsetLeft + prevElem.offsetWidth,
-          y: prevElem.offsetTop + prevElem.offsetHeight + 5,
-        });
       }
     }
   };
@@ -435,7 +413,11 @@ export default function Editor(): JSX.Element | null {
         >
           {selectMenuIsOpen
             ? <BlockSelection
-              pos={selectMenuPos}
+              pos={{
+                x: document.getElementById(anchorId)?.offsetLeft!,
+                y: document.getElementById(anchorId)?.offsetTop! +
+                  document.getElementById(anchorId)?.offsetHeight! + 5
+              }}
               items={selectMenuItems}
               currSelection={selectedItem}
               onSelect={onSelectHandler}

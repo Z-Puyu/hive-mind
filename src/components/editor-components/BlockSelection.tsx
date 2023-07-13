@@ -16,7 +16,6 @@ interface BlockSelectionProps {
 export default function BlockSelection(props: BlockSelectionProps): JSX.Element {
   return (
     <>
-      <ModalOverlay onClick={props.onClose} color={css``}/>
       <SelectMenu position={props.pos}>
         <VerticalList>
           {props.items.map(

@@ -11,15 +11,21 @@ import {
   ListItemText,
   Menu,
   Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
   TextField
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { db } from "../config/Firebase";
 import {
   DocumentData,
   Query,
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   onSnapshot,
@@ -36,6 +42,9 @@ import classes from "./Dashboard.module.css";
 import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
 import TagManager from "../components/navigation/TagManager";
 import Colour from "../components/Colour";
+import ProjectManagerHead from "../components/navigation/ProjectManagerHead";
+import compare from "../utils/Comparator";
+import { DeleteOutlineSharp, NoteAddSharp } from "@mui/icons-material";
 
 export default function Dashboard(): JSX.Element | null {
   const auth: Auth = getAuth();
@@ -47,6 +56,8 @@ export default function Dashboard(): JSX.Element | null {
   const [currUser, setCurrUser] = useState<User | null>(null);
   const [selectedDocs, setSelectedDocs] = useState<DocumentData[]>([]);
   const [tagMenuAnchor, setTagMenuAnchor] = useState<HTMLElement | null>(null);
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [filter, setFilter] = useState<string>("timeStamp");
 
   useEffect(() => onAuthStateChanged(auth, user => {
     // We have to check if the user is null before rendering 
@@ -107,6 +118,7 @@ export default function Dashboard(): JSX.Element | null {
           addDoc(
             collection(db, "userProjects", currUser.uid, "projects"),
             {
+              owner: currUser.displayName,
               fileName: newDocName,
               timeStamp: serverTimestamp(),
               slateValue: JSON.stringify([
@@ -172,24 +184,6 @@ export default function Dashboard(): JSX.Element | null {
     return true;
   };
 
-  const isDisplayed = (doc: DocumentData) => {
-    if (doc.tags) {
-      for (const tag of doc.tags) {
-        for (const tagData of tagsData) {
-          if (tag.id === tagData.id && tagData.isDisplayed) {
-            return true;
-          }
-        }
-      }
-    }
-    for (const tagData of tagsData) {
-      if (!tagData.isDisplayed) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   const onFilterHandler = (tag: DocumentData) => {
     if (activeTags.some(activeTag => activeTag.id === tag.id)) {
       const updatedTags: DocumentData[] = [...activeTags];
@@ -200,6 +194,25 @@ export default function Dashboard(): JSX.Element | null {
       setActiveTags(activeTags.concat([{ ...tag }]));
     }
   }
+
+  const isVisibleDoc = (data: DocumentData) => activeTags.length === 0
+    || (Array.isArray(data.tags) && activeTags.every(activeTag => data.tags
+      .some((tag: DocumentData) => activeTag.id === tag.id)))
+
+  const onSortProjectsHandler = (sortFilter: string) => {
+    setOrder(filter === sortFilter && order === "asc" ? "desc" : "asc");
+    setFilter(sortFilter);
+  }
+
+  const onDeleteDocsHandler = () => {
+    setDocsData(docsData.filter(data => !selectedDocs
+      .some(doc => doc.id === data.id)))
+    selectedDocs.forEach(docData => deleteDoc(doc(db, "userProjects",
+      docData.user, "projects", docData.id)))
+  }
+
+  const visibleDocs = docsData.filter(data => isVisibleDoc(data))
+    .sort((a, b) => compare(a, b, filter as keyof (typeof a), order));
 
   return (
     <div
@@ -215,15 +228,29 @@ export default function Dashboard(): JSX.Element | null {
       >
         <section>
           <Box className={classes.topBar}>
-            {selectedDocs.length > 0 ? <Button
-              variant="contained"
-              sx={{
-                margin: "1em",
-              }}
-              onClick={event => setTagMenuAnchor(event.currentTarget)}
-            >
-              Manage Tags
-            </Button> : null}
+            {selectedDocs.length > 0 ? <>
+              <Button
+                variant="outlined"
+                sx={{
+                  margin: "1em 0.25em",
+                  borderRadius: "5em"
+                }}
+                onClick={onDeleteDocsHandler}
+              >
+                <DeleteOutlineSharp sx={{ marginRight: "0.5em" }} />
+                Delete All Selected
+              </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  margin: "1em 0.25em",
+                  borderRadius: "5em"
+                }}
+                onClick={event => setTagMenuAnchor(event.currentTarget)}
+              >
+                Manage Tags
+              </Button>
+            </> : null}
             <Menu
               open={!!tagMenuAnchor}
               onClose={() => setTagMenuAnchor(null)}
@@ -242,16 +269,13 @@ export default function Dashboard(): JSX.Element | null {
                         tabIndex={-1}
                         disableRipple
                       />
-                      <span className={css`
-                        display: inline-flex;
-                        align-items: center;
-                      `}>
+                      <span className={classes.tagColour}>
                         <Colour
                           colour={tag.tagColour.value}
                           size={css`
-                          width: 12.5px;
-                          height: 12.5px;
-                        `}
+                            width: 12.5px;
+                            height: 12.5px;
+                          `}
                           static
                         />
                       </span>
@@ -264,28 +288,15 @@ export default function Dashboard(): JSX.Element | null {
             <Button
               variant="contained"
               sx={{
-                margin: "1em",
+                margin: "1em 1em 1em 0.25em",
+                borderRadius: "5em",
               }}
               onClick={() => setIsAddingDoc(true)}
             >
+              <NoteAddSharp sx={{ marginRight: "0.5em" }} />
               Add new document
             </Button>
             <Divider />
-            <Box
-              className={css`
-                text-align: left;
-                font-size: smaller;
-                font-weight: bold;
-                display: flex;
-                padding: 0.1em 1.2em;
-                :hover {
-                  background-color: rgba(192, 192, 192, 0.2);
-                }
-              `}
-            >
-              <p className={css`flex-grow: 5`}>Project name</p>
-              <p className={css`flex-grow: 3.75`}>Last modified at</p>
-            </Box>
           </Box>
           <Modal
             open={isAddingDoc}
@@ -319,19 +330,32 @@ export default function Dashboard(): JSX.Element | null {
             </Button>
           </Modal>
         </section>
-        <section>
-          <List>
-            {docsData.map(data => activeTags.length === 0 || (Array.isArray(data.tags)
-              && activeTags.every(activeTag => data.tags
-                .some((tag: DocumentData) => activeTag.id === tag.id)))
-              ? <DocumentRow
-                key={data.id}
-                docData={data}
-                onSelect={() => setSelectedDocs(selectedDocs.concat([data]))}
-                onRemove={() => setSelectedDocs(selectedDocs.filter(doc => doc.id !== data.id))}
-                isChecked={false}
-              /> : null)}
-          </List>
+        <section className={css`padding: 0.5em 1em`}>
+          <TableContainer>
+            <Table
+              sx={{ minWidth: 750 }}
+              size="medium"
+            >
+              <ProjectManagerHead
+                numSelected={selectedDocs.length}
+                rowCount={visibleDocs.length}
+                sortOrder={order}
+                sortFilter={filter}
+                onSelectAll={() => setSelectedDocs(selectedDocs.length === docsData.length
+                  ? [] : docsData)}
+                onSortBy={onSortProjectsHandler}
+              />
+              <TableBody>
+                {visibleDocs.map(data => <DocumentRow
+                  key={data.id}
+                  docData={data}
+                  onSelect={() => setSelectedDocs(selectedDocs.concat([data]))}
+                  onRemove={() => setSelectedDocs(selectedDocs.filter(doc => doc.id !== data.id))}
+                  isChecked={selectedDocs.some(doc => doc.id === data.id)}
+                />)}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </section>
       </Paper>
     </div>

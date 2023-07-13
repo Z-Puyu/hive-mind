@@ -8,17 +8,8 @@ import classes from "./AuthenticationPages.module.css";
 
 export default function ResetPassword() {
   const [email, setEmail] = useState("");
-  const [user, loading, error] = useAuthState(auth);
 
   const navigate: NavigateFunction = useNavigate();
-
-  useEffect(() => {
-    if (!loading) {
-      if (user) {
-        navigate("/dashboard");
-      }
-    }
-  }, [user, loading]);
 
   return (
     <div
@@ -49,7 +40,7 @@ export default function ResetPassword() {
             margin: "1em 0",
             textTransform: "none",
           }}
-          onClick={() => resetPassword(email)}
+          onClick={() => resetPassword(email).then(() => navigate("/authentication"))}
         >
           Send password reset email
         </Button>
