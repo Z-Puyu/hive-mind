@@ -14,7 +14,6 @@ import { ComputeEngine } from "@cortex-js/compute-engine";
 import { Utilities } from "./utils/Utilities";
 
 export default function App(): JSX.Element {
-  console.log(Utilities.evaluate("\\sin{1/x}", 1, "x"))
   return (
     <div
       className="webpage"

@@ -15,6 +15,7 @@
   height: 100%;
 }
 
-.tag-popup {
-  display: flex;
+.tagColour {
+  display: inline-flex;
+  align-items: center;
 }
