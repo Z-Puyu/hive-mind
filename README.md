@@ -482,12 +482,13 @@ On the authentication page, use either a registered e-mail account or Google to 
 The production build now includes the following main features:
 
 - Rich-text formatting using toolbar or hotkeys.
-- Press "$" to activate mathematical mode and input inline $\LaTeX$.
-- Type a slash to activate the slash command menu to toggle block types.
-- Press ctrl + m to generate a new bookmark and double-click on it to configure it.
+- Press "\$" to activate mathematical mode and input inline $\LaTeX$.
+- Type a backslash to activate the slash command menu to toggle block types.
 - Drag and drop the top-level blocks to re-order paragraphs.
 - Animated styling to enhance user interactions.
 - Auto-saving of editor contents.
+
+Follow the example project which will be automatically generated on successful user registration to discover more.
 
 ## Timeline and Development Plan
 

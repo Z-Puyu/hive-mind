@@ -8,10 +8,10 @@
 }
 
 .fileName {
-  flex: 5;
-  width: 20%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: inline-flex;
+  width: 50%;
+  margin: unset;
+  align-items: center;
 
   &:hover {
     cursor: pointer;
@@ -41,4 +41,18 @@
   padding: 2em;
   border-radius: 1em;
   text-align: center;
+}
+
+
+
+.moreTags {
+  display: inline-flex;
+  background-color: rgba(192, 192, 192, 0.5);
+  color: black;
+  border-radius: 10px;
+  margin-left: 0.5em;
+  align-items: center;
+  height: 17.5px;
+  padding: 0 0.5em;
+  font-size: 8pt;
 }

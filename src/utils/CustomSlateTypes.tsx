@@ -1,7 +1,7 @@
 import { BaseEditor, Descendant } from "slate";
 import { ReactEditor } from "slate-react";
 import { HistoryEditor } from "slate-history";
-import { Dispatch, SetStateAction } from "react";
+import { FuncObj } from "../components/windows/GraphMaker";
 
 export type FormattedPlainText = {
   text: string;
@@ -87,10 +87,18 @@ export type BookmarkElem = {
   id: string;
   type: "bookmark" | null | string;
   title: string;
-  dest?: BookmarkElem;
+  dest?: string;
+  destTitle?: string;
   customDesc: string;
   children: any[];
 };
+
+export type FuncPlotElem = {
+  id: string;
+  type: "func-plot" | null | string;
+  functions: FuncObj[];
+  children: any[];
+}
 
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 
@@ -105,6 +113,7 @@ export type CustomElement =
   | CommandElem
   | ThmElem
   | SolnElem
+  | FuncPlotElem
   | BookmarkElem;
 
 export type CustomText = FormattedPlainText;

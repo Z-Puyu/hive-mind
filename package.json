@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@cortex-js/compute-engine": "^0.12.3",
     "@dnd-kit/core": "^6.0.8",
     "@dnd-kit/sortable": "^7.0.2",
-    "@emotion/css": "^11.11.0",
+    "@emotion/css": "^11.11.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.11.16",
@@ -19,15 +20,17 @@
     "@types/react-dom": "^18.2.4",
     "ahooks": "^3.7.7",
     "better-react-mathjax": "^2.0.2",
+    "evaluatex": "^2.2.0",
     "firebase": "^9.22.2",
     "is-hotkey": "^0.2.0",
     "is-url": "^1.2.4",
+    "mafs": "^0.17.1",
     "match-sorter": "^6.3.1",
     "nanoid": "^4.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
-    "react-router-dom": "^6.11.2",
+    "react-router-dom": "^6.14.0",
     "react-scripts": "5.0.1",
     "slate": "^0.94.1",
     "slate-history": "^0.93.0",
@@ -60,6 +63,7 @@
     ]
   },
   "devDependencies": {
+    "@types/evaluatex": "^2.2.4",
     "@types/is-url": "^1.2.30"
   }
 }

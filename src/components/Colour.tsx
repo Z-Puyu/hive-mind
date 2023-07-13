@@ -4,14 +4,22 @@ import classes from "./Colour.module.css";
 
 interface ColourProps {
   colour: string;
-  isSelected: boolean;
-  onCheck: () => void;
+  isSelected?: boolean;
+  onCheck?: () => void;
+  static?: true;
+  size: string;
 }
 
 export default function Colour(props: ColourProps) {
-  return (
+  return props.static ? (
     <span
-      className={cx(classes.button, css`
+      className={cx(classes.button, props.size, css`
+        background-color: ${props.colour};
+      `)}
+    />
+  ) : (
+    <span
+      className={cx(classes.button, props.size, css`
         background-color: ${props.colour};
       `)}
       onPointerDown={props.onCheck}

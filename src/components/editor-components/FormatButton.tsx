@@ -1,7 +1,6 @@
 import { Editor, Text } from "slate";
 import { TypesetUtil } from "../../utils/TypesetUtil";
 import { useSlate } from "slate-react";
-import { Button } from "@mui/material";
 import { css } from "@emotion/css";
 
 interface FormatButtonProps {

@@ -1,7 +1,7 @@
 import { css, cx } from "@emotion/css"
 import classes from "./TheoremTitle.module.css";
 import { MathJax } from "better-react-mathjax";
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 
 interface TheoremTitleProps {
   style?: "dfn" | "eg" | "problem"
@@ -12,6 +12,7 @@ export default function TheoremTitle(props: TheoremTitleProps) {
   const [title, setTitle] = useState<string | undefined>(props.title);
   const [inputIsVisible, setInputIsVisible] = useState<boolean>(true);
   const inputRef = useRef<HTMLDivElement>(null);
+  
   let bgColor: string;
   let type: string;
   switch (props.style) {

@@ -1,9 +1,20 @@
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, isExistingUser, signIn, signInWithGoogle, signUp } from "../config/Firebase";
+import { auth, signInWithGoogle, signUp } from "../config/Firebase";
 import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import { css } from "@emotion/css";
-import { Box, TextField, Button, Divider, IconButton, InputAdornment, FormControl, OutlinedInput, FormHelperText, InputLabel } from "@mui/material";
+import { 
+  Box, 
+  TextField, 
+  Button, 
+  Divider, 
+  IconButton, 
+  InputAdornment, 
+  FormControl, 
+  OutlinedInput, 
+  FormHelperText, 
+  InputLabel 
+} from "@mui/material";
 import classes from "./AuthenticationPages.module.css";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 

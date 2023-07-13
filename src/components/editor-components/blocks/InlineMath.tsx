@@ -2,9 +2,9 @@ import { MathJax } from "better-react-mathjax";
 import { ReactEditor, RenderElementProps, useSelected, useSlate } from "slate-react";
 import { useEffect, useState, useRef } from "react";
 import MathPreview from "../MathPreview";
-import { Editor, Transforms } from "slate";
 import { css } from "@emotion/css";
 import { findDOMNode } from "react-dom";
+import { Editor, Transforms } from "slate";
 
 export default function InlineMath(props: RenderElementProps) {
   const editor: Editor = useSlate();
@@ -19,11 +19,33 @@ export default function InlineMath(props: RenderElementProps) {
     setIsVisible(true);
   }
 
-  return isVisible || isSelected ? (
+  return isSelected ? (
     <span
       className={css`
         position: relative;
       `}
+    >
+      <MathPreview
+        value={props.children[0].props.text.text}
+        rect={mathRef.current?.getBoundingClientRect()}
+      />
+      <span
+        {...props.attributes}
+        ref={mathRef}
+        style={{
+          color: "gray",
+        }}
+        suppressContentEditableWarning={true}
+      >
+        {props.children}
+      </span>
+    </span>
+  ) : isVisible ? (
+    <span
+      className={css`
+          position: relative;
+        `}
+      contentEditable="false"
     >
       <MathPreview
         value={props.children[0].props.text.text}

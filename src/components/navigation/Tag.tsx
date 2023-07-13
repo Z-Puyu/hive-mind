@@ -2,23 +2,38 @@ import { Box } from "@mui/material";
 import classes from "./Tag.module.css";
 import { css, cx } from "@emotion/css";
 import { DeleteSharp, DriveFileRenameOutlineSharp } from "@mui/icons-material";
+import { DocumentData } from "firebase/firestore";
+import Colour from "../Colour";
+import { useState } from "react";
 
 interface TagProps {
   colour: string;
   name: string;
-  onEdit: () => void;
-  onDelete: () => void;
+  isSelected: boolean;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onClick: () => void;
 }
 
 export default function Tag(props: TagProps) {
   return (
     <Box
-      className={classes.tag}
+      className={props.isSelected ? classes.selectedTag : classes.tag}
+      onClick={() => props.onClick()}
     >
-      <span className={cx(classes.pin, css`background-color: ${props.colour}`)}/>
-      <p className={classes.text}>{props.name}</p>
-      <DriveFileRenameOutlineSharp onClick={props.onEdit}/>
-      <DeleteSharp onClick={props.onDelete}/>
+      <Colour 
+        colour={props.colour}
+        size={css`
+          width: 15px;
+          height: 15px;
+        `}
+        static
+      />
+      <p className={classes.text}>
+        {props.name}
+      </p>
+      {props.onEdit ? <DriveFileRenameOutlineSharp onClick={props.onEdit}/> : null}
+      {props.onDelete ? <DeleteSharp onClick={props.onDelete}/> : null}
     </Box>
   )
 }

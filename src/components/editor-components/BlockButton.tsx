@@ -1,5 +1,4 @@
 import { useSlate } from "slate-react";
-import TooltipButton from "../../interface/TooltipButton";
 import { TypesetUtil } from "../../utils/TypesetUtil";
 import { Editor } from "slate";
 import { css } from "@emotion/css";
