@@ -1,11 +1,8 @@
-import { useState } from "react";
-import PopUp from "../../interface/PopUp";
-import classes from "./BookmarkConfigMenu.module.css"
+import { useEffect, useState } from "react";
 import { BookmarkElem } from "../../utils/CustomSlateTypes";
 import { Editor, Element, Node, Transforms } from "slate";
 import { ReactEditor, useSlate } from "slate-react";
-import SelectMenu from "../../interface/SelectMenu";
-import VerticalList from "../../interface/VerticalList";
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 
 interface BookmarkConfigMenuProps {
   target: BookmarkElem;
@@ -41,6 +38,8 @@ export default function BookmarkConfigMenu(props: BookmarkConfigMenuProps) {
     setAvailableBookmarks(bmList);
   }
 
+  useEffect(() => initialiseBookmarkList(), []);
+
   const onClickHandler = () => {
     if (availableBookmarks.length === 0) {
       initialiseBookmarkList();
@@ -48,79 +47,60 @@ export default function BookmarkConfigMenu(props: BookmarkConfigMenuProps) {
     setIsSelectMenuActive(!isSelectMenuActive);
   }
 
+  const onLinkBookmarksHandler = (id: string) => {
+    const bm: BookmarkElem = availableBookmarks.find(bookmark => bookmark.id === id)!;
+    setBookmarkDest(bm.title);
+    setBookmarkDestId(bm.id);
+    Transforms.setNodes(editor, {
+      dest: bm.id,
+    }, { at: ReactEditor.findPath(editor, props.target) });
+    Transforms.setNodes(editor, {
+      dest: props.target.id,
+    }, { at: ReactEditor.findPath(editor, bm) });
+    setIsSelectMenuActive(!isSelectMenuActive);
+  }
+
+  console.log(bookmarkDest)
   return (
-    <PopUp>
-      <div className={classes.inputField}>
-        <label htmlFor="bm-name" >
-          Tag this bookmark as...
-        </label>
-        <input
-          required
-          className={classes.input}
-          id="bm-name"
-          type="text"
-          value={bookmarkName}
-          onChange={event => setBookmarkName(event.target.value)}
-        />
-      </div>
-      <div className={classes.inputField}>
-        <label htmlFor="bm-destination">
-          Link this bookmark to...
-        </label>
-        <input
-          required
-          className={classes.input}
-          id="bm-destination"
-          type="text"
-          value={bookmarkDest ? bookmarkDest : ""}
-          onClick={onClickHandler}
-        />
-      </div>
-      {isSelectMenuActive ? <SelectMenu
-        position={{
-          x: document.getElementById("bm-destination")?.offsetLeft!,
-          y: document.getElementById("bm-destination")?.offsetTop! + 35,
-        }}
-      >
-        <VerticalList>
+    <>
+      <TextField
+        variant="outlined"
+        margin="normal"
+        fullWidth
+        required
+        label="Bookmark Name"
+        value={bookmarkName}
+        onChange={event => setBookmarkName(event.target.value)}
+      />
+      <TextField
+        variant="outlined"
+        margin="normal"
+        fullWidth
+        required
+        label="Custom Description"
+        value={bookmarkDesc}
+        onChange={event => setBookmarkDesc(event.target.value)}
+      />
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="bookmark-linkage-label">Link to</InputLabel>
+        <Select
+          labelId="bookmark-linkage-label"
+          value={bookmarkDestId}
+          label="Link to"
+          onChange={event => onLinkBookmarksHandler(event.target.value)}
+        >
           {availableBookmarks
             .filter(bm => bm.id !== props.target.id)
-            .map(bm => <div
-              onClick={() => {
-                setBookmarkDest(bm.title);
-                setBookmarkDestId(bm.id);
-                Transforms.setNodes(editor, {
-                  dest: bm.id,
-                }, { at: ReactEditor.findPath(editor, props.target) });
-                Transforms.setNodes(editor, {
-                  dest: props.target.id,
-                }, { at: ReactEditor.findPath(editor, bm) });
-                setIsSelectMenuActive(!isSelectMenuActive);
-              }}
-            >
-              {bm.title}
-            </div>)
+            .map(bm => <MenuItem value={bm.id}>{bm.title}</MenuItem>)
           }
-        </VerticalList>
-      </SelectMenu> : null}
-      <div className={classes.inputField}>
-        <label htmlFor="bm-desc">
-          Add a custom description:
-        </label>
-        <input
-          required
-          className={classes.input}
-          id="bm-desc"
-          type="text"
-          value={bookmarkDesc}
-          onChange={event => setBookmarkDesc(event.target.value)}
-        />
-      </div>
-      <button
+        </Select>
+      </FormControl>
+      <Button
+        variant="contained"
         onClick={() => props.onConfirm(bookmarkName, bookmarkDest, bookmarkDestId, bookmarkDesc)}
       >
         Confirm
-      </button>
-    </PopUp>
+      </Button>
+    </>
   )
 }

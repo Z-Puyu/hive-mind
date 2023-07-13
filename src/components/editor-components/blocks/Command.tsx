@@ -19,6 +19,7 @@ export default function Command(props: RenderElementProps): JSX.Element {
     <code
       {...props.attributes}
       style={{ color: "blue" }}
+      id={props.element.id}
     >
       {props.children}
     </code>
