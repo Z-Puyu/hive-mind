@@ -30,7 +30,9 @@ export default function Navbar(): JSX.Element {
   return (
     <div id="nav-bar" className={classes.navBar}>
       <div className={classes.links}>
-        {currUser ? <Link to="/dashboard">Dashboard</Link> : <Link to="/authentication">Login</Link>}
+        {currUser?.emailVerified
+          ? <Link to="/dashboard">Dashboard</Link>
+          : <Link to="/authentication">Login</Link>}
       </div>
       <div className={classes.user} onClick={() => navigate("/user-profile")}>
         {currUser ? (

@@ -3,26 +3,47 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, signInWithGoogle, signUp } from "../config/Firebase";
 import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import { css } from "@emotion/css";
-import { 
-  Box, 
-  TextField, 
-  Button, 
-  Divider, 
-  IconButton, 
-  InputAdornment, 
-  FormControl, 
-  OutlinedInput, 
-  FormHelperText, 
-  InputLabel 
+import {
+  Box,
+  TextField,
+  Button,
+  Divider,
+  IconButton,
+  InputAdornment,
+  FormControl,
+  OutlinedInput,
+  FormHelperText,
+  InputLabel
 } from "@mui/material";
 import classes from "./AuthenticationPages.module.css";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
+import { valid } from "semver";
+
+const validatePassword = (password: string) => {
+  if (password.length < 8 || password.length > 15) {
+    return "The password must be between 8 and 15 characters (inclusive) in length";
+  }
+  if (!/\d/.test(password)) {
+    return "The password must contain at least 1 number";
+  }
+  if (!/[a-zA-Z]/.test(password)) {
+    return "The password must contain at least 1 alphabet";
+  }
+  return null;
+};
+
+const validateEmail = (email: string) => !/\S+@\S+\.\S+/.test(email) 
+  ? "Please enter a valid e-mail address" : null;
+
+const canRegister = (userName: string, email: string, pin: string, repeatedPin: string) =>
+  userName !== "" && !validateEmail(email) && !validatePassword(pin) && pin === repeatedPin;
 
 export default function Registration() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [repeatedPassword, setRepeatedPassword] = useState("");
   const [userName, setUserName] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState<[boolean, boolean]>([false, false]);
 
   const navigate: NavigateFunction = useNavigate();
 
@@ -38,6 +59,8 @@ export default function Registration() {
           required
           variant="outlined"
           label="User name"
+          error={userName === ""}
+          helperText={userName === "" ? "The user name cannot be empty" : null}
           fullWidth
           margin="normal"
           placeholder="Enter your user name"
@@ -47,11 +70,9 @@ export default function Registration() {
           required
           variant="outlined"
           label="Email"
-          error={email !== "" && !/\S+@\S+\.\S+/.test(email)}
+          error={validateEmail(email) !== null}
           helperText={
-            email !== "" && !/\S+@\S+\.\S+/.test(email)
-              ? "Please enter a valid e-mail address"
-              : ""
+            validateEmail(email)
           }
           fullWidth
           margin="normal"
@@ -64,26 +85,55 @@ export default function Registration() {
             id="password-input"
             required
             label="Password"
-            error={password !== "" && password.length < 8}
-            type={isPasswordVisible ? "text" : "password"}
+            error={validatePassword(password) !== null}
+            type={isPasswordVisible[0] ? "text" : "password"}
             fullWidth
             placeholder="Set your password"
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
-                  onPointerDown={() => setIsPasswordVisible(!isPasswordVisible)}
+                  onPointerDown={() => setIsPasswordVisible(
+                    [!isPasswordVisible[0], isPasswordVisible[1]]
+                  )}
                   edge="end"
                 >
-                  {isPasswordVisible ? <VisibilityOff /> : <Visibility />}
+                  {isPasswordVisible[0] ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
             }
             onChange={event => setPassword(event.target.value)}
           />
-          <FormHelperText>
-            {password !== "" && password.length < 8
-              ? "The password has to at least contain 8 characters"
-              : ""}
+          <FormHelperText sx={{color: "rgb(225, 0, 0)"}}>
+            {validatePassword(password)}
+          </FormHelperText>
+        </FormControl>
+        <FormControl>
+          <InputLabel htmlFor="password-input2">Password</InputLabel>
+          <OutlinedInput
+            id="password-input2"
+            required
+            label="Repeat password"
+            disabled={validatePassword(password) !== null}
+            error={repeatedPassword !== password}
+            type={isPasswordVisible[1] ? "text" : "password"}
+            fullWidth
+            placeholder="Repeat your password"
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  onPointerDown={() => setIsPasswordVisible(
+                    [isPasswordVisible[0], !isPasswordVisible[1]]
+                  )}
+                  edge="end"
+                >
+                  {isPasswordVisible[1] ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            onChange={event => setRepeatedPassword(event.target.value)}
+          />
+          <FormHelperText sx={{color: "rgb(225, 0, 0)"}}>
+            {password === repeatedPassword ? null : "The passwords do not match"}
           </FormHelperText>
         </FormControl>
         <Button
@@ -92,7 +142,8 @@ export default function Registration() {
             margin: "1em 0",
             textTransform: "none",
           }}
-          onClick={() => signUp(userName, email, password).then(() => navigate("/dashboard"))}
+          disabled={!canRegister(userName, email, password, repeatedPassword)}
+          onClick={() => signUp(userName, email, password)}
         >
           Register
         </Button>

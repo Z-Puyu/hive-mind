@@ -47,3 +47,8 @@
   font-style: italic;
   margin: 0.25em 1em;
 }
+
+.msg {
+  color: red;
+  margin: 0.25em 1em;
+}

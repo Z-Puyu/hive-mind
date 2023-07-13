@@ -9,7 +9,11 @@ export default function Home() {
 
   useEffect(() => onAuthStateChanged(auth, user => {
     if (user) {
-      navigate("/Dashboard");
+      if (user.emailVerified) {
+        navigate("/Dashboard");
+      } else {
+        alert("Please verify your registered e-mail!")
+      }
     } else {
       return <Login />;
     }

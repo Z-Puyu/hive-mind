@@ -7,6 +7,7 @@ import { auth, db, storage, upload } from "../config/Firebase";
 import { getDownloadURL, ref } from "@firebase/storage";
 import { DoneSharp } from "@mui/icons-material";
 import { doc, updateDoc } from "@firebase/firestore";
+import { css } from "@emotion/css";
 
 export default function UserProfile() {
   const [currUser, setCurrUser] = useState<User | null>(null);
@@ -45,7 +46,7 @@ export default function UserProfile() {
   const onUpdateProfileHandler = () => {
     setUserName(newUserName);
     setUserEmail(newUserEmail);
-    updateProfile(currUser!, { 
+    updateProfile(currUser!, {
       photoURL: newPhotoURL,
       displayName: newUserName,
     }).then(() => currUser?.reload());
@@ -57,7 +58,7 @@ export default function UserProfile() {
   }
 
   return userName && userEmail ? (
-    <Card className={classes.userProfileConfig} sx={{borderRadius: "1em"}}>
+    <Card className={classes.userProfileConfig} sx={{ borderRadius: "1em" }}>
       <Box className={classes.overview}>
         <img
           className={classes.avatar}
@@ -75,6 +76,9 @@ export default function UserProfile() {
         />
         <span className={classes.userName}>{userName}</span>
         <span className={classes.email}>{userEmail}</span>
+        {currUser?.emailVerified ? null : <span className={classes.msg}>
+          {"(E-mail has NOT been verified)"}
+        </span>}
         <Button
           variant="text"
           sx={{
@@ -91,7 +95,7 @@ export default function UserProfile() {
         </Button>
       </Box>
       <Box className={classes.details}>
-        <TextField 
+        <TextField
           variant="standard"
           label="Display Name"
           defaultValue={userName}
@@ -99,7 +103,7 @@ export default function UserProfile() {
           fullWidth
           margin="normal"
         />
-        <TextField 
+        <TextField
           variant="standard"
           label="E-mail Address"
           defaultValue={userEmail}
@@ -107,7 +111,7 @@ export default function UserProfile() {
           fullWidth
           margin="normal"
         />
-        <TextField 
+        <TextField
           variant="outlined"
           label="Bio"
           placeholder="Say something about yourself..."

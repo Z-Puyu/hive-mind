@@ -2,9 +2,8 @@
 import { FirebaseApp, getApp, getApps, initializeApp } from "firebase/app";
 import { Analytics, getAnalytics } from "firebase/analytics";
 import { DocumentData, Firestore, Query, QuerySnapshot, addDoc, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, serverTimestamp, setDoc, where } from "firebase/firestore"
-import { Auth, createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile, User, UserCredential } from "firebase/auth";
+import { Auth, createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile, User, UserCredential } from "firebase/auth";
 import { FirebaseStorage, StorageReference, UploadResult, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { NavigateFunction, useNavigate } from "react-router";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -56,40 +55,40 @@ export const isExistingUser = async (user?: User, email?: string) => {
  * @param email The new user's e-mail address.
  * @param password The new user's password.
  */
-export const signUp = async (userName: string, email: string, password: string) => {
-  try {
-    const credential: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user: User = credential.user;
-    await addDoc(collection(db, "users"), {
-      uid: user.uid,
-      name: userName,
-      authProvider: "local",
-      email: email,
-    });
-    // We have to also update the profile for the new user to get the user's info displayed.
-    await updateProfile(user, {
-      photoURL: await getDownloadURL(ref(storage, "defaultUserAvatar/defaultUserAvatar.jpg")),
-      displayName: userName,
-    })
-    // Retrieve the example project and load it to the new user's project manager.
-    await getDoc(doc(db, "exampleProject", "exampleProject")).then(
-      doc => {
-        addDoc(collection(db, "userProjects", user.uid, "projects"), {
-          fileName: "Example",
-          slateValue: doc.data()?.slateValue,
-          timeStamp: serverTimestamp(),
-          owner: user.displayName
-        })
-      }
-    )
-    await signIn(email, password);
-  } catch (e: unknown) {
+export const signUp = async (userName: string, email: string, password: string) =>
+  createUserWithEmailAndPassword(auth, email, password).then(
+    credential => {
+      sendEmailVerification(credential.user);
+      addDoc(collection(db, "users"), {
+        uid: credential.user.uid,
+        name: userName,
+        authProvider: "local",
+        email: email,
+      })
+      getDownloadURL(ref(storage, "defaultUserAvatar/defaultUserAvatar.jpg")).then(url =>
+        updateProfile(credential.user, {
+          photoURL: url,
+          displayName: userName,
+        }))
+      getDoc(doc(db, "exampleProject", "exampleProject")).then(
+        doc => {
+          addDoc(collection(db, "userProjects", credential.user.uid, "projects"), {
+            fileName: "Example",
+            slateValue: doc.data()?.slateValue,
+            timeStamp: serverTimestamp(),
+            owner: credential.user.displayName
+          })
+        }
+      )
+      alert("An verification e-mail has been sent to " + email + " !");
+      signOut(auth);
+    }
+  ).catch(e => {
     if (e instanceof Error) {
       console.error(e);
       alert((e as Error).message);
     }
-  }
-};
+  });
 
 export const signIn = async (email: string, password: string) => {
   try {

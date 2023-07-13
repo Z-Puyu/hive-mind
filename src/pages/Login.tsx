@@ -19,16 +19,20 @@ import classes from "./AuthenticationPages.module.css";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 
 export default function Login(): JSX.Element {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string | null>("");
+  const [password, setPassword] = useState<string>("");
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [user, loading, error] = useAuthState(auth);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading) {
-      if (user) {
+    if (!loading && user) {
+      setEmail(user.email);
+      setPassword("");
+      if (user.emailVerified) {
         navigate("/dashboard");
+      } else {
+        alert("Please verify your registered e-mail!")
       }
     }
     // maybe trigger a loading screen
@@ -84,9 +88,9 @@ export default function Login(): JSX.Element {
             margin: "1em 0",
             textTransform: "none",
           }}
-          onClick={() => isExistingUser(undefined, email)
+          onClick={() => isExistingUser(undefined, email!)
             .then(exists => exists
-              ? signIn(email, password)
+              ? signIn(email!, password)
               : alert("This e-mail has not been registered!")
             )
           }
