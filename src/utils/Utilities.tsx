@@ -1,3 +1,8 @@
+import { BoxedExpression, ComputeEngine } from "@cortex-js/compute-engine";
+import { Expression } from "@cortex-js/compute-engine/dist/types/math-json/math-json-format";
+
+type MathExpression = number | string | MathExpression[];
+
 export const Utilities = {
   generate2DArray: (nRows: number, nCols: number, item: any) => {
     type arrayElement = typeof item;
@@ -35,5 +40,72 @@ export const Utilities = {
       }
     }
     return updatedMatrix;
+  },
+
+  toNumber: (value: string) => {
+    const result: number = Number(value);
+    return Number.isNaN(result) ? 0 : result;
+  },
+
+  substitute: (val: number | string, x: string, expr: MathExpression | MathExpression[]) => {
+    let f: MathExpression | MathExpression[] = JSON.parse(JSON.stringify(expr));
+    if (!Array.isArray(f)) {
+      // f is either a constant or a single variable.
+      switch (f) {
+        case "\\pi":
+          return Math.PI;
+        case "e":
+          return Math.E;
+        case "\\infty":
+          return Math.min();
+        case "-\\infty":
+          return Math.max();
+        default:
+          break;
+      }
+      switch (val) {
+        case "\\pi":
+          val = Math.PI;
+          break;
+        case "e":
+          val = Math.E;
+          break;
+        case "\\infty":
+          val = Math.min();
+          break;
+        case "-\\infty":
+          val = Math.max();
+          break;
+        default:
+          break;
+      }
+      return f === x ? val : f;
+    }
+    for (let i: number = 0; i < f.length; i += 1) {
+      f[i] = Utilities.substitute(val, x, f[i]);
+    }
+    return f;
+  },
+
+  evaluate: (f: string, x: number | string, varName: string) => {
+    const ce: ComputeEngine = new ComputeEngine();
+    const mathJSON: BoxedExpression = ce.parse(f);
+    let stringExpr: string = mathJSON.valueOf() as string;
+    if (stringExpr[0] !== '[') {
+      return ce.box(Utilities.substitute(x, varName, stringExpr)).N().valueOf() as number;
+    }
+    const expr: MathExpression | MathExpression[] = JSON.parse(stringExpr);
+    return ce.box(Utilities.substitute(x, varName, expr)).N().valueOf() as number;  
+  },
+
+  evaluateExactly: (f: string, x: number | string, varName: string) => {
+    const ce: ComputeEngine = new ComputeEngine();
+    const mathJSON: BoxedExpression = ce.parse(f);
+    let stringExpr: string = mathJSON.valueOf() as string;
+    if (stringExpr[0] !== '[') {
+      stringExpr = "[ " + stringExpr + "]";
+    }
+    const expr: MathExpression | MathExpression[] = JSON.parse(stringExpr);
+    return ce.box(Utilities.substitute(x, varName, expr)).evaluate().json;  
   }
 }

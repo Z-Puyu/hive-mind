@@ -10,8 +10,11 @@ import { MathJaxContext } from "better-react-mathjax";
 import { mathjaxConfig } from "./config/MathJax";
 import Registration from "./pages/Registration";
 import ResetPassword from "./pages/ResetPassword";
+import { ComputeEngine } from "@cortex-js/compute-engine";
+import { Utilities } from "./utils/Utilities";
 
 export default function App(): JSX.Element {
+  console.log(Utilities.evaluate("\\sin{1/x}", 1, "x"))
   return (
     <div
       className="webpage"

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@cortex-js/compute-engine": "^0.12.3",
     "@dnd-kit/core": "^6.0.8",
     "@dnd-kit/sortable": "^7.0.2",
     "@emotion/css": "^11.11.2",
@@ -19,6 +20,7 @@
     "@types/react-dom": "^18.2.4",
     "ahooks": "^3.7.7",
     "better-react-mathjax": "^2.0.2",
+    "evaluatex": "^2.2.0",
     "firebase": "^9.22.2",
     "is-hotkey": "^0.2.0",
     "is-url": "^1.2.4",
@@ -61,6 +63,7 @@
     ]
   },
   "devDependencies": {
+    "@types/evaluatex": "^2.2.4",
     "@types/is-url": "^1.2.30"
   }
 }
