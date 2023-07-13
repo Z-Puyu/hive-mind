@@ -3,6 +3,8 @@ import { FirebaseApp, getApp, getApps, initializeApp } from "firebase/app";
 import { Analytics, getAnalytics } from "firebase/analytics";
 import { DocumentData, Firestore, Query, QuerySnapshot, addDoc, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, serverTimestamp, setDoc, where } from "firebase/firestore"
 import { Auth, createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile, User, UserCredential } from "firebase/auth";
+import { FirebaseStorage, StorageReference, UploadResult, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { NavigateFunction, useNavigate } from "react-router";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -25,6 +27,7 @@ const analytics: Analytics = getAnalytics(app);
 export const auth: Auth = getAuth(app);
 export const googleProvider: GoogleAuthProvider = new GoogleAuthProvider();
 export const db: Firestore = getFirestore(app);
+export const storage: FirebaseStorage = getStorage()
 
 // Authentication functions
 /**
@@ -65,6 +68,7 @@ export const signUp = async (userName: string, email: string, password: string) 
     });
     // We have to also update the profile for the new user to get the user's info displayed.
     await updateProfile(user, {
+      photoURL: await getDownloadURL(ref(storage, "defaultUserAvatar/defaultUserAvatar.jpg")),
       displayName: userName,
     })
     // Retrieve the example project and load it to the new user's project manager.
@@ -74,9 +78,11 @@ export const signUp = async (userName: string, email: string, password: string) 
           fileName: "Example",
           slateValue: doc.data()?.slateValue,
           timeStamp: serverTimestamp(),
+          owner: user.displayName
         })
       }
     )
+    await signIn(email, password);
   } catch (e: unknown) {
     if (e instanceof Error) {
       console.error(e);
@@ -144,4 +150,13 @@ export const signInWithGoogle = async () => {
 
 export const signUserOut = async () => {
   await signOut(auth);
+}
+
+// File-uploading functions
+type Uploadable = Blob | Uint8Array | ArrayBuffer;
+
+export const upload = async (file: Uploadable, user: User) => {
+  const fileRef: StorageReference = ref(storage, "userAvatars/" + user.uid);
+  const snapShot: UploadResult = await uploadBytes(fileRef, file)
+  alert("Uploading completed")
 }

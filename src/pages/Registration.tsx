@@ -23,17 +23,8 @@ export default function Registration() {
   const [password, setPassword] = useState("");
   const [userName, setUserName] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [user, loading, error] = useAuthState(auth);
 
   const navigate: NavigateFunction = useNavigate();
-
-  useEffect(() => {
-    if (!loading) {
-      if (user) {
-        navigate("/dashboard");
-      }
-    }
-  }, [user, loading]);
 
   return (
     <div
@@ -101,7 +92,7 @@ export default function Registration() {
             margin: "1em 0",
             textTransform: "none",
           }}
-          onClick={() => signUp(userName, email, password)}
+          onClick={() => signUp(userName, email, password).then(() => navigate("/dashboard"))}
         >
           Register
         </Button>
