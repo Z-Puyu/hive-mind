@@ -3,6 +3,7 @@ import "./App.css";
 import Navbar from "./components/navigation/NavBar";
 import Editor from "./pages/Editor";
 import Dashboard from "./pages/Dashboard";
+import Friends from "./pages/Friends";
 import Login from "./pages/Login";
 import { css } from "@emotion/css";
 import Home from "./pages/Home";
@@ -33,6 +34,7 @@ export default function App(): JSX.Element {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/friends" element={<Friends />} />
               <Route path="/authentication" element={<Login />} />
               <Route path="/register" element={<Registration />} />
               <Route path="/reset-password" element={<ResetPassword />} />
