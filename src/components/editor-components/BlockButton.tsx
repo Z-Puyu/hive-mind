@@ -39,8 +39,6 @@ export default function BlockButton(props: BlockButtonProps): JSX.Element {
     event.preventDefault();
     if (props.blockType === "heading") {
       props.onClick!(event)
-    } else if (props.blockType === "thm") {
-      
     }
   }
 

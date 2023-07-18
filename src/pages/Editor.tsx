@@ -155,6 +155,7 @@ export default function Editor(): JSX.Element | null {
   const activeElement: Descendant | undefined = editor.children
     .find(child => (child as Element).id === activeId);
 
+  // Get current user.
   useEffect(() => onAuthStateChanged(auth, user => {
     if (user) {
       const currDoc: DocumentReference<DocumentData> = doc(db, "userProjects",
@@ -166,6 +167,8 @@ export default function Editor(): JSX.Element | null {
       })
     }
   }), [])
+
+  useEffect(() => TypesetUtil.updateHeadingIndexes(editor), [editor.children]);
 
   if (!initVal) {
     return null;
@@ -195,7 +198,6 @@ export default function Editor(): JSX.Element | null {
         to: [overIndex]
       });
     }
-
     setActiveId(null);
   };
 

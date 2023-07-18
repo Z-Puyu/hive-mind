@@ -49,12 +49,12 @@ export const TypesetUtil = {
     const newListOfHeadings: HeadingElem[] = [...listOfHeadings];
     let partIndex: number = 1;
     let sectionIndex: number[] = [0, 0, 0, 0];
-    if (listOfHeadings[0].level === "subsection" || listOfHeadings[0].level === "subsubsection") {
+    if (listOfHeadings.length > 0 && (listOfHeadings[0].level === "subsection"
+      || listOfHeadings[0].level === "subsubsection")) {
       newListOfHeadings[0] = { ...listOfHeadings[0], level: "section" };
     }
     for (let i: number = 0; i < listOfHeadings.length; i += 1) {
       switch (newListOfHeadings[i].level) {
-
         case "part":
           Transforms.setNodes(
             editor,
