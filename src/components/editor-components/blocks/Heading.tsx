@@ -1,10 +1,10 @@
-import { 
-  FormatBoldSharp, 
-  FormatItalicSharp, 
-  FormatClearSharp, 
-  FormatUnderlinedSharp, 
-  FormatStrikethroughSharp, 
-  CodeSharp 
+import {
+  FormatBoldSharp,
+  FormatItalicSharp,
+  FormatClearSharp,
+  FormatUnderlinedSharp,
+  FormatStrikethroughSharp,
+  CodeSharp
 } from "@mui/icons-material";
 import { Toolbar, Divider } from "@mui/material";
 import { RenderElementProps, useSelected } from "slate-react";
@@ -15,49 +15,22 @@ import FormatButton from "../FormatButton";
 import MathButton from "../MathButton";
 import ToggleLinkButton from "../ToggleLinkButton";
 
+const HEADING_STYLES: { [type: string]: { fontSize: string } } = {
+  "part": { fontSize: "24.88pt" },
+  "chapter": { fontSize: "24.88pt" },
+  "section": { fontSize: "17.28pt" },
+  "subsection": { fontSize: "14.4pt" },
+  "subsubsection": { fontSize: "12pt" },
+}
+
 export default function Heading(props: RenderElementProps) {
   const isSelected: boolean = useSelected();
-
-  let styles: { [key: string]: string };
-  switch ((props.element as HeadingElem).level) {
-    case "part":
-      styles = {
-        fontSize: "24.88pt",
-      };
-      break;
-    case "chapter":
-      styles = {
-        fontSize: "24.88pt",
-      };
-      break;
-    case "section":
-      styles = {
-        fontSize: "17.28pt",
-      };
-      break;
-    case "subsection":
-      styles = {
-        fontSize: "14.4pt",
-      };
-      break;
-    case "subsubsection":
-      styles = {
-        fontSize: "12pt",
-      };
-      break;
-    default:
-      styles = {
-        fontSize: "17.28pt",
-      };
-      break;
-  }
 
   return (
     <TextCard>
       {isSelected
         ? <section contentEditable="false">
           <Toolbar>
-            <FormatButton mark="bold" icon={<FormatBoldSharp />} />
             <FormatButton mark="italic" icon={<FormatItalicSharp />} />
             <FormatButton mark="roman" icon={<FormatClearSharp />} />
             <FormatButton mark="underline" icon={<FormatUnderlinedSharp />} />
@@ -71,7 +44,7 @@ export default function Heading(props: RenderElementProps) {
         </section>
         : null}
       <Paragraph attributes={props.attributes}>
-        <h1 style={styles}>
+        <h1 style={HEADING_STYLES[(props.element as HeadingElem).level]}>
           {props.children}
         </h1>
       </Paragraph>

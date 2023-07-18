@@ -2,6 +2,7 @@ import { useSlate } from "slate-react";
 import { TypesetUtil } from "../../utils/TypesetUtil";
 import { Editor } from "slate";
 import { css } from "@emotion/css";
+import { Button } from "@mui/material";
 
 interface BlockButtonProps {
   blockType: string;
@@ -11,24 +12,30 @@ interface BlockButtonProps {
 
 export default function BlockButton(props: BlockButtonProps): JSX.Element {
   const editor: Editor = useSlate();
-  const isActive: boolean = TypesetUtil.isBlockActive(editor, props.blockType);
+  const isActive: boolean = TypesetUtil.isBlockActive(editor, props.blockType, props.thmStyle);
 
   const onPointerDownHandler = (event: React.PointerEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    TypesetUtil.toggleBlock(editor, props.blockType, props.thmStyle);
+    if (!isActive) {
+      TypesetUtil.toggleBlock(editor, props.blockType, props.thmStyle);
+    } else {
+      TypesetUtil.toggleBlock(editor, "paragraph");
+    }
   };
 
   return (
-    <span
-      className={css`
-        cursor: pointer;
-        color: ${isActive ? "black" : "gray"};
-        margin-right: 0.25em;
-        margin-bottom: 0.25em;
-      `}
+    <Button
+      variant="contained"
+      sx={{
+        backgroundColor: isActive ? "rgb(225, 225, 225)" : "white",
+        color: isActive ? "black" : "gray",
+        ":hover": {
+          backgroundColor: "rgb(192, 192, 192)"
+        }
+      }}
       onPointerDown={onPointerDownHandler}
     >
       {props.icon}
-    </span>
+    </Button>
   );
 };

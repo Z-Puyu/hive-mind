@@ -1,5 +1,5 @@
 import { Editor, Text, Element, Transforms, Range, Node } from "slate";
-import { MathElem } from "./CustomSlateTypes";
+import { MathElem, ThmElem } from "./CustomSlateTypes";
 import { nanoid } from "nanoid";
 
 export const TypesetUtil = {
@@ -21,14 +21,17 @@ export const TypesetUtil = {
     }
   },
 
-  isBlockActive: (editor: Editor, blockType: string) => {
+  isBlockActive: (editor: Editor, blockType: string, thmStyle?: string) => {
     const { selection } = editor;
-    if (!!selection) {
+    if (selection) {
       // If a selection exists, we check if it contains any block with the matching type.
       const [matchingBlock] = Array.from(
         Editor.nodes(editor, {
           at: Editor.unhangRange(editor, selection),
-          match: n => !Editor.isEditor(n) && Element.isElement(n) && n.type === blockType,
+          match: n => !Editor.isEditor(n)
+            && Element.isElement(n)
+            && ((n.type === "thm" && (n as ThmElem).style === thmStyle)
+              || (n.type !== "thm" && n.type === blockType)),
         })
       );
       return !!matchingBlock;
