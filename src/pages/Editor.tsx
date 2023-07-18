@@ -166,9 +166,9 @@ export default function Editor(): JSX.Element | null {
         setInitVal(slateValue);
       })
     }
-  }), [])
-
+  }), []);
   useEffect(() => TypesetUtil.updateHeadingIndexes(editor), [editor.children]);
+  useEffect(() => TypesetUtil.updateThmIndexes(editor), [editor.children]);
 
   if (!initVal) {
     return null;
@@ -224,6 +224,7 @@ export default function Editor(): JSX.Element | null {
           break;
         case "Backspace":
           if (editor.selection?.anchor.offset === 1) {
+            console.log("unwrap")
             Transforms.unwrapNodes(
               editor,
               { at: SlateEditor.parent(editor, editor.selection.anchor)[1] },

@@ -18,7 +18,9 @@ const TOOLTIPS: { [key: string]: string } = {
   "quote": "Quote",
   "dfn": "Definition",
   "thm": "Theorem",
-  "remark": "Remark"
+  "remark": "Remark",
+  "eg": "Example",
+  "problem": "Problem"
 }
 
 export default function BlockButton(props: BlockButtonProps): JSX.Element {
@@ -39,6 +41,8 @@ export default function BlockButton(props: BlockButtonProps): JSX.Element {
     event.preventDefault();
     if (props.blockType === "heading") {
       props.onClick!(event)
+    } else if (props.blockType === "thm") {
+      TypesetUtil.updateThmIndexes(editor);
     }
   }
 

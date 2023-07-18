@@ -43,6 +43,46 @@ export const TypesetUtil = {
     return false;
   },
 
+  updateThmIndexes: (editor: Editor) => {
+    const listOfThms: ThmElem[] = editor.children
+      .filter(child => (child as Element).type === "thm") as ThmElem[];
+    let thmIndex: number = 1;
+    let currSection: string = "";
+    for (const thm of listOfThms) {
+      let closestSection: HeadingElem | null = null;
+      for (let i: number = editor.children.indexOf(thm); i >= 0; i -= 1) {
+        if ((editor.children[i] as Element).type === "heading") {
+          closestSection = editor.children[i] as HeadingElem;
+          break;
+        }
+      }
+      if (!closestSection || closestSection.level === "part") {
+        Transforms.setNodes(editor, { index: `${thmIndex}` },
+          { at: ReactEditor.findPath(editor, thm) });
+      } else if (closestSection.level === "chapter") {
+        const activeSection: string = closestSection.index!.split(" ")[1];
+        if (activeSection !== currSection) {
+          currSection = closestSection.index!.split(" ")[1]
+          thmIndex = 1;
+        }
+        Transforms.setNodes(editor, { 
+          index: `${currSection}.${thmIndex}` 
+        }, { at: ReactEditor.findPath(editor, thm) });
+      } else {
+        const sectionIndex: string[] = closestSection.index!.split(".");
+        const activeSection: string = `${sectionIndex[0]}.${sectionIndex[1].trim()}`
+        if (activeSection !== currSection) {
+          currSection = activeSection;
+          thmIndex = 1;
+        }
+        Transforms.setNodes(editor, { 
+          index: `${currSection}.${thmIndex}`
+        }, { at: ReactEditor.findPath(editor, thm) });
+      }
+      thmIndex += 1;
+    }
+  },
+
   updateHeadingIndexes: (editor: Editor) => {
     const listOfHeadings: HeadingElem[] = editor.children
       .filter(child => (child as Element).type === "heading") as HeadingElem[];
@@ -58,7 +98,7 @@ export const TypesetUtil = {
         case "part":
           Transforms.setNodes(
             editor,
-            { level: "part", index: `Part ${Utilities.romanise(partIndex)} ` },
+            { level: "part", index: `Part ${Utilities.romanise(partIndex)}   ` },
             { at: ReactEditor.findPath(editor, listOfHeadings[i]) }
           )
           if (i + 1 < listOfHeadings.length && (listOfHeadings[i + 1].level === "subsection"
@@ -72,7 +112,7 @@ export const TypesetUtil = {
           sectionIndex = [sectionIndex[0] + 1, 0, 0, 0];
           Transforms.setNodes(
             editor,
-            { level: "chapter", index: `Chapter ${sectionIndex[0]} ` },
+            { level: "chapter", index: `Chapter ${sectionIndex[0]}   ` },
             { at: ReactEditor.findPath(editor, listOfHeadings[i]) }
           )
           if (i + 1 < listOfHeadings.length && (listOfHeadings[i + 1].level === "subsection"
@@ -86,8 +126,8 @@ export const TypesetUtil = {
             editor,
             {
               level: "section", index: sectionIndex[0] === 0
-                ? `${sectionIndex[1]} `
-                : `${sectionIndex[0]}.${sectionIndex[1]} `
+                ? `${sectionIndex[1]}   `
+                : `${sectionIndex[0]}.${sectionIndex[1]}   `
             },
             { at: ReactEditor.findPath(editor, listOfHeadings[i]) }
           )
@@ -101,8 +141,8 @@ export const TypesetUtil = {
             editor,
             {
               level: "subsection", index: sectionIndex[0] === 0
-                ? `${sectionIndex[1]}.${sectionIndex[2]} `
-                : `${sectionIndex[0]}.${sectionIndex[1]}.${sectionIndex[2]} `
+                ? `${sectionIndex[1]}.${sectionIndex[2]}   `
+                : `${sectionIndex[0]}.${sectionIndex[1]}.${sectionIndex[2]}   `
             },
             { at: ReactEditor.findPath(editor, listOfHeadings[i]) }
           )
@@ -114,8 +154,8 @@ export const TypesetUtil = {
             {
               level: "subsubsection",
               index: sectionIndex[0] === 0
-                ? `${sectionIndex[1]}.${sectionIndex[2]}.${sectionIndex[3]} `
-                : `${sectionIndex[0]}.${sectionIndex[1]}.${sectionIndex[2]}.${sectionIndex[3]} `
+                ? `${sectionIndex[1]}.${sectionIndex[2]}.${sectionIndex[3]}   `
+                : `${sectionIndex[0]}.${sectionIndex[1]}.${sectionIndex[2]}.${sectionIndex[3]}   `
             },
             { at: ReactEditor.findPath(editor, listOfHeadings[i]) }
           )
