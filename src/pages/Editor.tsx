@@ -363,7 +363,7 @@ export default function Editor(): JSX.Element | null {
         const optionalArgs = [
           item.blockType === "thm" ? item.name : undefined
         ]
-        TypesetUtil.toggleBlock(editor, item.blockType, ...optionalArgs);
+        TypesetUtil.toggleBlock(editor, item.blockType, { ...optionalArgs });
       }
     }
     setSelectMenuItems(INIT_BLOCK_TYPES);

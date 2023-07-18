@@ -45,6 +45,7 @@ export default function Heading(props: RenderElementProps) {
         : null}
       <Paragraph attributes={props.attributes}>
         <h1 style={HEADING_STYLES[(props.element as HeadingElem).level]}>
+          <span contentEditable="false">{(props.element as HeadingElem).index}</span>
           {props.children}
         </h1>
       </Paragraph>

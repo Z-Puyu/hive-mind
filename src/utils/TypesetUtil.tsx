@@ -1,6 +1,8 @@
 import { Editor, Text, Element, Transforms, Range, Node } from "slate";
-import { MathElem, ThmElem } from "./CustomSlateTypes";
+import { HeadingElem, MathElem, ThmElem } from "./CustomSlateTypes";
 import { nanoid } from "nanoid";
+import { Utilities } from "./Utilities";
+import { ReactEditor } from "slate-react";
 
 export const TypesetUtil = {
   isMarkActive: (editor: Editor, mark: keyof Omit<Text, "text">) => {
@@ -21,7 +23,7 @@ export const TypesetUtil = {
     }
   },
 
-  isBlockActive: (editor: Editor, blockType: string, thmStyle?: string) => {
+  isBlockActive: (editor: Editor, blockType: string, optionalProps?: { [key: string]: any }) => {
     const { selection } = editor;
     if (selection) {
       // If a selection exists, we check if it contains any block with the matching type.
@@ -30,8 +32,10 @@ export const TypesetUtil = {
           at: Editor.unhangRange(editor, selection),
           match: n => !Editor.isEditor(n)
             && Element.isElement(n)
-            && ((n.type === "thm" && (n as ThmElem).style === thmStyle)
-              || (n.type !== "thm" && n.type === blockType)),
+            && ((n.type === "thm" && (n as ThmElem).style === optionalProps?.thmStyle)
+              || (n.type !== "thm" && n.type === blockType))
+            && ((n.type === "heading" && (n as HeadingElem).level === optionalProps?.headingLevel)
+              || (n.type !== "heading" && n.type === blockType)),
         })
       );
       return !!matchingBlock;
@@ -39,18 +43,102 @@ export const TypesetUtil = {
     return false;
   },
 
-  toggleBlock: (editor: Editor, blockType: string, thmStyle?: string) => {
+  updateHeadingIndexes: (editor: Editor) => {
+    const listOfHeadings: HeadingElem[] = editor.children
+      .filter(child => (child as Element).type === "heading") as HeadingElem[];
+    const newListOfHeadings: HeadingElem[] = [...listOfHeadings];
+    let partIndex: number = 1;
+    let sectionIndex: number[] = [0, 0, 0, 0];
+    if (listOfHeadings[0].level === "subsection" || listOfHeadings[0].level === "subsubsection") {
+      newListOfHeadings[0] = { ...listOfHeadings[0], level: "section" };
+    }
+    for (let i: number = 0; i < listOfHeadings.length; i += 1) {
+      switch (newListOfHeadings[i].level) {
+
+        case "part":
+          Transforms.setNodes(
+            editor,
+            { level: "part", index: `Part ${Utilities.romanise(partIndex)} ` },
+            { at: ReactEditor.findPath(editor, listOfHeadings[i]) }
+          )
+          if (i + 1 < listOfHeadings.length && (listOfHeadings[i + 1].level === "subsection"
+            || listOfHeadings[i + 1].level === "subsubsection")) {
+            newListOfHeadings[i + 1] = { ...listOfHeadings[i + 1], level: "section" }
+          }
+          sectionIndex = [0, 0, 0, 0];
+          partIndex += 1;
+          break;
+        case "chapter":
+          sectionIndex = [sectionIndex[0] + 1, 0, 0, 0];
+          Transforms.setNodes(
+            editor,
+            { level: "chapter", index: `Chapter ${sectionIndex[0]} ` },
+            { at: ReactEditor.findPath(editor, listOfHeadings[i]) }
+          )
+          if (i + 1 < listOfHeadings.length && (listOfHeadings[i + 1].level === "subsection"
+            || listOfHeadings[i + 1].level === "subsubsection")) {
+            newListOfHeadings[i + 1] = { ...listOfHeadings[i + 1], level: "section" }
+          }
+          break;
+        case "section":
+          sectionIndex = [sectionIndex[0], sectionIndex[1] + 1, 0, 0];
+          Transforms.setNodes(
+            editor,
+            {
+              level: "section", index: sectionIndex[0] === 0
+                ? `${sectionIndex[1]} `
+                : `${sectionIndex[0]}.${sectionIndex[1]} `
+            },
+            { at: ReactEditor.findPath(editor, listOfHeadings[i]) }
+          )
+          if (i + 1 < listOfHeadings.length && listOfHeadings[i + 1].level === "subsubsection") {
+            newListOfHeadings[i + 1] = { ...listOfHeadings[i + 1], level: "subsection" }
+          }
+          break;
+        case "subsection":
+          sectionIndex = [sectionIndex[0], sectionIndex[1], sectionIndex[2] + 1, 0];
+          Transforms.setNodes(
+            editor,
+            {
+              level: "subsection", index: sectionIndex[0] === 0
+                ? `${sectionIndex[1]}.${sectionIndex[2]} `
+                : `${sectionIndex[0]}.${sectionIndex[1]}.${sectionIndex[2]} `
+            },
+            { at: ReactEditor.findPath(editor, listOfHeadings[i]) }
+          )
+          break;
+        case "subsubsection":
+          sectionIndex = [sectionIndex[0], sectionIndex[1], sectionIndex[2], sectionIndex[3] + 1];
+          Transforms.setNodes(
+            editor,
+            {
+              level: "subsubsection",
+              index: sectionIndex[0] === 0
+                ? `${sectionIndex[1]}.${sectionIndex[2]}.${sectionIndex[3]} `
+                : `${sectionIndex[0]}.${sectionIndex[1]}.${sectionIndex[2]}.${sectionIndex[3]} `
+            },
+            { at: ReactEditor.findPath(editor, listOfHeadings[i]) }
+          )
+          break;
+        default:
+          break;
+      }
+    }
+    console.log(editor.children
+      .filter(child => (child as Element).type === "heading"))
+  },
+
+  toggleBlock: (editor: Editor, blockType: string, optionalProps?: { [key: string]: any }) => {
     let newProperties: Partial<Element>;
-    if (TypesetUtil.isBlockActive(editor, blockType) && blockType !== "thm") {
+    if (TypesetUtil.isBlockActive(editor, blockType, optionalProps)) {
       newProperties = {
         type: "paragraph",
       };
     } else {
       newProperties = {
         type: blockType,
-        style: thmStyle && ["thm", "dfn", "remark", "eg", "problem"].includes(thmStyle)
-          ? thmStyle as "thm" | "dfn" | "remark" | "eg" | "problem"
-          : undefined,
+        style: optionalProps?.thmStyle,
+        level: optionalProps?.headingLevel
       };
     }
     Transforms.setNodes(editor, newProperties);
