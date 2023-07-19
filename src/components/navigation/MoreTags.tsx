@@ -12,8 +12,6 @@ interface MoreTagsProps {
 export default function MoreTags(props: MoreTagsProps) {
   const cardRef = useRef<HTMLDivElement | null>(null);
 
-  console.log(props.tagList)
-
   return (
     <Portal container={document.body}>
       <Card

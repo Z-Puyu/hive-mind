@@ -59,8 +59,6 @@ export default function MatrixMaker(props: MatrixMakerProps) {
 
   const texRef: React.RefObject<HTMLElement> = useRef<HTMLElement>(null);
 
-  console.log(editor.selection);
-
   const updateMatrixData = (i: number, j: number, data: string, which?: "Secondary") => {
     if (which === "Secondary") {
       const updatedData: string[][] = JSON.parse(JSON.stringify(matrixDataSec));

@@ -164,8 +164,6 @@ export const TypesetUtil = {
           break;
       }
     }
-    console.log(editor.children
-      .filter(child => (child as Element).type === "heading"))
   },
 
   toggleBlock: (editor: Editor, blockType: string, optionalProps?: { [key: string]: any }) => {

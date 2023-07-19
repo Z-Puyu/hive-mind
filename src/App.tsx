@@ -3,16 +3,12 @@ import "./App.css";
 import Navbar from "./components/navigation/NavBar";
 import Editor from "./pages/Editor";
 import Dashboard from "./pages/Dashboard";
-import Friends from "./pages/Friends";
 import Login from "./pages/Login";
-import { css } from "@emotion/css";
 import Home from "./pages/Home";
 import { MathJaxContext } from "better-react-mathjax";
 import { mathjaxConfig } from "./config/MathJax";
 import Registration from "./pages/Registration";
 import ResetPassword from "./pages/ResetPassword";
-import { ComputeEngine } from "@cortex-js/compute-engine";
-import { Utilities } from "./utils/Utilities";
 import UserProfile from "./pages/UserProfile";
 
 export default function App(): JSX.Element {
@@ -34,12 +30,11 @@ export default function App(): JSX.Element {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/friends" element={<Friends />} />
               <Route path="/authentication" element={<Login />} />
               <Route path="/register" element={<Registration />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/user-profile" element={<UserProfile />} />
-              <Route path="/editor/:status/:userId/:projId" element={<Editor />} />
+              <Route path="/editor/:userId/:ownerId/:projId" element={<Editor />} />
               <Route path="*" element={<h1>PAGE NOT FOUND</h1>} />
             </Routes>
           </div>

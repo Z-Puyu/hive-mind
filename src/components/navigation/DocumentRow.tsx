@@ -31,6 +31,7 @@ import MoreTags from "./MoreTags";
 
 interface DocumentRowProps {
   docData: DocumentData;
+  userId: string;
   onSelect: () => void;
   onRemove: () => void;
   isChecked: boolean;
@@ -87,7 +88,7 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
         component="th"
         scope="row"
         padding="none"
-        onClick={() => navigate(`/Editor/${props.docData.isShared ? "share" : "my-projects"}/${props.docData.user}/${props.docData.id}`)}
+        onClick={() => navigate(`/Editor/${props.userId}/${props.docData.user}/${props.docData.id}`)}
         sx={{
           cursor: "pointer"
         }}

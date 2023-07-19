@@ -102,7 +102,6 @@ export default function Dashboard(): JSX.Element | null {
         docsSnap => {
           const currDocs: DocumentData[] = [];
           docsSnap.forEach(doc => currDocs.push({ ...doc.data(), user: user.uid, id: doc.id }));
-          console.log(currDocs)
           setDocsData(currDocs);
         },
       );
@@ -264,7 +263,6 @@ export default function Dashboard(): JSX.Element | null {
   }
 
   const onSearchUsersHandler = (substr: string) => {
-    console.log(substr)
     if (substr === "") {
       setFriendList([]);
     }
@@ -290,6 +288,7 @@ export default function Dashboard(): JSX.Element | null {
       setDocsData(updatedDocsData);
       updateDoc(docRef, { coEditors: updatedDoc.coEditors });
       for (const user of collaborators) {
+        console.log(docData.owner)
         addDoc(collection(db, "userProjects", user.uid, "sharedProjects"), {
           fileName: docData.fileName,
           ownerId: currUser.uid,
@@ -304,8 +303,6 @@ export default function Dashboard(): JSX.Element | null {
 
   const visibleDocs = docsData.concat(sharedDocsData).filter(data => isVisibleDoc(data))
     .sort((a, b) => compare(a, b, filter as keyof (typeof a), order));
-
-  console.log(sharedDocsData)
 
   return (
     <div
@@ -516,17 +513,11 @@ export default function Dashboard(): JSX.Element | null {
                 {visibleDocs.map(data => <DocumentRow
                   key={data.id}
                   docData={data}
+                  userId={currUser.uid}
                   onSelect={() => setSelectedDocs(selectedDocs.concat([data]))}
                   onRemove={() => setSelectedDocs(selectedDocs.filter(doc => doc.id !== data.id))}
                   isChecked={selectedDocs.some(doc => doc.id === data.id)}
                 />)}
-                {/* {sharedDocsData.map(data => <DocumentRow
-                  key={data.id}
-                  docData={data}
-                  onSelect={() => console.log("")}
-                  onRemove={() => console.log("")}
-                  isChecked={false}
-                />)} */}
               </TableBody>
             </Table>
           </TableContainer>

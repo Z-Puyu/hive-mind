@@ -60,7 +60,6 @@ export default function BookmarkConfigMenu(props: BookmarkConfigMenuProps) {
     setIsSelectMenuActive(!isSelectMenuActive);
   }
 
-  console.log(bookmarkDest)
   return (
     <>
       <TextField

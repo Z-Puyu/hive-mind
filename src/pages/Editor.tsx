@@ -1,4 +1,4 @@
-import { KeyboardEvent, useCallback, useMemo, useState, useEffect } from "react";
+import { KeyboardEvent, useCallback, useMemo, useState, useEffect, useRef } from "react";
 import { withInline, withBetterBreaks, withNodeUids, withVoids } from "../plugins/SlatePlugins";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import isHotkey, { isKeyHotkey } from "is-hotkey";
@@ -23,7 +23,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../config/Firebase";
 import { Paper, Portal } from "@mui/material";
-import { Auth, getAuth, onAuthStateChanged } from "firebase/auth";
+import { Auth, User, getAuth, onAuthStateChanged } from "firebase/auth";
 import BlockToggler from "../components/editor-components/BlockToggler";
 import {
   UniqueIdentifier,
@@ -40,9 +40,12 @@ import {
   Element,
   Range,
   Text,
+  Operation,
 } from "slate";
 import { withHistory } from "slate-history";
 import { withReact, RenderElementProps, ReactEditor, RenderLeafProps, Slate, Editable } from "slate-react";
+import mitt, { Emitter } from "mitt";
+import { Socket, io } from "socket.io-client";
 
 const INIT_BLOCK_TYPES: { [key: string]: string }[] = [
   {
@@ -111,12 +114,23 @@ const HOTKEYS: { [key: string]: string } = {
   "mod+`": "code",
 };
 
+const emitter: Emitter<Record<string, Operation[]>> = mitt();
+
+const socket: Socket = io("http://localhost:4000");
+
+let hasReceivedRemote: boolean = false;
+
 export default function Editor(): JSX.Element | null {
   const params: Readonly<Params<string>> = useParams();
 
   // Import Firestore.
   const auth: Auth = getAuth();
   const [currDoc, setCurrDoc] = useState<DocumentReference<DocumentData> | null>(null);
+  const [currUser, setCurrUser] = useState<User | null>(null);
+
+  // Initialise data-sending.
+  const id: string = `${params.userId}-#-${params.ownerId}-#-${params.projId}`;
+  const remote = useRef<boolean>(false);
 
   // Initialise Slate editor.
   const [editor] = useState<SlateEditor>(() => withNodeUids(
@@ -158,8 +172,9 @@ export default function Editor(): JSX.Element | null {
   // Get current user.
   useEffect(() => onAuthStateChanged(auth, user => {
     if (user) {
+      setCurrUser(user);
       const currDoc: DocumentReference<DocumentData> = doc(db, "userProjects",
-        params.userId!, "projects", params.projId!);
+        params.ownerId!, "projects", params.projId!);
       setCurrDoc(currDoc);
       getDoc(currDoc).then(doc => {
         const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);
@@ -169,6 +184,23 @@ export default function Editor(): JSX.Element | null {
   }), []);
   useEffect(() => TypesetUtil.updateHeadingIndexes(editor), [editor.children]);
   useEffect(() => TypesetUtil.updateThmIndexes(editor), [editor.children]);
+
+  const hasReceivedChange = useRef<boolean>(false);
+
+  useEffect(() => {
+    socket.on("new-remote-operation", (userId, ownerId, projId, ops) => {
+      const isRemoteChange: boolean = userId !== params.userId
+        && ownerId === params.ownerId
+        && projId === params.projId;
+      console.log(isRemoteChange ? "remote change from" + userId : "Not a remote change from server")
+      if (isRemoteChange && !hasReceivedChange.current) {
+        remote.current = true;
+        hasReceivedChange.current = true;
+        console.log(JSON.parse(ops))
+        JSON.parse(ops).forEach((op: Operation) => editor.apply(op))
+      }
+    })
+  }, [])
 
   if (!initVal) {
     return null;
@@ -224,7 +256,6 @@ export default function Editor(): JSX.Element | null {
           break;
         case "Backspace":
           if (editor.selection?.anchor.offset === 1) {
-            console.log("unwrap")
             Transforms.unwrapNodes(
               editor,
               { at: SlateEditor.parent(editor, editor.selection.anchor)[1] },
@@ -378,12 +409,17 @@ export default function Editor(): JSX.Element | null {
     setSelectMenuIsOpen(false);
   };
 
-  // This can be a very expensive operation... Need to find ways to optimise.
   const autoSave = (value: Descendant[]) => {
-    const isAtChange = editor.operations.some(
+    // The editor's contents have altered if the operation is 
+    // something other than changing cursor selection.
+    const ops: Operation[] = editor.operations.filter(
       op => "set_selection" !== op.type
     );
-    if (isAtChange) {
+    if (ops.length > 0) {
+      console.log(remote.current ? "change is from remote" : "change is local")
+      if (!remote.current) {
+        socket.emit("new-operation", params.userId, params.ownerId, params.projId, JSON.stringify(ops));
+      }
       updateDoc(currDoc!, {
         slateValue: JSON.stringify(value.map(node => {
           const newNode: Descendant = {
@@ -394,6 +430,8 @@ export default function Editor(): JSX.Element | null {
         })),
         timeStamp: serverTimestamp(),
       });
+      remote.current = false;
+      hasReceivedChange.current = false;
     }
   }
 

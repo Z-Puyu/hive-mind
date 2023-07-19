@@ -134,6 +134,7 @@ export const signInWithGoogle = async () => {
           addDoc(collection(db, "userProjects", user.uid, "projects"), {
             fileName: "Example",
             slateValue: doc.data()?.slateValue,
+            owner: user.displayName,
             timeStamp: serverTimestamp(),
           })
         }
