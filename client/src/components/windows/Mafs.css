@@ -1,0 +1,8 @@
+.MafsView {
+  border-radius: 1em;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}

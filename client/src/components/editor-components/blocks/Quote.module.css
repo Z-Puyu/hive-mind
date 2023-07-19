@@ -1,0 +1,18 @@
+.quote {
+  display: block;
+  float: left;
+  width: 80%;
+  text-align: distribute;
+  color: rgb(192, 192, 192);
+  font-family: "Times New Roman";
+  flex-grow: 100;
+  &:hover {
+    background-color: rgba(225, 225, 225, 0.25);
+    transition: background-color 0.5s;
+  }
+}
+
+.quoteContents {
+  border-left: 2.5px solid rgb(175, 175, 175);
+  padding-left: 10px;
+}

@@ -1,0 +1,54 @@
+.userProfileConfig {
+  display: flex;
+  height: fit-content;
+  margin: 2% 20%;
+  color: white;
+}
+
+.overview {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  margin: 2em;
+  text-align: left;
+  align-items: left;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin: 2em;
+  text-align: left;
+  align-items: left;
+}
+
+.avatar {
+  width: 200px;
+  height: 200px;
+  border-radius: 100px;
+  box-shadow: 0px 0px 10px gray;
+  cursor: pointer;
+}
+
+.invisibleButton {
+  display: none;
+}
+
+.userName {
+  color: black;
+  font-weight: bold;
+  font-size: large;
+  margin: 1em 1em 0.25em 1em;
+}
+
+.email {
+  color: gray;
+  font-style: italic;
+  margin: 0.25em 1em;
+}
+
+.msg {
+  color: red;
+  margin: 0.25em 1em;
+}

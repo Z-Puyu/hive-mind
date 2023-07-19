@@ -17,7 +17,6 @@ const io = new Server(server, {
 io.on("connection", socket => {
   console.log("A user has connected");
   socket.on("new-operation", (userId, ownerId, projId, ops) => {
-    console.log("emitting")
     io.emit("new-remote-operation", userId, ownerId, projId, ops)
   });
 });
