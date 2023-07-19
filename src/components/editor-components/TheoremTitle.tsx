@@ -6,6 +6,7 @@ import { useState, useRef } from "react";
 interface TheoremTitleProps {
   style?: "dfn" | "eg" | "problem"
   title?: string;
+  index?: string
 }
 
 export default function TheoremTitle(props: TheoremTitleProps) {
@@ -43,7 +44,7 @@ export default function TheoremTitle(props: TheoremTitleProps) {
         onClick={() => setInputIsVisible(!inputIsVisible)}
       >
         <MathJax inline dynamic>
-          {type + (title ? "(" + title + ")" : "")}
+          {type + " " + (props.index ? props.index : "") + (title ? "(" + title + ")" : "")}
         </MathJax>
       </div>
     </>
