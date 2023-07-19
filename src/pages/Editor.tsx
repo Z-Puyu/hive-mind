@@ -159,7 +159,7 @@ export default function Editor(): JSX.Element | null {
   useEffect(() => onAuthStateChanged(auth, user => {
     if (user) {
       const currDoc: DocumentReference<DocumentData> = doc(db, "userProjects",
-        user.uid, "projects", params.projId!);
+        params.userId!, "projects", params.projId!);
       setCurrDoc(currDoc);
       getDoc(currDoc).then(doc => {
         const slateValue: Descendant[] = JSON.parse(doc.data()?.slateValue);

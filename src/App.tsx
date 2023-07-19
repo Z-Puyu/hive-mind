@@ -39,7 +39,7 @@ export default function App(): JSX.Element {
               <Route path="/register" element={<Registration />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/user-profile" element={<UserProfile />} />
-              <Route path="/editor/:projId" element={<Editor />} />
+              <Route path="/editor/:status/:userId/:projId" element={<Editor />} />
               <Route path="*" element={<h1>PAGE NOT FOUND</h1>} />
             </Routes>
           </div>

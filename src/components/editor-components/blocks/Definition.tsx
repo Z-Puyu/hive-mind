@@ -1,5 +1,6 @@
 import { FormatBoldSharp, FormatItalicSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp, CodeSharp } from "@mui/icons-material";
-import { Divider, Toolbar } from "@mui/material";
+import { Divider } from "@mui/material";
+import Toolbar from "../../../interface/Toolbar";
 import { RenderElementProps, useSelected } from "slate-react";
 import Paragraph from "../../../interface/Paragraph";
 import TextCard from "../../../interface/TextCard";

@@ -120,7 +120,7 @@ export const signInWithGoogle = async () => {
   try {
     const credential: UserCredential = await signInWithPopup(auth, googleProvider);
     const user: User = credential.user;
-    if (!isExistingUser(user)) {
+    if (!await isExistingUser(user)) {
       // First time using this account for log-in. 
       // We have to initialise the user's info as what we do for new user registration.
       await addDoc(collection(db, "users"), {

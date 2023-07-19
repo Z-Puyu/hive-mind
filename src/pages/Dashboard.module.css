@@ -19,3 +19,7 @@
   display: inline-flex;
   align-items: center;
 }
+
+.collaboratorBadge {
+  margin: 0.25em 0.5em;
+}

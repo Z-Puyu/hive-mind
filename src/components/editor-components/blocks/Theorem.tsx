@@ -8,7 +8,8 @@ import {
   CodeSharp,
   FormatItalicSharp
 } from "@mui/icons-material";
-import { Divider, Toolbar } from "@mui/material";
+import { Divider } from "@mui/material";
+import Toolbar from "../../../interface/Toolbar";
 import Paragraph from "../../../interface/Paragraph";
 import { ThmElem } from "../../../utils/CustomSlateTypes";
 import FormatButton from "../FormatButton";

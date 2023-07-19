@@ -62,7 +62,6 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
     } else {
       props.onRemove();
     }
-    /* setIsChecked(!isChecked); */
   }
 
   return (
@@ -88,9 +87,9 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
         component="th"
         scope="row"
         padding="none"
-        onClick={() => navigate(`/Editor/${props.docData.id}`)}
-        sx={{ 
-          cursor: "pointer" 
+        onClick={() => navigate(`/Editor/${props.docData.isShared ? "share" : "my-projects"}/${props.docData.user}/${props.docData.id}`)}
+        sx={{
+          cursor: "pointer"
         }}
       >
         <span
@@ -102,14 +101,14 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
             text-overflow: ellipsis;
           `}
         >
-        {props.docData.fileName}
+          {props.docData.fileName}
         </span>
       </TableCell>
       {isShowingAllTags ? <MoreTags
         anchor={ellipsisRef.current}
         tagList={props.docData.tags?.slice(3)}
       /> : null}
-      <TableCell align="left" sx={{width: "fit-content"}} padding="none">
+      <TableCell align="left" sx={{ width: "fit-content" }} padding="none">
         <span
           className={css`
             display: flex;
@@ -174,10 +173,16 @@ export default function DocumentRow(props: DocumentRowProps): JSX.Element {
             </Button>
           </Box>
         </Modal>
-        <span className={classes.button} onClick={() => setIsRenaming(true)}>
+        <span
+          className={classes.button}
+          onClick={props.docData.isShared ? undefined : () => setIsRenaming(true)}
+        >
           <DriveFileRenameOutlineSharp />
         </span>
-        <span className={classes.button} onClick={() => deleteDoc(currProject)}>
+        <span
+          className={classes.button}
+          onClick={props.docData.isShared ? undefined : () => deleteDoc(currProject)}
+        >
           <DeleteSharp />
         </span>
       </TableCell>

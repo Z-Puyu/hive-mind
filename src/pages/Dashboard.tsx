@@ -3,6 +3,8 @@ import {
   Box,
   Button,
   Checkbox,
+  Chip,
+  ClickAwayListener,
   Divider,
   List,
   ListItem,
@@ -10,7 +12,10 @@ import {
   ListItemIcon,
   ListItemText,
   Menu,
+  MenuItem,
+  MenuList,
   Paper,
+  Popper,
   Table,
   TableBody,
   TableCell,
@@ -22,11 +27,13 @@ import { useEffect, useMemo, useState } from "react";
 import { db } from "../config/Firebase";
 import {
   DocumentData,
+  DocumentReference,
   Query,
   addDoc,
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   onSnapshot,
   orderBy,
@@ -45,12 +52,20 @@ import Colour from "../components/Colour";
 import ProjectManagerHead from "../components/navigation/ProjectManagerHead";
 import compare from "../utils/Comparator";
 import { DeleteOutlineSharp, NoteAddSharp } from "@mui/icons-material";
+import { matchSorter } from "match-sorter";
+import { TypesetUtil } from "../utils/TypesetUtil";
+import FriendCard from "../components/navigation/FriendCard";
 
 export default function Dashboard(): JSX.Element | null {
   const auth: Auth = getAuth();
   const [isAddingDoc, setIsAddingDoc] = useState<boolean>(false);
+  const [isSharingDoc, setIsSharingDoc] = useState<boolean>(false);
+  const [userList, setUserList] = useState<DocumentData[]>([]);
+  const [friendList, setFriendList] = useState<DocumentData[]>([]);
+  const [collaborators, setCollaborators] = useState<DocumentData[]>([]);
   const [newDocName, setNewDocName] = useState<string>("New Project");
   const [docsData, setDocsData] = useState<DocumentData[]>([]);
+  const [sharedDocsData, setSharedDocsData] = useState<DocumentData[]>([]);
   const [tagsData, setTagsData] = useState<DocumentData[]>([]);
   const [activeTags, setActiveTags] = useState<DocumentData[]>([]);
   const [currUser, setCurrUser] = useState<User | null>(null);
@@ -64,6 +79,20 @@ export default function Dashboard(): JSX.Element | null {
     // because the user may not be ready yet when the effect triggers.
     if (user) {
       setCurrUser(user);
+      if (userList.length === 0) {
+        onSnapshot(
+          query(
+            collection(db, "users"),
+            orderBy("name")
+          ),
+          docsSnap => {
+            const allUsers: DocumentData[] = [];
+            docsSnap.forEach(doc => allUsers.push({ ...doc.data() }));
+            setUserList(allUsers);
+          }
+        );
+      }
+      // Get projects owned by the user.
       onSnapshot(
         query(
           collection(db, "userProjects", user.uid, "projects"),
@@ -73,9 +102,36 @@ export default function Dashboard(): JSX.Element | null {
         docsSnap => {
           const currDocs: DocumentData[] = [];
           docsSnap.forEach(doc => currDocs.push({ ...doc.data(), user: user.uid, id: doc.id }));
+          console.log(currDocs)
           setDocsData(currDocs);
         },
-      )
+      );
+
+      // Get projects shared with the user.
+      onSnapshot(
+        query(
+          collection(db, "userProjects", user.uid, "sharedProjects"),
+          orderBy("timeStamp"),
+          orderBy("fileName")
+        ),
+        docsSnap => {
+          const currDocs: DocumentData[] = [];
+          docsSnap.forEach(docSnap => {
+            const data: DocumentData = docSnap.data();
+            getDoc(doc(db, "userProjects", data.ownerId, "projects", data.projId)).then(
+              doc => currDocs.push({ 
+                ...doc.data(), 
+                user: data.ownerId, 
+                id: data.projId,
+                isShared: true
+              })
+            ).then(
+              () => setSharedDocsData(currDocs)
+            )
+          });
+        }
+      );
+
       onSnapshot(
         query(
           collection(db, "userProjects", user.uid, "tags"),
@@ -84,22 +140,13 @@ export default function Dashboard(): JSX.Element | null {
           const currTags: DocumentData[] = [];
           docsSnap.forEach(doc => currTags.push({ ...doc.data(), user: user.uid, id: doc.id }));
           setTagsData(currTags);
-          //   let n = currTags.length;
-          //   let tmp = [];
-          //   for (let i = 0; i < n; i += 1)
-          //   {
-          //     tmp.push(false);
-          //     setIsChecked(tmp);
-          //   }
-          //   //console.log(n);
-          //   //console.log(tmp);
         }
-      )
+      );
     }
   }), []);
 
   // With early return, we avoid unnecessary initialisation of the functions below.
-  if (!currUser) {
+  if (!currUser || !sharedDocsData) {
     return null;
   }
 
@@ -211,8 +258,54 @@ export default function Dashboard(): JSX.Element | null {
       docData.user, "projects", docData.id)))
   }
 
-  const visibleDocs = docsData.filter(data => isVisibleDoc(data))
+  const onShareProjectHandler = () => {
+    setCollaborators([]);
+    setIsSharingDoc(true);
+  }
+
+  const onSearchUsersHandler = (substr: string) => {
+    console.log(substr)
+    if (substr === "") {
+      setFriendList([]);
+    }
+    const matchingUsers: DocumentData[] = matchSorter(
+      userList,
+      substr,
+      {
+        keys: ["email", "name"],
+        threshold: matchSorter.rankings.STARTS_WITH,
+      }
+    );
+    setFriendList(matchingUsers.filter(user => user.email !== currUser.email));
+  }
+
+  const onSetUpSharingHandler = (docs: DocumentData[]) => {
+    for (const docData of docs) {
+      const index: number = docsData.findIndex(doc => doc.id === docData.id);
+      const updatedDocsData: DocumentData[] = [...docsData];
+      const updatedDoc: DocumentData = { ...docsData[index], coEditors: collaborators };
+      updatedDocsData[index] = updatedDoc;
+      const docRef: DocumentReference<DocumentData> = doc(
+        db, "userProjects", currUser.uid, "projects", updatedDoc.id);
+      setDocsData(updatedDocsData);
+      updateDoc(docRef, { coEditors: updatedDoc.coEditors });
+      for (const user of collaborators) {
+        addDoc(collection(db, "userProjects", user.uid, "sharedProjects"), {
+          fileName: docData.fileName,
+          ownerId: currUser.uid,
+          owner: docData.owner,
+          projId: docData.id,
+          timeStamp: docData.timeStamp,
+          tags: []
+        })
+      }
+    }
+  }
+
+  const visibleDocs = docsData.concat(sharedDocsData).filter(data => isVisibleDoc(data))
     .sort((a, b) => compare(a, b, filter as keyof (typeof a), order));
+
+  console.log(sharedDocsData)
 
   return (
     <div
@@ -240,6 +333,16 @@ export default function Dashboard(): JSX.Element | null {
                 <DeleteOutlineSharp sx={{ marginRight: "0.5em" }} />
                 Delete All Selected
               </Button>
+              {selectedDocs.length < 2 ? <Button
+                variant="contained"
+                sx={{
+                  margin: "1em 0.25em",
+                  borderRadius: "5em"
+                }}
+                onClick={() => onShareProjectHandler()}
+              >
+                Share
+              </Button> : null}
               <Button
                 variant="contained"
                 sx={{
@@ -329,6 +432,70 @@ export default function Dashboard(): JSX.Element | null {
               Create Project
             </Button>
           </Modal>
+          <Modal
+            open={isSharingDoc}
+            onClose={() => setIsSharingDoc(false)}
+          >
+            <TextField
+              id="search-users"
+              variant="outlined"
+              placeholder="Search a user by user name or e-mail..."
+              fullWidth
+              margin="normal"
+              onChange={event => onSearchUsersHandler(event.target.value)}
+              onFocus={event => onSearchUsersHandler(event.target.value)}
+            />
+            <section>
+              {collaborators.map(user => <Chip
+                key={user.uid}
+                className={classes.collaboratorBadge}
+                label={user.email}
+                onDelete={() => setCollaborators(collaborators
+                  .filter(collaborator => collaborator.uid !== user.uid))}
+              />)}
+            </section>
+            <Popper
+              style={{
+                zIndex: 2000,
+              }}
+              open={true}
+              anchorEl={document.getElementById("search-users")}
+              disablePortal
+            >
+              <Paper>
+                <ClickAwayListener onClickAway={() => setFriendList([])}>
+                  <MenuList autoFocusItem>
+                    {friendList.filter(friend => !collaborators
+                      .some(collaborator => collaborator.uid === friend.uid)
+                    ).map(friend => <FriendCard
+                      key={friend.uid}
+                      name={friend.name}
+                      email={friend.email}
+                      onClick={() => setCollaborators(collaborators.concat({ ...friend }))}
+                    />)}
+                  </MenuList>
+                </ClickAwayListener>
+              </Paper>
+            </Popper>
+            <Button
+              variant="text"
+              onClick={() => setIsSharingDoc(false)}
+              sx={{
+                margin: "0 0.75em"
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "0 0.75em"
+              }}
+              onClick={() => onSetUpSharingHandler(selectedDocs)}
+            >
+              Share
+            </Button>
+          </Modal>
         </section>
         <section className={css`padding: 0.5em 1em`}>
           <TableContainer>
@@ -353,6 +520,13 @@ export default function Dashboard(): JSX.Element | null {
                   onRemove={() => setSelectedDocs(selectedDocs.filter(doc => doc.id !== data.id))}
                   isChecked={selectedDocs.some(doc => doc.id === data.id)}
                 />)}
+                {/* {sharedDocsData.map(data => <DocumentRow
+                  key={data.id}
+                  docData={data}
+                  onSelect={() => console.log("")}
+                  onRemove={() => console.log("")}
+                  isChecked={false}
+                />)} */}
               </TableBody>
             </Table>
           </TableContainer>
