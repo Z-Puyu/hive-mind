@@ -56,6 +56,7 @@ export type HeadingElem = {
   id: string;
   type: "heading" | null | string;
   level: "part" | "chapter" | "section" | "subsection" | "subsubsection";
+  index?: string;
   children: any[];
 };
 
@@ -72,6 +73,7 @@ export type ThmElem = {
   style: "dfn" | "thm" | "remark" | "eg" | "problem";
   title?: string; 
   withProof?: true;
+  index?: string;
   children: any[];
 };
 

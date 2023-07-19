@@ -1,16 +1,19 @@
 .handle {
   display: block;
-  background-color: rgb(192, 72, 81);
+  background-color: rgba(192, 72, 81);
+  opacity: 0.5;
   float: left;
   width: 2.5%;
   margin: 0 auto 0px 5px;
   flex-grow: 1;
-}
+  cursor: grab;
 
-.transparentHandle {
-  display: block;
-  float: left;
-  width: 2.5%;
-  margin: 0 auto 0px 5px;
-  flex-grow: 1;
+  &:hover {
+    opacity: 1;
+    transition: 0.1s;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
 }

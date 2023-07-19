@@ -3,6 +3,7 @@ import { TypesetUtil } from "../../utils/TypesetUtil"
 import { useSlate } from "slate-react"
 import { css } from "@emotion/css";
 import { BookmarkAddSharp } from "@mui/icons-material";
+import { Tooltip } from "@mui/material";
 
 export default function BookmarkButton(): JSX.Element {
   const editor: Editor = useSlate();
@@ -19,15 +20,17 @@ export default function BookmarkButton(): JSX.Element {
   };
 
   return (
-    <span
-      className={css`
+    <Tooltip title="Bookmark (ctrl + m)" arrow placement="top">
+      <span
+        className={css`
         cursor: pointer;
         color: ${isActive ? "rgb(83, 60, 27)" : "rgb(182, 164, 118)"};
         margin-right: 0.25em;
       `}
-      onPointerDown={onPointerDownHandler}
-    >
-      <BookmarkAddSharp />
-    </span>
+        onPointerDown={onPointerDownHandler}
+      >
+        <BookmarkAddSharp />
+      </span>
+    </Tooltip>
   );
 };
