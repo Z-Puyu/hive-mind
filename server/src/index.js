@@ -25,6 +25,6 @@ io.on("connection", socket => {
   });
 });
 
-server.listen(4000, "https://hive-mind-inky.vercel.app/", () => console.log("listening"));
+server.listen("https://hive-mind-server.vercel.app/", () => console.log("listening"));
 
 module.exports = app;
