@@ -1,4 +1,4 @@
-import { ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper, Portal } from "@mui/material";
+import { ButtonGroup, ClickAwayListener, MenuItem, MenuList, Paper, Popper } from "@mui/material";
 import { CodeSharp, FormatQuoteSharp, QuizSharp, TitleSharp } from "@mui/icons-material";
 import BlockButton from "./BlockButton";
 import classes from "./BlockToggler.module.css";

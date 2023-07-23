@@ -1,9 +1,44 @@
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, getApp, getApps, initializeApp } from "firebase/app";
 import { Analytics, getAnalytics } from "firebase/analytics";
-import { DocumentData, Firestore, Query, QuerySnapshot, addDoc, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, serverTimestamp, setDoc, where } from "firebase/firestore"
-import { Auth, createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile, User, UserCredential } from "firebase/auth";
-import { FirebaseStorage, StorageReference, UploadResult, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { 
+  DocumentData, 
+  Firestore, 
+  Query, 
+  QuerySnapshot, 
+  addDoc, 
+  collection, 
+  doc, 
+  getDoc, 
+  getDocs, 
+  getFirestore, 
+  query, 
+  serverTimestamp, 
+  where 
+} from "firebase/firestore"
+import { 
+  Auth, 
+  createUserWithEmailAndPassword, 
+  getAuth, 
+  GoogleAuthProvider, 
+  sendEmailVerification, 
+  sendPasswordResetEmail, 
+  signInWithEmailAndPassword, 
+  signInWithPopup, 
+  signOut, 
+  updateProfile, 
+  User, 
+  UserCredential 
+} from "firebase/auth";
+import { 
+  FirebaseStorage, 
+  StorageReference, 
+  UploadResult, 
+  getDownloadURL, 
+  getStorage, 
+  ref, 
+  uploadBytes 
+} from "firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 

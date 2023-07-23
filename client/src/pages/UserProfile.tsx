@@ -1,13 +1,12 @@
-import { Box, Button, Card, Divider, TextField } from "@mui/material";
+import { Box, Button, Card, TextField } from "@mui/material";
 import classes from "./UserProfile.module.css"
-import { User, onAuthStateChanged, reload, updateProfile } from "@firebase/auth";
+import { User, onAuthStateChanged, updateProfile } from "@firebase/auth";
 import { useState, useEffect, useRef } from "react";
 import { NavigateFunction, useNavigate } from "react-router";
 import { auth, db, storage, upload } from "../config/Firebase";
 import { getDownloadURL, ref } from "@firebase/storage";
 import { DoneSharp } from "@mui/icons-material";
 import { doc, updateDoc } from "@firebase/firestore";
-import { css } from "@emotion/css";
 
 export default function UserProfile() {
   const [currUser, setCurrUser] = useState<User | null>(null);

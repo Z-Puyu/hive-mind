@@ -18,7 +18,6 @@ import TheoremTitle from "../TheoremTitle";
 import ToggleLinkButton from "../ToggleLinkButton";
 import BookmarkButton from "../BookmarkButton";
 import { css } from "@emotion/css";
-import { MathJax } from "better-react-mathjax";
 
 export default function Theorem(props: RenderElementProps): JSX.Element {
   const isSelected: boolean = useSelected();

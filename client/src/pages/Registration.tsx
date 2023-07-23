@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, signInWithGoogle, signUp } from "../config/Firebase";
+import { useState } from "react";
+import { signInWithGoogle, signUp } from "../config/Firebase";
 import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import { css } from "@emotion/css";
 import {
@@ -17,7 +16,6 @@ import {
 } from "@mui/material";
 import classes from "./AuthenticationPages.module.css";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
-import { valid } from "semver";
 
 const validatePassword = (password: string) => {
   if (password.length < 8 || password.length > 15) {

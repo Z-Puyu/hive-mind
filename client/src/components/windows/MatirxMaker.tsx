@@ -1,10 +1,20 @@
-import { Box, Button, ButtonGroup, Divider, FormControl, FormControlLabel, FormGroup, InputLabel, MenuItem, Select, Switch, TextField } from "@mui/material";
-import Modal from "./Modal";
+import { 
+  Box, 
+  Button, 
+  ButtonGroup, 
+  Divider, 
+  FormControl, 
+  FormControlLabel, 
+  FormGroup, 
+  InputLabel, 
+  MenuItem, 
+  Select, 
+  Switch, 
+} from "@mui/material";
 import { useRef, useState } from "react";
 import { MathJax } from "better-react-mathjax";
 import { css } from "@emotion/css";
 import { Utilities } from "../../utils/Utilities";
-import { RepeatOnOutlined } from "@mui/icons-material";
 import { nanoid } from "nanoid";
 import { Editor, Transforms } from "slate";
 import { useSlate } from "slate-react";

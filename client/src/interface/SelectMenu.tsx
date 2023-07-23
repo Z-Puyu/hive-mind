@@ -1,8 +1,6 @@
 import { css, cx } from "@emotion/css";
 import { Coords } from "../utils/UtilityInterfaces";
 import classes from "./SelectMenu.module.css";
-import { useMouse } from "ahooks";
-import { CursorState } from "ahooks/lib/useMouse";
 import { useRef } from "react";
 
 interface SelectMenuProps {

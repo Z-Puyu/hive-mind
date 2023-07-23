@@ -44,7 +44,6 @@ import {
 } from "slate";
 import { withHistory } from "slate-history";
 import { withReact, RenderElementProps, ReactEditor, RenderLeafProps, Slate, Editable } from "slate-react";
-import mitt, { Emitter } from "mitt";
 import { Socket, io } from "socket.io-client";
 
 const INIT_BLOCK_TYPES: { [key: string]: string }[] = [

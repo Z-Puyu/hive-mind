@@ -1,7 +1,4 @@
 import { BoxedExpression, ComputeEngine } from "@cortex-js/compute-engine";
-import { Expression } from "@cortex-js/compute-engine/dist/types/math-json/math-json-format";
-import { Descendant, Editor, Element } from "slate";
-import { HeadingElem } from "./CustomSlateTypes";
 
 type MathExpression = number | string | MathExpression[];
 
@@ -169,6 +166,4 @@ export const Utilities = {
     }
     return result;
   },
-
-  
-}
+};

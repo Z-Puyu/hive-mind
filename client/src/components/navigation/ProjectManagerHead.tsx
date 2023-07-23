@@ -1,7 +1,6 @@
 import { TableHead, TableRow, TableCell, Checkbox, TableSortLabel } from "@mui/material";
 import { Box } from "@mui/system";
 import { visuallyHidden } from "@mui/utils";
-import { orderBy } from "lodash";
 
 interface ProjectManagerHeadProps {
   numSelected: number;

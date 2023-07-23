@@ -1,9 +1,7 @@
 import { useSlate } from "slate-react";
 import { TypesetUtil } from "../../utils/TypesetUtil";
 import { Editor } from "slate";
-import { css } from "@emotion/css";
-import { Button, ClickAwayListener, MenuItem, MenuList, Popper, Tooltip } from "@mui/material";
-import { useRef, useState } from "react";
+import { Button, Tooltip } from "@mui/material";
 
 interface BlockButtonProps {
   blockType: string;

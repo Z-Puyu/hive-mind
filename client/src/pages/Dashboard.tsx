@@ -18,12 +18,10 @@ import {
   Popper,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
-  TableRow,
   TextField
 } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { db } from "../config/Firebase";
 import {
   DocumentData,
@@ -53,7 +51,6 @@ import ProjectManagerHead from "../components/navigation/ProjectManagerHead";
 import compare from "../utils/Comparator";
 import { DeleteOutlineSharp, NoteAddSharp } from "@mui/icons-material";
 import { matchSorter } from "match-sorter";
-import { TypesetUtil } from "../utils/TypesetUtil";
 import FriendCard from "../components/navigation/FriendCard";
 
 export default function Dashboard(): JSX.Element | null {

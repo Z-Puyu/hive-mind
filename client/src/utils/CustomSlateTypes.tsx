@@ -100,7 +100,7 @@ export type FuncPlotElem = {
   type: "func-plot" | null | string;
   functions: FuncObj[];
   children: any[];
-}
+};
 
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 

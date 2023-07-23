@@ -1,5 +1,4 @@
 import {
-  FormatBoldSharp,
   FormatItalicSharp,
   FormatClearSharp,
   FormatUnderlinedSharp,

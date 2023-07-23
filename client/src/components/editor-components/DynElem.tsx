@@ -19,7 +19,6 @@ import "mafs/core.css";
 import "../windows/Mafs.css";
 import { Utilities } from "../../utils/Utilities";
 import { PLOT_COLOURS } from "../windows/GraphMaker";
-import classes from "./DynElem.module.css";
 
 export default function DynElem(props: RenderElementProps): JSX.Element {
   switch (props.element.type) {

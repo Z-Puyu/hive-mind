@@ -1,6 +1,4 @@
 import classes from "./BlockSelection.module.css";
-import ModalOverlay from "../../interface/ModalOverlay";
-import { css } from "@emotion/css";
 import SelectMenu from "../../interface/SelectMenu";
 import VerticalList from "../../interface/VerticalList";
 import { Coords } from "../../utils/UtilityInterfaces";

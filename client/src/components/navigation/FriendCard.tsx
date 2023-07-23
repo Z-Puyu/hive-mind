@@ -1,4 +1,4 @@
-import { Divider, ListItem, ListItemButton, MenuItem } from "@mui/material";
+import { Divider, ListItem, ListItemButton } from "@mui/material";
 import classes from "./FriendCard.module.css";
 
 interface FriendCardProps {

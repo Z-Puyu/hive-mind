@@ -1,4 +1,4 @@
-import { Editor, Transforms, Element, NodeEntry, Ancestor, Point, Operation, BaseOperation } from "slate";
+import { Editor, Transforms, Element, NodeEntry, Ancestor, Point, BaseOperation } from "slate";
 import isUrl from "is-url";
 import { TypesetUtil } from "../utils/TypesetUtil";
 import { nanoid } from "nanoid";
@@ -109,4 +109,4 @@ export const withVoids = (editor: Editor) => {
   editor.isVoid = (element: Element) => element.type === "func-plot" || isVoid(element);
 
   return editor;
-}
+};

@@ -1,10 +1,8 @@
 import { Box } from "@mui/material";
 import classes from "./Tag.module.css";
-import { css, cx } from "@emotion/css";
+import { css } from "@emotion/css";
 import { DeleteSharp, DriveFileRenameOutlineSharp } from "@mui/icons-material";
-import { DocumentData } from "firebase/firestore";
 import Colour from "../Colour";
-import { useState } from "react";
 
 interface TagProps {
   colour: string;

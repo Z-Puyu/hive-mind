@@ -1,13 +1,11 @@
 import { Link, NavigateFunction } from "react-router-dom";
-import { auth, storage } from "../../config/Firebase";
-import { AuthStateHook, useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../config/Firebase";
 import { signUserOut } from "../../config/Firebase";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import classes from "./NavBar.module.css";
 import { useState, useEffect } from "react";
-import { User, onAuthStateChanged, updateProfile } from "firebase/auth";
-import { getDownloadURL, ref } from "@firebase/storage";
+import { User, onAuthStateChanged } from "firebase/auth";
 
 export default function Navbar(): JSX.Element {
   const [currUser, setCurrUser] = useState<User | null>(null)

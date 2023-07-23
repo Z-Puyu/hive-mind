@@ -1,16 +1,13 @@
 import { css } from "@emotion/css";
-import { Box, Button, List, ListItem, TextField } from "@mui/material";
-import { Coordinates, LaTeX, Mafs, Plot, Text, Theme } from "mafs";
+import { Box, Button, List } from "@mui/material";
+import { Coordinates, Mafs, Plot, Theme } from "mafs";
 import "mafs/core.css";
 import "./Mafs.css";
-import evaluatex from "evaluatex/dist/evaluatex";
 import { useState } from "react";
 import { nanoid } from "nanoid";
 import Function from "../Function";
-import { ComputeEngine } from "@cortex-js/compute-engine";
 import { Utilities } from "../../utils/Utilities";
 import { AddSharp } from "@mui/icons-material";
-import { MathJax } from "better-react-mathjax";
 import "katex/dist/katex.min.css";
 import { Editor, Transforms } from "slate";
 import { useSlate } from "slate-react";

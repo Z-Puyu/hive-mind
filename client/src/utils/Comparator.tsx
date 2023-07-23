@@ -6,4 +6,4 @@ export default function compare<T>(a: T, b: T, orderBy: keyof T, order: "asc" | 
     return order === "desc" ? 1 : -1;
   }
   return 0;
-}
+};

@@ -1,7 +1,7 @@
 import { css } from "@emotion/css";
 import { CheckSharp } from "@mui/icons-material";
-import { Box, Button, ListItem, ListItemText } from "@mui/material";
-import { MathJax, MathJaxContext } from "better-react-mathjax";
+import { Box } from "@mui/material";
+import { MathJax } from "better-react-mathjax";
 import { useState } from "react";
 
 interface FunctionProps {

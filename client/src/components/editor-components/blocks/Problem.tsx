@@ -1,4 +1,11 @@
-import { FormatBoldSharp, FormatItalicSharp, FormatClearSharp, FormatUnderlinedSharp, FormatStrikethroughSharp, CodeSharp } from "@mui/icons-material";
+import { 
+  FormatBoldSharp, 
+  FormatItalicSharp, 
+  FormatClearSharp, 
+  FormatUnderlinedSharp, 
+  FormatStrikethroughSharp, 
+  CodeSharp 
+} from "@mui/icons-material";
 import { Divider } from "@mui/material";
 import Toolbar from "../../../interface/Toolbar";
 import { RenderElementProps, useSelected } from "slate-react";
@@ -10,7 +17,6 @@ import MathButton from "../MathButton";
 import TheoremTitle from "../TheoremTitle";
 import ToggleLinkButton from "../ToggleLinkButton";
 import BookmarkButton from "../BookmarkButton";
-import { MathJax } from "better-react-mathjax";
 import { css } from "@emotion/css";
 
 export default function Problem(props: RenderElementProps): JSX.Element {

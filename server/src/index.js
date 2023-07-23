@@ -5,6 +5,10 @@ const cors = require("cors");
 
 app.use(cors());
 
+app.get('/', (req, res) => {
+  res.send("This is the HiveMind server running!")
+});
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -12,7 +16,7 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST"]
   }
-})
+});
 
 io.on("connection", socket => {
   console.log("A user has connected");
@@ -22,3 +26,5 @@ io.on("connection", socket => {
 });
 
 server.listen(4000, () => console.log("listening on *:4000"));
+
+module.exports = app;
