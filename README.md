@@ -557,22 +557,13 @@ To effectively achieve this goal, though, it requires a higher number of testers
 
 ## Proof-of-concept and Demonstration Project
 
-The [project poster](https://drive.google.com/file/d/1nrOBtsAm5hrHAS1ok_Vsw5_PstDqHmvf/view?usp=drive_link) and [project video](https://drive.google.com/file/d/1e7t9K8qMJnjLR59IZqi6TdiP0apbOAkV/view?usp=drive_link) can be accessed from here.
+The [project poster](https://drive.google.com/file/d/1dL180YuiV-PIWLBDEUgYuJS8fi1AkTxh/view?usp=sharing) and [project video](https://drive.google.com/file/d/1jKPr2qM6JK-PTmRO0F_hU6YwX8UCQqUH/view?usp=sharing) can be accessed from here.
 
-We have also deployed our application [here](https://hive-mind-inky.vercel.app/).
+We have also deployed on Vercel our [main application site](https://hive-mind-inky.vercel.app/) and the [server](https://hive-mind-server.vercel.app/) used for collaborative editing.
 
-On the authentication page, use either a registered e-mail account or Google to log in and be re-directed to the dashboard. After that, create a new project to enter the editor and see the various features implemented there.
+Unfortunately, however, we realise that Vercel does not support WebSockets, which means that our server, though successfully deployed, cannot function normally to send and receive data between collaborator accounts for shared projects in our application. *This has been totally out of our expectation so we did not have any time to deal with the issue, and so for the time being, running the server and the application on the localhost seems to be the only way to test the collaboration feature.*
 
-The production build now includes the following main features:
-
-- Rich-text formatting using toolbar or hotkeys.
-- Press "\$" to activate mathematical mode and input inline $\LaTeX$.
-- Type a backslash to activate the slash command menu to toggle block types.
-- Drag and drop the top-level blocks to re-order paragraphs.
-- Animated styling to enhance user interactions.
-- Auto-saving of editor contents.
-
-Follow the example project which will be automatically generated on successful user registration to discover more.
+On the authentication page, use either a registered e-mail account or Google to log in and be re-directed to the dashboard. After that, there should be an example project where you can view and test out the various functionalities of our editor.
 
 ## Timeline and Development Plan
 

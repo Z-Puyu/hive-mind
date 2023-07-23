@@ -442,6 +442,9 @@ export default function Dashboard(): JSX.Element | null {
             open={isSharingDoc}
             onClose={() => setIsSharingDoc(false)}
           >
+            <p>
+              Please note that as of the current deployed version, real-time syncing of collaborative projects is yet to be fully supported due to Vercel's inability to use WebSockets.
+            </p>
             <TextField
               id="search-users"
               variant="outlined"
