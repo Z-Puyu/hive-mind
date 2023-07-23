@@ -25,6 +25,6 @@ io.on("connection", socket => {
   });
 });
 
-server.listen("https://hive-mind-server.vercel.app/", () => console.log("listening"));
+server.listen(4000, () => console.log("listening on port: 4000"));
 
 module.exports = app;

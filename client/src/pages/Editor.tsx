@@ -133,7 +133,7 @@ const HOTKEYS: { [key: string]: string } = {
   "mod+`": "code",
 };
 
-const socket: Socket = io("https://hive-mind-server.vercel.app/");
+const socket: Socket = io("http://localhost:4000");
 
 export default function Editor(): JSX.Element | null {
   const params: Readonly<Params<string>> = useParams();
