@@ -1,0 +1,40 @@
+.tag {
+  display: flex;
+  color: white;
+  align-items: center;
+  margin: 0.25em 0.5em;
+  padding: 0 0.5em;
+  border-radius: 0.25em;
+  cursor: pointer;
+  &:hover {
+    background-color: rgb(62, 56, 65);
+    transition: 0.1s;
+  }
+}
+
+.selectedTag {
+  display: flex;
+  color: white;
+  background-color: rgba(62, 56, 65, 0.5);
+  align-items: center;
+  margin: 0.25em 0.5em;
+  padding: 0 0.5em;
+  border-radius: 0.25em;
+  cursor: pointer;
+  &:hover {
+    background-color: rgb(62, 56, 65);
+    transition: 0.1s;
+  }
+}
+
+.pin {
+  width: 15px;
+  height: 15px;
+  border-radius: 7.5px;
+}
+
+.text {
+  flex: 1;
+  text-align: left;
+  padding-left: 1em;
+}

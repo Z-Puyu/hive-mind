@@ -1,0 +1,43 @@
+.navBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background-color: rgb(20, 35, 52);
+  margin: none;
+  padding: 1em;
+  box-shadow: 0 10px 20px rgb(0, 0, 0, 0.25);
+  z-index: 800;
+}
+
+.links {
+  text-align: center;
+  margin-right: 50px;
+}
+
+.links a {
+  color: rgb(255, 255, 255);
+  text-decoration: none;
+  border-bottom: 3px solid rgb(255, 255, 255);
+  padding-bottom: 2px;
+  margin: 10px;
+}
+
+.user {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 50px;
+  cursor: pointer;
+}
+
+.user p {
+  font-size: 15px;
+  margin-right: 10px;
+  color: #ffffff;
+}
+
+.user img {
+  width: 30px;
+  margin-right: 10px;
+  border-radius: 50%;
+}

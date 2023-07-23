@@ -147,15 +147,21 @@ This mechanism has been implemented using **dnd-kit**. We chose to use this pack
 
 - Second, dnd-kit allows all draggable components to be wrapped in its context provider. This means we can easily build a universal mechanism which is general enough to be extended onto every component we add to our application, thus reducing repetitive work. These context providers can then be nested, which means we can achieve different drag-and-drop behaviours for different blocks by simply overriding certain properties or methods without the need to write separate logic.
 
-To ensure that the editor keeps track of the order of TeXBoxes correctly, we assign each TeXBox with a unique ID, so that the editor identifies each element to be rendered using this ID instead of an array index which changes frequently under the drag-and-drop setting.
+To ensure that the editor keeps track of the order of TeXBoxes correctly, we assign each TeXBox a unique ID, so that the editor identifies each element to be rendered using this ID instead of an array index which changes frequently under the drag-and-drop setting.
 
-#### [Future Plan]
+##### Automatic Numbering of Headings
 
-On to the next phase, we should continuously incorporate more formatting options into our editor. The most important items include (ordered and unordered) lists and proofs. Other than those, text colouring and shading might also be useful functionalities to add in.
+An important feature that makes an editor feels "smart" is the ability to automatically index all headings and sub-headings in a properly formatted way. In our case, since we expect people who regularly use $\LaTeX$ to use our application, we also wish to implement this in a way which is similar to the original $\LaTeX$ logic.
 
-We should finish building the indexing mechanics for heading blocks as soon as possible. The indexes of headings should be static so as to be compatible with our drag-and-drop feature, meaning that no matter how the user decides to re-order the headings, their indexes should always stay in numerical order (i.e. dragging "Chapter 1" and placing it after "Chapter 3" will only change the texts in the titles and not the numbering).
+Imitating the behaviour of $\LaTeX$, we configured 5 different header levels - namely **Part, Chapter, Section, Sub-section** and **Sub-sub-section**, in the order of descending importance and font sizes. Among these, parts are labelled using **Roman** numerals, while the others follow the format of `chapter + "." + section + "." + subsection + "." subsubsection` for indexing (so in the form like Section 1.3 or Sub-sub-section 1.4.3.2).
 
-The theorems and definitions should be implemented with a similar behaviour and have their indexes automatically generated based on their locations in the document. For instance, if the user inserts a definition block under Section 1.2, the definition will have a default title of "Definition 1.2.x" where *x* is the number of definitions in the same section before this new definition plus one, and dragging and dropping theorems and definitions should not disrupt this numbering.
+We achieve auto-numbering of these headers using the following way: every time the top-level nodes of the document updates, a utility function will fire, which interates all top-level nodes and retrieve all headers from there. After that, the function iteratively set the node properties of these header nodes to label them with the correct indexes. As such, the auto-indexing will be compatible with drag-and-drop.
+
+Doing this has its pitfalls: the order of the headings does not necessarily change when the document nodes alter. For example, appending a new paragraph to the end of the document does not add new headings nor shift existing ones around. However, our utility function will still fire nonetheless to re-calculate the headers' indexes which will essentially be identical. Therefore, we have compromised some efficiency due to these redundant calculations.
+
+On the other hand, we still decided to keep it this way despite this known issue because we realise that a more efficient algorithm may grow in syntax complexity drastically, which makes it more bug-prone and less easy to debug. Meanwhile, despite the redundancies, our original algorithm is still bounded by $O(n)$, so the marginal benefit of optimising would be minimal.
+
+Regarding theorems, definitions, examples and problems, the numbering of these blocks is achieved with a similar algorithm but with a small tweak. For each of the theorem blocks retrieved from the document nodes, we will locate the first **section header** before it. If this theorem is the $n$-th theorem block in that section, its index is determined by `sectionIndex + n`. So for instance, the 2nd theorem under section 1.3 is labelled as Theorem 1.3.2, and the 5th problem under section 2.2 is labelled as Problem 2.2.5.
 
 #### [Potential Addtions]
 
@@ -168,6 +174,8 @@ Here we list a few good-to-have features:
 3. "Transfer Station" which hosts temporary copies of blocks deemed potentially useful by the user, such that the user can retrieve them directly from the station to paste in the appropriate position without needing to browse back and forth to search for the blocks. 
 
 4. Ability to chain up neighbouring blocks and move them around together.
+
+However, it is unlikely that we have sufficient time to implement these nice features due to their complexity and the fact that our team have to prioritise on other essential functionalities of the application first.
 
 ### Intuitive and Smooth User-Interface Interactions
 
@@ -191,6 +199,8 @@ However, $\LaTeX$ cannot be rendered in the browser in the same way as texts and
 In searching for an alternative, an inspiration struck: instead of using an **inline display + hovering input box**, can we switch them and use an **inline input + hovering preview box** instead? Following this idea, we rebuilt the input mechanics for $\LaTeX$ such that the user can insert a $\LaTeX$ block by either clicking the math-mode tooltip button or pressing "\$", after which the user can directly type in $\LaTeX$ code. Since $\LaTeX$ code consists of just regular characters, it can be typed just like any other normal text. This $\LaTeX$ code then gets automatically wrapped inside an inline element, from which a hovering box will pop up to display the rendering result of the code. 
 
 When the user completed, he or she can return to normal text mode by simply moving the caret away from the inline element containing the $\LaTeX$ code, which will then be replaced by the rendered mathematics. Note that in this implementation, the $\LaTeX$ component is no longer read-only but an **editable inline element**. This means that it can be selected and focused in the regular way. Therefore, when the user moves the caret into the inline mathematics, the $\LaTeX$ code will become visible and the preview box will appear again automatically, and mouse clicking is no longer necessary.
+
+In the newest version, we have also added support for more environments for displayed mathematics, so that the user can input things like systems of equations, matrices and multi-line expressions with ease.
 
 ##### Hotkeys and Toolbar
 
@@ -240,13 +250,7 @@ Initially, we planned to design most of the UI components from scratch. However,
 
 Therefore, we decided to switch to a UI library instead. We have chosen to use MUI to build our user interface. This decision was mainly because MUI by default uses Emotion to style its components, which we had already been using earlier in many of our own components, so it would be easier to migrate those components to newer versions based on MUI. Furthermore, MUI has a minimalistic design which suits the overall theme of our application's aesthetics.
 
-#### [Future Plan]
-
-We will keep updating the hotkey bindings and tooltip buttons to synchronise with new formatting options added. For $\LaTeX$ input, we wish to upgrade it such that toggling math mode with texts selected will wrap the selected texts into $\LaTeX$ environment.
-
-We would also continue to improve the various interactions and hotkeys with regard to webpage navigation. We expect this to be a continuous and long-term process in a sense that new interactions and UI components will be implemented wherever and whenever they are deemed appropriate.
-
-Regarding the UI, we would continue rebuilding all of our interface components with MUI and simplify the code structures by removing unnecessary abstractions and reducing nesting of components as much as possible. 
+By now, we have mostly finished migrating to MUI framework. Additionally, we also implemented some animations which add semantic indications to these UI components. For example, a floating tooltip will appear when the user hovers the cursor on a button in the editor's toolbar containing a short description of the button's function and its hotkey; hovering the cursor on the drag-and-drop event listener will change its opacity, while the cursor changes to the grabbing form to hint user interactions; select menu items and various buttons will change colours based on the current state of activation to serve as a better visual guide to the user.
 
 ### Real-time Rendering of $\LaTeX$ Contents
 
@@ -271,9 +275,7 @@ We have employed the **better-mathjax-react** Node package to help implement $\L
 
 We wished to improve further such that the rendered mathematics only updates when the $\LaTeX$ statements in the input area is legal and complete. Otherwise, the mathematics displayed remains the same as before the change in $\LaTeX$ code. The intent of this proposed improvement was to prevent the user from seeing flashes of incomplete rendering or error messages from $\LaTeX$ compiler. However, "better-mathjax-react" is engineered with the technical pitfall where only static contents are allowed if we were to configure the rendering process to be such, i.e. the user will not be able to edit the $\LaTeX$ code to be rendered once it is initialised. Therefore, we had to discard this idea.
 
-#### [Future Plan]
-
-We would reuse the same mechanism when we implement displayed mathematics such as equation blocks. Another aspect worth taking note of is that $\LaTeX$ environments may be required or useful in other components, such as wrappings for theorems, definitions and proofs.
+We have also made use of the $\LaTeX$ rendering mechanism to add an optional proof section for theorem blocks, which can be activated with a slash command.
 
 ### Hyperlink between Notes Components
 
@@ -293,11 +295,11 @@ Currently, the user can insert *bookmarks* which are read-only inline elements b
 
 Double-clicking on a bookmark calls up a configuration menu where the user can customise all three attributes by simply editing in the corresponding input fields. The destination section has an extra filter which will display all matching bookmarks from a drop-down menu filtered based on the current user input. For example, if the user has typed in "abc" in the input, then only bookmarks whose titles start with "abc" will show up for selection. This allows the user to locate and select the target bookmark faster.
 
-The destination is by default **bi-lateral**, meaning that once bookmark A is defined with its destination as bookmark B, bookmark B will automatically be updated to have bookmark A as its destination as well. This means that clicking on these two bookmarks allows the user to quickly toggle back and forth between the two sections.
+The linkage relation is by default **symmetric**, meaning that once bookmark A is defined with its destination as bookmark B, bookmark B will automatically be updated to have bookmark A as its destination as well. This means that clicking on these two bookmarks allows the user to quickly toggle back and forth between the two sections.
 
-#### [Future Plan]
+#### [Potential Additions]
 
-We would continue exploring to see whether there is an efficient way to upgrade the bookmark linkage such that an arbitrary number of bookmarks can be linked.
+We could continue exploring to see whether there is an efficient way to upgrade the bookmark linkage such that an arbitrary number of bookmarks can be linked.
 
 Furthermore, a new inspiration derived from working on the bookmark and hyperlink feature is an **index page** for notes. Based on the headings present in the current notes, we could build a mechanism that auto-generates an index page at the very beginning of the document, where each entry is hyperlinked with the corresponding heading. This hyperlink should behave very similar to the current bookmark feature we have implemented.
 
@@ -311,6 +313,38 @@ Making beautiful graphs and diagrams with $\LaTeX$ can have a very steep learnin
 - Tables
 - 2D graphs
 - Geometric diagrams
+
+#### [Current Progress]
+
+This has been a particularly challenging feature to build throughout the project, and while we have managed to implement the core functionalities, the overall result has not been satisfactory.
+
+##### Matrix Builder
+
+The matrix builder has been implemented the most comprehensively. The user can type in the size of the matrix and fill in the entries in a grid, while the output will be displayed in a preview box in real time. We managed to add three quality-of-life improvements to this seemingly simple system which aim to suit some niche but important demands for people who need to input matrices frequently. First, the matrix builder offers an option to generate a grid for an *augmented* matrix, which can be toggled on and off with a switch. Second, there is a select menu from which the user can *change the delimiters* of the matrix between parentheses, square brackets, curly braces, modulus and norm. Third, we provide a series of buttons to instantly perform some special matrix transformations, which are:
+
+- Produce an identity matrix of the given size.
+
+- Produce a zero matrix of the given size.
+
+- Change the current matrix to an upper- or lower-triangular matrix.
+
+- Change the current matrix to a diagonal matrix.
+
+- Transpose the current matrix.
+
+After the user is done with creating the matrix, clicking on the insert button will add the matrix as a display math block into the editor. While it is still fully possible to type in a matrix manually using the `array` environments of $\LaTeX$, the matrix builder offers a more visual framework to create matrices more efficiently.
+
+##### Function Plotter
+
+Originally, we planned to make use of the `tikz` $\LaTeX$ package to build our function plotter. Unfortunately, however, this package is not compatible with MathJax which is essential to display $\LaTeX$ in the browser. This almost put us into a dead end as most libraries for creating charts and diagrams focus on Microsoft-style illustrations rather than mathematically precise and professional graphs.
+
+Luckily, there is still a library which we have found to be usable, which is **Mafs.js**. However, this library is far from being optimal for our use case as what it does is to map a **JavaScript function** to a mathematical plot, and so we have to find a way to first convert $\LaTeX$ syntaxes into a JavaScript function.
+
+During our search, we finally decided to use **Cortex.js** and in particular, its **ComputeEngine** library. The logic of Cortex.js is to represent a mathematical operation with a tuple containing the names of the operator and the operands. For instance, the JavaScript function `Math.sin(x)` or equivalently in $\LaTeX$, `\sin(x)` is represented using `["sin", "x"]`. Naturally, these tuples can be nested in to what is known as a **MathJSON** object to represent composed functions. For example, the MathJSON object `["add", ["multiply", ["divide", 1, "x"], ["sin", "x"]], 5]` represents the function `Math.sin(x) / x + 5`. By using MathJSON as a bridge, we can convert a user input string written in $\LaTeX$ into an executable JavaScript function, which can be then passed in to Mafs.js to plot the function.
+
+While we managed to get the plotter working, there are huge pitfalls with the current implementation. The evaluation of a MathJSON object is extremely expensive as we have to recursively replace of occurrences of `"x"` in the nested tuple with the value to be substituted in. For any mathematical expression with reasonable complexity, the corresponding MathJSON can already have a very high degree of nesting, not to mention the sheer number of values we have to substitute into the MathJSON to plot the graph. As a result, the behaviour of our function plotter has been very slow and laggy, and so far we have not found a viable alternative to implement it.
+
+Moreover, the internal implementation details of the Math.js library has determined that it only accepts pure strings as label texts, which means there is no way we can label the plotted functions with accurate mathematical texts. Due to these prominent issues, we decided to postpone the implementation for geometric diagram maker indefinitely.
 
 ### Project Management System
 
@@ -326,9 +360,23 @@ We chose to use Firestore to build our back-end server for data storage.
 
 ##### User Authentication:
 
-Currently, we have built the authentication page. The user can choose to register and log in with an e-mail and a password, or sign in with a Google account. To register a new account, the user inputs his or her user name, an e-mail address and a password. We have implemented simple validation rules for the user e-mail (it has to be a string in the form of <span>x@y&#8203;.z</span>) and password (it has to be at least 8 characters long). If the user input does not pass the validation checks, a helper text will be displayed under the input field.
+Currently, we have built the authentication page. The user can choose to register and log in with an e-mail and a password, or sign in with a Google account. To register a new account, the user inputs his or her user name, an e-mail address and a password. 
+
+We have implemented validation rules for user registration as follows:
+
+1. The user name may be identical to someone else's.
+
+2. However, the user e-mail must be **unique** to every user, a registered e-mail cannot be used by a new user again.
+
+3. The password must contain at least 8 characters, including at least one alphabet and at least one number.
+
+4. The user needs to repeat the password to check if two password inputs match.
+
+If the user input does not pass the validation checks, the registration will fail and a helper text will be displayed under the input field. After submitting validated registration data, a verification e-mail will be sent to the registered e-mail address. Once the user has verified the e-mail address, he or she can then enter the application's dashboard.
 
 After successful registration, the user will be automatically signed in. Afterwards, the user can use the registered e-mail and password to log in any time. If the user forgets his or her password, he or she can request a password-reset e-mail be sent to a designated e-mail address.
+
+The user's avatar and user name will be displayed in a badge in the navigation bar. Clicking it will direct the user to his or her profile settings where he or she can edit the user name, change the avatar icon or add a short personal description.
 
 We store all the user information under the "users" collection in Firestore. When a user logs in, we first query the database for documents under the collection which has the same ID as the current user credential (for Google sign-in) ot the same user e-mail (for regular e-mail and password sign-in). If such documents do not exist, we follow up by adding a new document containing the current user's information to the "users" collection. If the user has successfully logged in, we will redirect him or her to the Dashboard. Otherwise, the website will alert the user with an error message.
 
@@ -336,29 +384,29 @@ We store all the user information under the "users" collection in Firestore. Whe
 
 On Firestore, we created a "userProjects" collection, which contains all users that have been registered with our application. Each user points to a sub-collection named "projects" where all the projects owned by the user are stored. Once the user is directed to the Dashboard, he or she will see the project manager. The application will send a request to the database to retrieve the data of all of the user's projects and display them as entries of a vertical list. 
 
-Currently, every entry will display the project name and date of last update, and the projects are ranked in order of last update time by default. Clicking on the entry will re-direct the user to the editor page with the corresponding project loaded. All changes of project contents thereafter will be automatically saved in real time to the database.
+Currently, every entry will display the file name, tags, owner's user name and the date of last update of the project, and the projects are ranked in order of last update time by default. Alternatively, the user can also rank the projects by file name or owner's user name. Clicking on the corresponding table heading cell switches between ascending and descending ranking. Clicking on the entry will re-direct the user to the editor page with the corresponding project loaded. All changes of project contents thereafter will be automatically saved in real time to the database.
 
 The user can click on the "Create New Project" button to set up a new project, which pops up a window for the user to enter the project name. On pressing "confirm" button, the application will first check the validity of the project name. If the project name is empty or is the same as another existing project, the webpage will alert the user with a message. Otherwise, the new project will be created successfully and its data will be send to the database.
 
-The user can also rename or delete a project by clicking on the corresponding button beside the entry in the manager. When renaming, the same validation process for project name applies.
+The user can also rename or delete a project by clicking on the corresponding button beside the entry in the manager. When renaming, the same validation process for project name applies. 
 
 To help new users quickly learn the various features of our application, their project manager will have a default example project on successful registration.
 
-#### [Future Plan]
+##### Tag Management
 
-Currently, the project manager is not very interesting as only the most basic actions about file management have been implemented. In the next phase of development, we will extend the project manager with the following additions:
+The user may group several projects together using **tags**. To create a new tag, the user needs to click on the "New Tag" button and gives the tag a unique name and a colour. After the tags have been created, the user selects the projects to be grouped together by clicking the check boxes beside the project names, and click on the desired tags from a drop-down menu to apply them to (or toggle them off) the selected projects.
 
-1. The user should be able to rank projects differently, such as by file name or by file size. Each ranking method should also have "ascending" and "descending" options.
-
-2. The user should be able to export the projects, for example as PDFs.
-
-3. The time stamp displayed for each project should be more precise to minutes instead of just dates.
-
-4. The "tag" feature should be implemented.
-
-Furthermore, we would continue building on the authentication process. We plan to add other login methods such as Facebook and Github. There should also be a user profile page where the user can configure his or her personal credential such as avatar icon, description, user name, e-mail address etc.
+Once successfully associated, the tags will be displayed beside the projects' name. There is a tag management panel to the left of the project manager, where the user can select one or more tags, so that only the projects containing the selected tags get displayed. 
 
 #### [Potential Additions]
+
+There are some notable additions that we could make to the project management system, for example:
+
+1. The user should be able to export the projects, for example as PDFs.
+
+2. The time stamp displayed for each project should be more precise to minutes instead of just dates.
+
+Furthermore, we would continue building on the authentication process. We plan to add other login methods such as Facebook and Github. 
 
 There are a few potentially complex features that could be added to the project manager. For instance, since our editor supports $\LaTeX$ input, it would be good if a user can import $\LaTeX$ source code, which can then be converted to a project.
 
@@ -374,6 +422,34 @@ What is the point of taking down notes for everything on your own, if your peers
 
 Thus, we propose to incorporate collaborative editing into HiveMind. Users may create and share collectively owned projects to co-edit or conduct group audit, allowing higher efficiency in note-taking as a group. At the same time, this also allows one to take reference or gain insights from the notes written by someone else, after which he or she may find it helpful to copy over the section to his or her own notes.
 
+##### [Current Progress]
+
+We divided the work of this feature into two major parts: first, the user should be able to search for and share a project with other users so that they have the access to edit the same project; second, changes from different users should get synchronised in real time on every collaborator's front-end.
+
+##### Project Sharing
+
+In the dashboard, the user can select a project and click on the "Share" button to grant other users access to editing it. To search for a user, one can either type in the user name or the user's registered e-maill in the search box. Once an input is detected, the application iterates through all user data in Firestore and retrieve the entries with (partially) matching user names and e-mail addresses.
+
+The retrieved users will then be displayed in a drop-down menu under the search box. Clicking on a user will add the user to the collaborator list for the currently selected project. After confirmation, all users in the collaborator list will have access to the project, and the project will show up in their dashboards for them to view and edit it.
+
+##### Group Editing
+
+The group editing feature has not been implemented up to our original expectation due to the internal constraint of the Slate.js library which we have used to build our editor.
+
+Slate.js does not provide built-in support for syncing contents across different instances of its editor, and thus we have to build the synchronisation mechanism on our own. We were faced with two options: we could choose to reload the document nodes once after some fixed time interval, so that the newest contents from Firestore will be retrieved and updated for the current collaborative project; alternatively, we can also monitor the operations applied to the project such as inserting texts or moving paragraphs, and send these operations to the other collaborators and apply them concurrently.
+
+After some contemplation, we resolved that the first option was not feasible as changes could occur very frequently from multiple sources under a collaborative project setting. If we were to update these changes in real time, this would lead to an extremely expensive algorithm, compromising efficiency greatly. On the other hand, if we only refresh the editor after some fixed time interval - say once every 5 seconds - that would severely affect the smoothness of the collaboration.
+
+Therefore, we decided to do the following: when a user applies some change to the document, we detect the type of operation for that change and send it over to all the other users in the collaborator list. Once the operation is received by the other users, it will immediately be applied to their copies of the document. The advantage of this is that compared to monitoring the entire document contents - which could be very extensive - syncing only single operations across multiple editor instances is a *low-cost* operation, which allows us to synchronise contents between different collaborators efficiently in real time.
+
+To achieve this, we incorporated **Socket.io** into our application and built a server with **Express.js** to send and receive data in real time. The detected operations will be sent to the server first, and after the server receives the data, it then broadcasts the data to all other connected users. At the user's side, we first examine the **source** of the incoming data by keeping track of the project's user ID and document ID. If the user ID and document ID are the same for the incoming data and the local project, then we know that the operations contained in the incoming event have occured in the current project. On top of that, if the user ID from the incoming data differs from the current user who received the data, we know that the data is a *remote* change and should be applied to the current document. Otherwise, the user who receives the data is the same as the user who sends it, meaning the change is a *local* one and has already been updated, so it should not be double-counted.
+
+##### [Potential Additions]
+
+In most other collaborative editors, features like decorated cursors to indicate the presence of collaborators and commenting are commonplace. However, these are complex mechanisms which we lack the time to implement from scratch.
+
+We did find a third-party library called *slate-yjs* which incorporates *Y.js* into Slate.js to achieve synchronisation and various decorative features for collaborative editing. However, this library has made significant changes to the structure of the editor component from the original Slate.js and it is therefore difficult to include it into our application without doing a major overhaul. In the future, however, we may rebuild the application using this framework to provide better support for collaborative editing.
+
 ## Tech Stack
 
 1. React.js
@@ -384,9 +460,104 @@ Thus, we propose to incorporate collaborative editing into HiveMind. Users may c
 6. MathJax
 7. $\LaTeX$
 
-## Proof-of-concept
+## Problems Encountered and How We Fixed Them
 
-The [project poster](https://drive.google.com/file/d/1iGHT04W8h5N5H2RU6KsVlVeNxAIIhOCD/view?usp=share_link) and [project video](https://drive.google.com/file/d/11urJgv1n9FsqEqYKHdD4jG00sjB7-DRh/view?usp=share_link) can be accessed from here.
+With both members as complete novices in software development, our team has had a hard time during the initial stages of our project. Though we had to spend much extra time tackling all kinds of issues we have encountered, these have later turned into invaluable learning experiences for us. Here we document several notable and major problems that appeared in the process of our project development.
+
+### The Pain of Re-building the Wheels
+
+Our project aims to tackle a relatively niche issue: **increasing the modularity of digital note-editing with comprehensive** $\LaTeX$ **support.** The one immediate problem we had to face was: there is little resource online that is directly relevant to our development. Most people who need large amount of $\LaTeX$ typesetting will just use a $\LaTeX$ editor or choose to write in Markdown anyways. Therefore, there are very few examples for such a note editor from which we can take reference. As such, we had no choice but to learn from and emulate other types of applications like a regular rich-text editor, which proved to be of great pain.
+
+Our inexperience also led us to being *overly (or naïvely) confident* to the extent that we believed we could achieve our targeted outcome by building everything using plain React alone. We simplistically thought that one contentEditable `<div>` would suffice for building an editor, but the mechanism behind a simple editor appeared far more complicated than it seemsed. We then resolved to using the content-editable Node package, but later realised that a simple and light-weight package like this could not cover our needs at all. As a result, by Milestone 1, only a very small fraction of our plan has been implemented, which was barely kept from breaking apart. It was by then that we realised that we urgently need to seek for a **comprehensive framework** which specifically targets editor development, and we finally found *Slate.js*.
+
+The advantages of Slate.js have been discussed in earlier sections so we shall skip them here. Nevertheless, what happened afterwards proved one important thing to us: *it is always better to adopt a ready-to-use tool than to build the wheels from scratch.* Even if the library does not fit your needs 100%, it would still be way more efficient to improvise using existing tools than to construct everything on our own. 
+
+We managed to rebuild our application from the previous mini-demo within only half a day. Since then, we finally have had a stable foundation for our application that can be easily extended with new functionalities.
+
+### Dilemmas in Design Decisions
+
+We had wished that we could always find the "best" or the "ideal" way to implement every single functionality for our application, but we have been proven wrong. There are times where every possible implementation brings along some seemingly "unacceptable" pitfalls.
+
+The most prominent instance is when we were implementing rendering logic for displayed mathematics. As a jargon for mathematical typesetting, "displayed mathematics" refers to mathematics which occupies its own lines which are disjoint from regular text flow. Examples of displayed mathematics include
+
+$$
+\lim_{n \to \infty}\left(1 + \frac{1}{n}\right)^n = \sum_{n = 0}^\infty \frac{1}{n!} = \mathrm{e}
+$$
+
+and other kinds of often complex mathematical expressions.
+
+You will notice that although displayed mathematics seem to occupy separate "paragraphs", they in reality carry semantic meanings and act as some part of speech in a full sentence. Thus, it is justified to implement displayed mathematics as **nested blocks** within a paragraph. 
+
+However, an issue soon emerged. We noticed that if a paragraph ends with displayed mathematics, an empty line will appear after the mathematics, which makes the gap after that paragraph inconsistently wider. What was worse was that we soon realised that there was practically no solution for it because it was caused by an inherent constraint of Slate.js. Slate.js uses an **empty string** to indicate the end of a top-level block, and since our displayed mathematics took away the full width of the block, Slate.js had to insert that empty string to the next line, leading to the empty line problem.
+
+We then considered re-building the displayed mathematics as its own top-level blocks. However, because the mathematics serves as a part of a complete sentence, this would cause one sentence to be fragmented into three different blocks, which was aesthetically weird. Moreover, as our editor needed to include blocks for theorems, definitions, remarks, solutions and proofs, it would not make sense if those blocks have to split up whenever displayed mathematics needs to be inserted.
+
+Eventually, we decided to compromise. We judged that issues due to empty lines would occur much less frequently as compared to potential broken blocks would do if we make displayed mathematics into top-level blocks. The encounter with such a dilemma has taught us that we often have to weigh the pitfalls between several non-ideal implementations and choose one, rather than to seek a "perfect" solution that is impractical.
+
+### Bugs with the Bookmark Feature
+
+In the features section, we mentioned that we wish to hyperlink important sections with bookmarks such that clicking on them allows the user to jump instantly back and forth between these sections. We planned to achieve this by associating each bookmark with a **destination**, represented by an optional property in the type declaration for the bookmark object.
+
+Initially, we thought that it was the most straight-forward if we just implement the destination as another bookmark object. For example, when marking Bookmark B as the destination for Bookmark A, we simply assign Bookmark B to the destination property of Bookmark A, like this:
+
+```typescript
+// Type declaration
+type Bookmark = {
+    // Other properties
+    dest: Bookmark;
+};
+
+// Bookmark A
+a: Bookmark = {
+    // Other properties
+    dest: b,
+};
+```
+
+If it worked as intended, we could then use the built-in methods of Slate.js to convert the bookmark node in the editor to a DOMNode (or an HTMLElement) and use the `scrollTo` method to perform the jump between sections.
+
+However, we soon noticed a bug: after configuring Bookmarks A and B as such, the linkage between them could not be saved! When we closed the editor and opened it again, the hyperlink between them disappeared and clicking did not work as expected. Moreover, when we tried to re-configure them, we received error messages from time to time.
+
+With some testing, we quickly located the problem. It was because our bookmark hyperlinks represent a **symmetric relation**, meaning that the code above would actually be:
+
+```typescript
+// Type declaration
+type Bookmark = {
+    // Other properties
+    dest: Bookmark;
+};
+
+// Bookmark A
+a: Bookmark = {
+    // Other properties
+    dest: b,
+};
+
+b: Bookmark = {
+    // Other properties
+    dest: a,
+};
+```
+
+Looking at `a`, since the value `b` of its `dest` property is also a Bookmark object, `b` would contain a `dest` property whose value is `a`. This essentially reduced to an infinite loop and cyclic dependency which broke our code.
+
+Hence, we needed another way to store the destination data. We though of using the *paths* of the corresponding bookmark nodes, which are structures provided by Slate.js representing the relative position of a node in an editor with respect to some root node. However, this idea was aborted before it was implemented, as we realised that the path of a node is mutable in our application due to the drag-and-drop mechanism.
+
+This pointed us a direction: we require an *immutable* value to represent and record a bookmark node! We happened to have already such a value associated with every node in the editor: previously when we implement the drag-and-drop logic, the library we used requires that every draggable element should have a unique ID. Therefore, we could just use that unique ID to manage the bookmark hyperlinks. 
+
+Through solving this bug, we have learnt the important lesson that we should always avoid cyclic references in our code, and re-use pre-existing structures to solve problems as much as possible.
+
+### Lack of Sufficient User Testing
+
+As of the current stage, our application has gone through a few rounds of user testing where we as developers as well as some of our friends as users have tried out the application. Through these testings we have managed to spot and fix a number of bugs and problems with our application.
+
+However, through the process we have also discovered another equally important purpose of user testing, which is to open up new inspirations for areas of future improvements or alternative implementations for existing features. Compared to fixing bugs, this can be even more valuable as it helps an application to grow and upgrade in the long term.
+
+To effectively achieve this goal, though, it requires a higher number of testers from a variety of backgrounds, as different users will have vastly contrasting habits when it comes to using an application. In this sense, our testing for the application is still lacking of sufficient testing with a focus for this area.
+
+## Proof-of-concept and Demonstration Project
+
+The [project poster](https://drive.google.com/file/d/1nrOBtsAm5hrHAS1ok_Vsw5_PstDqHmvf/view?usp=drive_link) and [project video](https://drive.google.com/file/d/1e7t9K8qMJnjLR59IZqi6TdiP0apbOAkV/view?usp=drive_link) can be accessed from here.
 
 We have also deployed our application [here](https://hive-mind-inky.vercel.app/).
 
@@ -486,6 +657,42 @@ Every bug spotted should be *immediately* recorded in **Github issues** with the
 > Any other information or contexts that might be relevant to the bug or useful for finding a fix.
 
 The bug reports should then be investigated, after which a comment should be made to the original issue describing the cause of the bug. Once a bug has been fixed, we comment to the corresponding bug report issue to explain the methods and steps taken to tackle it, as well as any change in the application's behaviour after the fix. If after investigating the bug report, it is found that the bug cannot be fixed in a straightforward manner, a comment should also be made to explain the reason behind it and any applicable alternatives to avoid the bug.
+
+### Test Case Design
+
+Since the various features of our application are very closely linked, it is difficult to isolated each component to carry out unit testing. As such, we have chosen to conduct user testing directly once a major feature has been implemented. We focus on the edge cases mainly, as the basic functionalities should already been tested during the development process based on our workflow. For each tester, we would first ask them to freely navigate the application so that we can observe how easy it is for new users to accustom to our UI. Then, we ask them to perform a series of tasks which we deem as somewhat bug-prone, to see if any issue happens. Finally, we ask for their opinions on potential improvements and additions to the application which would be useful.
+
+We now list down a few important test cases:
+
+#### Inline Elements
+
+By default, selecting an inline element and click on its corresponding button will toggle the element off. However, we would like to know what happens if the inline element is:
+
+- partially selected, or
+
+- selected together with another inline element, or
+
+- selected together with formatted plain texts.
+
+To test this, we prepared a mixed sentence. The first one third was plain text, the middle one third was an inline math block while the last on third was a link. We would then select half of the link, select the math block and the link together, and select the plain texts with the math block together respectively to test for the three target issues.
+
+#### Discontinuous Headers
+
+Based on the expected user input, headers should be set up *sequentially* in descending order, meaning that, for example, a sub-subsection only appears directly after a subsection and not a section or a chapter (so there is supposed to be no sudden jumps between header levels). In reality, however, this may not be the case, especially with the drag-and-drop mechanism where it is perfectly legal to move a subsection header such that it is then placed right after a chapter header.
+
+Therefore, we tested this by inserting headers with discontinuous levels and observed their indexing behaviour. We found that if a section does not have higher level headers before it (e.g. when the first header of a document is already a section), it will be labelled as **0.1**, which seems weird and unintuitive. Similar problems also happened for subsections and sub-subsections.
+
+To solve this problem, we added fallback mechanism that will forcefully revert the index to a single number if the above happens. For instance, if the first header of a document is a section, it will be labelled as section **1** rather than section **0.1**. For subsections and sub-subsections, we will forcefully convert them to the next higher level header if they appear disconnected with the other headers. For example, if the first header after a chapter title is a subsection, it is labelled as a **section** rather than a subsection.
+
+#### Illegal User Input
+
+One prominent issue with the matrix builder and function plotter is illegal user input. For example, the user may input things like `y = 2z + 1` for the application to plot when it is supposed to be a function of $x$ against $y$. When using the matrix builder, some user might also accidentally try to generate an identity matrix when the matrix is not a square matrix, or to transpose an augmented matrix which is mathematically meaningless. Such behaviours should be prevented such that they do not crash the application even if they do occur.
+
+We first tested the function plotter. We tried to let it plot `y = s` and fortunately, the libraries we used to build the plotter have built-in mechanisms to address such inputs by not allowing an output graph to be produced. Additionally, we also tested for functions containing special constants like `y = \pi` and `y = x + e`, both of which worked perfectly.
+
+Then, we tested the matrix builder focusing on non-square matrices. As expected, if matrix transformations which are supposed to be exclusive to square matrices get applied to these non-square matrices, bugs will occur, producing incorrect results or crashing the application. As such, we have disabled these transformations when the matrix builder detects that the user has input a size for a non-square matrix.
+
+We followed up by testing the behaviour of the matrix builder when the matrix has empty entries. In particular, we wish to make sure that the preview and exported $\LaTeX$ are still accurate despite the presence of empty entries.
 
 ## Appendix: Coding Convention
 

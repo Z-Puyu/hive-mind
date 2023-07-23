@@ -1,9 +1,0 @@
-.inlineMath {
-  border: 3px;
-  background-color: rgba(205, 209, 211, 1);
-  min-height: 22px;
-  min-width: 50px;
-  white-space: pre;
-  /* Margin is necessary to clearly show the cursor */
-  margin: 0 0.001em;
-}
