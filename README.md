@@ -422,6 +422,34 @@ What is the point of taking down notes for everything on your own, if your peers
 
 Thus, we propose to incorporate collaborative editing into HiveMind. Users may create and share collectively owned projects to co-edit or conduct group audit, allowing higher efficiency in note-taking as a group. At the same time, this also allows one to take reference or gain insights from the notes written by someone else, after which he or she may find it helpful to copy over the section to his or her own notes.
 
+##### [Current Progress]
+
+We divided the work of this feature into two major parts: first, the user should be able to search for and share a project with other users so that they have the access to edit the same project; second, changes from different users should get synchronised in real time on every collaborator's front-end.
+
+##### Project Sharing
+
+In the dashboard, the user can select a project and click on the "Share" button to grant other users access to editing it. To search for a user, one can either type in the user name or the user's registered e-maill in the search box. Once an input is detected, the application iterates through all user data in Firestore and retrieve the entries with (partially) matching user names and e-mail addresses.
+
+The retrieved users will then be displayed in a drop-down menu under the search box. Clicking on a user will add the user to the collaborator list for the currently selected project. After confirmation, all users in the collaborator list will have access to the project, and the project will show up in their dashboards for them to view and edit it.
+
+##### Group Editing
+
+The group editing feature has not been implemented up to our original expectation due to the internal constraint of the Slate.js library which we have used to build our editor.
+
+Slate.js does not provide built-in support for syncing contents across different instances of its editor, and thus we have to build the synchronisation mechanism on our own. We were faced with two options: we could choose to reload the document nodes once after some fixed time interval, so that the newest contents from Firestore will be retrieved and updated for the current collaborative project; alternatively, we can also monitor the operations applied to the project such as inserting texts or moving paragraphs, and send these operations to the other collaborators and apply them concurrently.
+
+After some contemplation, we resolved that the first option was not feasible as changes could occur very frequently from multiple sources under a collaborative project setting. If we were to update these changes in real time, this would lead to an extremely expensive algorithm, compromising efficiency greatly. On the other hand, if we only refresh the editor after some fixed time interval - say once every 5 seconds - that would severely affect the smoothness of the collaboration.
+
+Therefore, we decided to do the following: when a user applies some change to the document, we detect the type of operation for that change and send it over to all the other users in the collaborator list. Once the operation is received by the other users, it will immediately be applied to their copies of the document. The advantage of this is that compared to monitoring the entire document contents - which could be very extensive - syncing only single operations across multiple editor instances is a *low-cost* operation, which allows us to synchronise contents between different collaborators efficiently in real time.
+
+To achieve this, we incorporated **Socket.io** into our application and built a server with **Express.js** to send and receive data in real time. The detected operations will be sent to the server first, and after the server receives the data, it then broadcasts the data to all other connected users. At the user's side, we first examine the **source** of the incoming data by keeping track of the project's user ID and document ID. If the user ID and document ID are the same for the incoming data and the local project, then we know that the operations contained in the incoming event have occured in the current project. On top of that, if the user ID from the incoming data differs from the current user who received the data, we know that the data is a *remote* change and should be applied to the current document. Otherwise, the user who receives the data is the same as the user who sends it, meaning the change is a *local* one and has already been updated, so it should not be double-counted.
+
+##### [Potential Additions]
+
+In most other collaborative editors, features like decorated cursors to indicate the presence of collaborators and commenting are commonplace. However, these are complex mechanisms which we lack the time to implement from scratch.
+
+We did find a third-party library called *slate-yjs* which incorporates *Y.js* into Slate.js to achieve synchronisation and various decorative features for collaborative editing. However, this library has made significant changes to the structure of the editor component from the original Slate.js and it is therefore difficult to include it into our application without doing a major overhaul. In the future, however, we may rebuild the application using this framework to provide better support for collaborative editing.
+
 ## Tech Stack
 
 1. React.js
@@ -518,6 +546,14 @@ Hence, we needed another way to store the destination data. We though of using t
 This pointed us a direction: we require an *immutable* value to represent and record a bookmark node! We happened to have already such a value associated with every node in the editor: previously when we implement the drag-and-drop logic, the library we used requires that every draggable element should have a unique ID. Therefore, we could just use that unique ID to manage the bookmark hyperlinks. 
 
 Through solving this bug, we have learnt the important lesson that we should always avoid cyclic references in our code, and re-use pre-existing structures to solve problems as much as possible.
+
+### Lack of Sufficient User Testing
+
+As of the current stage, our application has gone through a few rounds of user testing where we as developers as well as some of our friends as users have tried out the application. Through these testings we have managed to spot and fix a number of bugs and problems with our application.
+
+However, through the process we have also discovered another equally important purpose of user testing, which is to open up new inspirations for areas of future improvements or alternative implementations for existing features. Compared to fixing bugs, this can be even more valuable as it helps an application to grow and upgrade in the long term.
+
+To effectively achieve this goal, though, it requires a higher number of testers from a variety of backgrounds, as different users will have vastly contrasting habits when it comes to using an application. In this sense, our testing for the application is still lacking of sufficient testing with a focus for this area.
 
 ## Proof-of-concept and Demonstration Project
 
@@ -657,8 +693,6 @@ We first tested the function plotter. We tried to let it plot `y = s` and fortun
 Then, we tested the matrix builder focusing on non-square matrices. As expected, if matrix transformations which are supposed to be exclusive to square matrices get applied to these non-square matrices, bugs will occur, producing incorrect results or crashing the application. As such, we have disabled these transformations when the matrix builder detects that the user has input a size for a non-square matrix.
 
 We followed up by testing the behaviour of the matrix builder when the matrix has empty entries. In particular, we wish to make sure that the preview and exported $\LaTeX$ are still accurate despite the presence of empty entries.
-
-
 
 ## Appendix: Coding Convention
 
